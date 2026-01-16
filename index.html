@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sheikh Computer – Live Entry System</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+.container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+h2 { text-align: center; color: #333; }
+label { display: block; margin-top: 10px; font-weight: bold; }
+select, input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+th { background: #4CAF50; color: white; }
+button { padding: 10px 20px; margin-top: 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+button:hover { background: #45a049; }
+.login { max-width: 350px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
+#entryDiv { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginDiv" class="login">
+    <h2>শেখ কম্পিউটার লগইন</h2>
+    <label>ইউজারনেম:</label>
+    <input type="text" id="username" placeholder="আপনার নাম লিখুন">
+    <label>পাসওয়ার্ড:</label>
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">লগইন</button>
+    <p id="loginError" style="color:red;"></p>
+</div>
+
+<!-- Entry Page -->
+<div id="entryDiv" class="container">
+    <h2>নতুন এন্ট্রি</h2>
+    <p><strong>Login হয়েছে: </strong><span id="currentUser"></span></p>
+
+    <label>তারিখ ও সময়:</label>
+    <input type="text" id="datetime" readonly>
+
+    <label>ক্যাটাগরি:</label>
+    <select id="category" onchange="populateWork()">
+        <option value="">-- নির্বাচন করুন --</option>
+        <option value="Print">প্রিন্ট</option>
+        <option value="Typing">টাইপিং</option>
+        <option value="Online">অনলাইন</option>
+        <option value="Photocopy">ফটোকপি</option>
+        <option value="Laminating">ল্যামিনেটিং</option>
+    </select>
+
+    <label>কাজ:</label>
+    <select id="work" onchange="setRate()" disabled>
+        <option value="">-- প্রথমে ক্যাটাগরি নির্বাচন করুন --</option>
+    </select>
+
+    <label>পরিমাণ (Qty / Page / Copy):</label>
+    <input type="number" id="quantity" min="1" value="1" oninput="calculateTotalLive()">
+
+    <label>দর (Rate / প্রতি ইউনিট):</label>
+    <input type="number" id="rate" value="0" oninput="calculateTotalLive()">
+
+    <label>মোট (Total):</label>
+    <input type="number" id="total" readonly>
+
+    <label>গ্রাহক কত দিয়েছেন (Taken Amount):</label>
+    <input type="number" id="taken" value="0" oninput="calculateTotalLive()">
+
+    <label>ছাড় (Discount):</label>
+    <input type="number" id="discount" readonly>
+
+    <label>নোট (Optional):</label>
+    <input type="text" id="notes">
+
+    <button onclick="saveEntry()">এন্ট্রি সংরক্ষণ করুন</button>
+
+    <h3>আজকের এন্ট্রি (Live Table)</h3>
+    <table id="entryTable">
+        <thead>
+            <tr>
+                <th>ক্রমিক</th>
+                <th>সময়</th>
+                <th>ক্যাটাগরি</th>
+                <th>কাজ</th>
+                <th>পরিমাণ</th>
+                <th>Rate</th>
+                <th>Total</th>
+                <th>Taken</th>
+                <th>Discount</th>
+                <th>Notes</th>
+                <th>User</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+// Users
+const users = [
+    {username:"admin", password:"admin123"},
+    {username:"owner", password:"owner123"},
+    {username:"roky", password:"roky123"}
+];
+
+// Rate List
+const rates = {
+    "Print": {"A4 প্রিন্ট":10},
+    "Typing": {"আবেদনপত্র":50,"ডিড":150},
+    "Online": {"নতুন NID":100,"NID হালনাগাদ":120,"জন্মসনদ কপি":30,"চাকরির আবেদন":500},
+    "Photocopy": {"কপি":5},
+    "Laminating": {"ল্যামিনেটিং":20}
+};
+
+let currentUser = "";
+let entries = [];
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "PROJECT_ID",
+  storageBucket: "PROJECT_ID.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// Login
+function login() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    const found = users.find(u => u.username === user && u.password === pass);
+    if(found) {
+        currentUser = user;
+        document.getElementById("loginDiv").style.display = "none";
+        document.getElementById("entryDiv").style.display = "block";
+        document.getElementById("currentUser").innerText = currentUser;
+        setDateTime();
+        loadEntries();
+    } else {
+        document.getElementById("loginError").innerText = "ইউজারনেম বা পাসওয়ার্ড ভুল!";
+    }
+}
+
+// Set Date & Time
+function setDateTime() {
+    const now = new Date();
+    document.getElementById("datetime").value = now.toLocaleString("bn-BD");
+}
+
+// Populate Work dropdown
+function populateWork() {
+    const category = document.getElementById("category").value;
+    const workSelect = document.getElementById("work");
+    workSelect.innerHTML = "";
+    if(category && rates[category]) {
+        Object.keys(rates[category]).forEach(w => {
+            const option = document.createElement("option");
+            option.value = w;
+            option.innerText = w;
+            workSelect.appendChild(option);
+        });
+        workSelect.disabled = false;
+    } else {
+        workSelect.disabled = true;
+    }
+    document.getElementById("rate").value = 0;
+    calculateTotalLive();
+}
+
+// Set Rate Auto
+function setRate() {
+    const category = document.getElementById("category").value;
+    const work = document.getElementById("work").value;
+    if(category && work && rates[category][work]) {
+        document.getElementById("rate").value = rates[category][work];
+        calculateTotalLive();
+    }
+}
+
+// Live Total + Discount calculation
+function calculateTotalLive() {
+    const qty = parseFloat(document.getElementById("quantity").value) || 0;
+    const rate = parseFloat(document.getElementById("rate").value) || 0;
+    const taken = parseFloat(document.getElementById("taken").value) || 0;
+    const total = qty * rate;
+    document.getElementById("total").value = total;
+    document.getElementById("discount").value = total - taken;
+}
+
+// Save Entry
+function saveEntry() {
+    const entry = {
+        time: new Date().toLocaleString("bn-BD"),
+        category: document.getElementById("category").value,
+        work: document.getElementById("work").value,
+        quantity: document.getElementById("quantity").value,
+        rate: document.getElementById("rate").value,
+        total: document.getElementById("total").value,
+        taken: document.getElementById("taken").value,
+        discount: document.getElementById("discount").value,
+        notes: document.getElementById("notes").value,
+        user: currentUser
+    };
+    db.ref('entries').push(entry);
+
+    // Reset form
+    document.getElementById("quantity").value = 1;
+    document.getElementById("rate").value = 0;
+    document.getElementById("total").value = 0;
+    document.getElementById("taken").value = 0;
+    document.getElementById("discount").value = 0;
+    document.getElementById("notes").value = "";
+}
+
+// Load live entries
+function loadEntries() {
+    db.ref('entries').on('value', snapshot => {
+        entries = [];
+        snapshot.forEach(child => { entries.push(child.val()); });
+        renderTable();
+    });
+}
+
+// Render Table
+function renderTable() {
+    const tbody = document.querySelector("#entryTable tbody");
+    tbody.innerHTML = "";
+    entries.forEach((e, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${index+1}</td><td>${e.time}</td><td>${e.category}</td><td>${e.work}</td><td>${e.quantity}</td><td>${e.rate}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.discount}</td><td>${e.notes}</td><td>${e.user}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+</script>
+</body>
+</html>
