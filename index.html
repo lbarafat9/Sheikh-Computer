@@ -119,12 +119,9 @@ firebase.initializeApp({
 const db=firebase.database();
 let user="", rates={};
 
-// সেশন চেক (রিফ্রেশ করলে লগইন ধরে রাখার জন্য)
 window.onload = function() {
     const savedUser = localStorage.getItem("loggedInUser");
-    if(savedUser) {
-        setupUser(savedUser);
-    }
+    if(savedUser) { setupUser(savedUser); }
 };
 
 function login(){
@@ -159,7 +156,7 @@ function showSection(id){
 }
 
 function loadRates(){
-    db.ref("rates").on("value",s=>{
+    db.ref("rates").on("value", s => {
         const defaultRates = {
             "Print": {"A4 প্রিন্ট": 10, "কালার": 30},
             "Typing": {"আবেদন": 100, "ডিড": 300},
@@ -167,17 +164,19 @@ function loadRates(){
             "Photocopy": {"কপি": 5},
             "Laminating": {"সাধারণ": 20}
         };
-        rates=s.val()||defaultRates;
-        category.innerHTML="<option value=''>ক্যাটাগরি</option>";
-        Object.keys(rates).forEach(c=>category.innerHTML+=`<option>${c}</option>`);
-        category.innerHTML+=`<option value="add">➕ নতুন ক্যাটাগরি</option>`;
+        const dbData = s.val() || {};
+        rates = { ...defaultRates, ...dbData };
+        
+        category.innerHTML = "<option value=''>ক্যাটাগরি</option>";
+        Object.keys(rates).forEach(c => category.innerHTML += `<option>${c}</option>`);
+        category.innerHTML += `<option value="add">➕ নতুন ক্যাটাগরি</option>`;
     });
 }
 
 function catChange(){
     if(category.value==="add"){
         const c=prompt("নতুন ক্যাটাগরি নাম:");
-        if(c) db.ref("rates/"+c).set({"ডিফল্ট কাজ":0});
+        if(c) db.ref("rates/"+c).set({"নতুন কাজ":0});
         return;
     }
     const cat = category.value;
@@ -219,7 +218,7 @@ function deleteWork(){
 }
 
 function calc(){
-    total.value = qty.value * rate.value;
+    total.value = qty.value * (rate.value || 0);
     loss.value = total.value - (taken.value || 0);
 }
 
