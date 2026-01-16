@@ -3,31 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sheikh Computer</title>
+    <title>শেখ কম্পিউটার ম্যানেজমেন্ট</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        *{box-sizing:border-box;font-family:'Hind Siliguri',sans-serif}
-        body{margin:0;background:#f0f2f5}
-        .en{font-family:Arial}
-        header{background:#4CAF50;color:#fff;padding:15px;text-align:center;font-size:20px;font-weight:bold;display:none;position:fixed;top:0;width:100%;z-index:100}
-        #loginDiv{max-width:400px;margin:120px auto;background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.1);text-align:center}
-        #container{display:none;padding:20px;padding-top:80px;max-width:1200px;margin:auto}
-        input,select,button{width:100%;padding:10px;margin-top:10px;border-radius:6px;border:1px solid #ccc;outline:none}
-        button{background:#4CAF50;color:#fff;font-weight:bold;border:none;cursor:pointer}
-        button:hover{opacity:0.9}
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
-        .card{background:#fff;padding:20px;border-radius:10px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,.05);border-bottom:3px solid #4CAF50}
-        #menuBtn{position:fixed;top:15px;left:15px;font-size:26px;color:#fff;cursor:pointer;display:none;z-index:150}
-        #sidebar{position:fixed;top:0;left:-260px;width:260px;height:100%;background:#2c3e50;color:#fff;transition:.3s;z-index:200;padding-top:20px}
-        #sidebar a{display:block;color:#ecf0f1;text-decoration:none;padding:15px 25px;border-bottom:1px solid #34495e;cursor:pointer}
-        #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);display:none;z-index:150}
-        .section{display:none}
-        .table-box{background:#fff;border-radius:10px;overflow-x:auto;box-shadow:0 2px 5px rgba(0,0,0,.05)}
-        table{width:100%;border-collapse:collapse;min-width:800px}
-        th,td{padding:12px;border-bottom:1px solid #eee;text-align:left}
-        th{background:#f8f9fa}
-        .btn-del{background:#ff4757;padding:5px 10px;width:auto;margin:0;font-size:12px}
-        @media print{header,#menuBtn,#sidebar,#overlay,#loginDiv,.noPrint{display:none!important}#container{padding:0}}
+        *{box-sizing:border-box;font-family:'Hind Siliguri', sans-serif}
+        body{margin:0;background:#f4f7f6;color:#2c3e50}
+        .en{font-family:Arial, sans-serif}
+        
+        header{background:#2ecc71;color:#fff;padding:15px;text-align:center;font-size:22px;font-weight:bold;display:none;position:fixed;top:0;width:100%;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+        
+        #loginDiv{max-width:400px;margin:120px auto;background:#fff;padding:35px;border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,0.1);text-align:center}
+        #container{display:none;padding:20px;padding-top:85px;max-width:1200px;margin:auto}
+        
+        .form-group {margin-bottom: 12px; text-align: left;}
+        .form-group label {display: block; font-weight: 600; margin-bottom: 4px; color: #34495e; font-size: 14px;}
+        
+        input,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;outline:none;transition:0.3s;font-size:15px}
+        input:focus{border-color:#2ecc71}
+        button{background:#2ecc71;color:#fff;font-weight:bold;border:none;cursor:pointer;font-size:16px; margin-top:5px;}
+        button:hover{background:#27ae60}
+        
+        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
+        .card{background:#fff;padding:20px;border-radius:12px;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.05);border-top:4px solid #2ecc71}
+        
+        #menuBtn{position:fixed;top:18px;left:20px;font-size:28px;color:#fff;cursor:pointer;display:none;z-index:150}
+        #sidebar{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#ffffff;transition:.3s;z-index:200;padding-top:20px;box-shadow:2px 0 10px rgba(0,0,0,0.1)}
+        #sidebar a{display:block;color:#34495e;text-decoration:none;padding:15px 25px;border-bottom:1px solid #f1f1f1;cursor:pointer;font-weight:600}
+        #sidebar a:hover{background:#f9f9f9;color:#2ecc71}
+        
+        #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:150}
+        .section{display:none;animation:fadeIn 0.5s}
+        @keyframes fadeIn {from{opacity:0} to{opacity:1}}
+        
+        .table-box{background:#fff;border-radius:12px;overflow-x:auto;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+        table{width:100%;border-collapse:collapse;min-width:600px}
+        th,td{padding:12px;border-bottom:1px solid #f0f0f0;text-align:left}
+        th{background:#f9f9f9;color:#7f8c8d;font-size:13px}
+        
+        .btn-del{background:#e74c3c;padding:5px 10px;width:auto;font-size:12px;border-radius:5px; margin:0;}
+        
+        .cart-box {margin-top:20px; border:2px dashed #2ecc71; padding:15px; border-radius:12px; background:#f9fff9}
+        .cart-item {display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px}
+        
+        #memoModal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:300;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
+        .chart-container{background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+
+        @media print{
+            body *{visibility:hidden}
+            #memoModal, #memoModal *{visibility:visible}
+            #memoModal{position:absolute;left:0;top:0;transform:none;box-shadow:none;width:100%}
+            .noPrint{display:none!important}
+        }
     </style>
 </head>
 <body>
@@ -37,73 +64,145 @@
 <div id="overlay" onclick="closeSidebar()"></div>
 
 <div id="loginDiv">
-    <h2>লগইন করুন</h2>
+    <h2 style="color:#2ecc71">লগইন করুন</h2>
     <input id="uName" placeholder="ইউজারনেম">
     <input id="uPass" type="password" placeholder="পাসওয়ার্ড">
-    <button onclick="login()">লগইন</button>
+    <button onclick="login()">প্রবেশ করুন</button>
 </div>
 
 <div id="container">
     <div id="sidebar">
-        <div style="text-align:right;padding:10px;font-size:28px;cursor:pointer" onclick="closeSidebar()">×</div>
-        <div style="text-align:center;padding-bottom:10px;font-weight:bold" id="userShow"></div>
-        <hr style="border:0;border-top:1px solid #34495e">
+        <div style="text-align:right;padding:15px;font-size:30px;cursor:pointer;color:#e74c3c" onclick="closeSidebar()">×</div>
+        <div style="text-align:center;padding:10px;margin-bottom:10px;border-bottom:2px solid #2ecc71" id="userShow"></div>
         <a onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড</a>
-        <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি</a>
-        <a onclick="showSection('oldEntry')">📄 রিপোর্ট / সার্চ</a>
+        <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (মাল্টি)</a>
+        <a onclick="showSection('inventory')">📦 ইনভেন্টরি স্টক</a>
+        <a onclick="showSection('reports')">📊 রিপোর্ট</a>
         <a onclick="logout()" style="color:#ff7675">🚪 লগআউট</a>
     </div>
 
     <div id="dashboard" class="section">
         <div class="stats en">
-            <div class="card">এন্ট্রি<br><b id="cCount">0</b></div>
-            <div class="card">মোট (৳)<br><b id="cTotal">0</b></div>
-            <div class="card">ক্যাশ (৳)<br><b id="cTaken">0</b></div>
-            <div class="card">লস (৳)<br><b id="cLoss">0</b></div>
+            <div class="card" style="border-top-color:#3498db">এন্ট্রি<br><b id="cCount">0</b></div>
+            <div class="card" style="border-top-color:#2ecc71">মোট (৳)<br><b id="cTotal">0</b></div>
+            <div class="card" style="border-top-color:#f1c40f">নগদ (৳)<br><b id="cTaken">0</b></div>
+            <div class="card" style="border-top-color:#e74c3c">বাকি (৳)<br><b id="cLoss">0</b></div>
         </div>
+        <div class="chart-container"><canvas id="salesChart" height="100"></canvas></div>
         <div class="table-box">
-            <table>
-                <thead>
-                    <tr><th>সময়/তারিখ</th><th>কাজ</th><th>পরিমাণ</th><th>মোট</th><th>ক্যাশ</th><th>লস</th><th>ইউজার</th><th class="noPrint">মুছুন</th></tr>
-                </thead>
-                <tbody id="tableBody" class="en"></tbody>
+            <h4 style="padding:15px; margin:0">সাম্প্রতিক কার্যক্রম</h4>
+            <table class="en">
+                <thead><tr><th>সময়</th><th>বিবরণ</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
+                <tbody id="tableBody"></tbody>
             </table>
         </div>
     </div>
 
     <div id="newEntry" class="section">
-        <div class="noPrint" style="max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px">
-            <h3>নতুন এন্ট্রি যোগ করুন</h3>
+        <div style="max-width:550px;margin:auto;background:#fff;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.05)">
+            <h3 style="margin-top:0; color:#2c3e50">নতুন ভাউচার তৈরি</h3>
             
-            <div style="display:flex; gap:5px; align-items:center;">
-                <select id="category" onchange="catChange()" style="flex:1"></select>
-                <button onclick="deleteCategory()" title="ক্যাটাগরি মুছুন" class="btn-del noPrint" style="padding:10px; margin-top:10px;">🗑️</button>
+            <div class="form-group">
+                <label>ক্যাটাগরি:</label>
+                <div style="display:flex;gap:5px">
+                    <select id="category" onchange="catChange()"></select>
+                    <button onclick="deleteCategory()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                </div>
             </div>
 
-            <div style="display:flex; gap:5px; align-items:center;">
-                <select id="work" disabled onchange="workChange()" style="flex:1"></select>
-                <button onclick="deleteWork()" title="কাজ মুছুন" class="btn-del noPrint" style="padding:10px; margin-top:10px;">🗑️</button>
+            <div class="form-group">
+                <label>কাজ/পণ্য:</label>
+                <div style="display:flex;gap:5px">
+                    <select id="work" disabled onchange="workChange()"></select>
+                    <button onclick="deleteWork()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                </div>
             </div>
 
-            <input id="qty" type="number" value="1" class="en" placeholder="পরিমাণ" oninput="calc()">
-            <input id="rate" type="number" class="en" placeholder="দর" oninput="calc()">
-            <input id="total" readonly class="en" placeholder="মোট" style="background:#eee">
-            <input id="taken" type="number" class="en" placeholder="ক্যাশ" oninput="calc()">
-            <input id="loss" readonly class="en" placeholder="লস" style="background:#eee">
-            <input id="note" placeholder="নোট (কাস্টমারের নাম)">
-            <button onclick="saveEntry()">সেভ করুন</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                <div class="form-group"><label>পরিমাণ:</label><input id="qty" type="number" value="1" class="en"></div>
+                <div class="form-group"><label>দর (৳):</label><input id="rate" type="number" class="en"></div>
+            </div>
+            
+            <button onclick="addToCart()" style="background:#3498db; margin-bottom:15px">🛒 কার্টে যোগ করুন</button>
+
+            <div id="cartArea" class="cart-box" style="display:none">
+                <h4 style="margin:0 0 10px 0; border-bottom:1px dashed #ccc; padding-bottom:5px">আইটেম লিস্ট:</h4>
+                <div id="cartList"></div>
+                <hr style="border:0; border-top:1px dashed #ccc; margin:15px 0">
+                
+                <div class="form-group"><label>কাস্টমারের নাম (ঐচ্ছিক):</label><input id="note" placeholder="নাম লিখুন..."></div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                    <div class="form-group"><label>সাব-টোটাল:</label><input id="total" readonly class="en" value="0" style="background:#f0f0f0"></div>
+                    <div class="form-group"><label>নগদ গ্রহণ:</label><input id="taken" type="number" class="en" oninput="calcLoss()"></div>
+                </div>
+                 <div class="form-group"><label>বাকি টাকা:</label><input id="loss" readonly class="en" value="0" style="background:#f0f0f0"></div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px">
+                    <button onclick="saveBulkEntry(false)" style="background:#f39c12">💾 শুধুমাত্র সেভ</button>
+                    <button onclick="saveBulkEntry(true)" style="background:#2ecc71">🖨️ সেভ ও মেমো</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="oldEntry" class="section">
-        <div class="noPrint" style="margin-bottom:20px;display:flex;gap:10px">
-            <input type="date" id="sDate" class="en" style="margin:0">
-            <button onclick="searchByDate()" style="margin:0">সার্চ</button>
-            <button onclick="loadEntries()" style="margin:0;background:#95a5a6">সব দেখুন</button>
-            <button onclick="downloadExcel()" style="margin:0;background:#3498db">Excel</button>
-            <button onclick="window.print()" style="margin:0;background:#2ecc71">প্রিন্ট</button>
+    <div id="inventory" class="section">
+        <div style="max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:15px">
+            <h3>স্টক ম্যানেজমেন্ট</h3>
+            <div style="display:flex;gap:10px">
+                <input id="itemName" placeholder="মালামালের নাম">
+                <input id="itemStock" type="number" placeholder="পরিমাণ">
+                <button onclick="addStock()" style="width:auto;padding:0 20px">যোগ</button>
+            </div>
+            <div class="table-box" style="margin-top:20px">
+                <table>
+                    <thead><tr><th>নাম</th><th>স্টক</th><th>অ্যাকশন</th></tr></thead>
+                    <tbody id="stockBody" class="en"></tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    <div id="reports" class="section">
+        <div class="noPrint" style="max-width: 800px; margin: auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
+            <h3 style="text-align:center; margin-top:0">রিপোর্ট ডাউনলোড ও সার্চ</h3>
+            <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; margin-bottom: 20px">
+                <input type="date" id="sDate" class="en" style="margin:0">
+                <button onclick="searchByDate()" style="width:auto;margin:0;padding:0 25px">সার্চ করুন</button>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                <button onclick="loadEntries()" style="background:#95a5a6">সব ডাটা লোড করুন</button>
+                <button onclick="downloadExcel()" style="background:#27ae60">📊 এক্সেল ফাইল ডাউনলোড</button>
+                <button onclick="window.print()" style="background:#9b59b6; grid-column: span 2">পৃষ্ঠাটি প্রিন্ট করুন</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="memoModal">
+    <div style="text-align:center">
+        <h3 style="margin:0; color:#2ecc71">শেখ কম্পিউটার</h3>
+        <p style="font-size:11px;margin:5px">কাশিয়ানী উপজেলার সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
+        <hr>
+    </div>
+    <div style="font-size:13px; text-align:left" class="en">
+        <p>তারিখ: <span id="mDate"></span> | ইউজার: <span id="mUser"></span></p>
+        <p>কাস্টমার: <b id="mNote"></b></p>
+        <table style="width:100%; font-size:12px; border-top:1px solid #000; margin-top:10px">
+            <thead style="border-bottom:1px solid #ddd"><tr><th>বিবরণ</th><th>পরিমাণ</th><th style="text-align:right">টাকা</th></tr></thead>
+            <tbody id="mItems"></tbody>
+        </table>
+        <hr>
+        <div style="text-align:right">
+            <p>মোট: ৳<b id="mTotal" style="font-size:15px"></b></p>
+            <p>নগদ: ৳<span id="mPaid"></span></p>
+            <p>বাকি: ৳<b id="mDue"></b></p>
+        </div>
+    </div>
+    <hr>
+    <p style="text-align:center; font-size:10px">ধন্যবাদ, আবার আসবেন!</p>
+    <button onclick="window.print()" class="noPrint">প্রিন্ট</button>
+    <button onclick="closeMemo()" class="noPrint" style="background:#7f8c8d">বন্ধ করুন</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -117,170 +216,184 @@ firebase.initializeApp({
     projectId:"sheikh-computer-b41d5"
 });
 const db=firebase.database();
-let user="", rates={};
+let user="", rates={}, cart=[], salesChart=null;
 
 window.onload = function() {
     const savedUser = localStorage.getItem("loggedInUser");
-    if(savedUser) { setupUser(savedUser); }
+    if(savedUser) setupUser(savedUser);
 };
 
 function login(){
-    const u=uName.value, p=uPass.value;
+    const u=uName.value.toLowerCase(), p=uPass.value;
     const users={admin:"123",owner:"456",roky:"789"};
-    if(users[u]===p){
-        localStorage.setItem("loggedInUser", u);
-        setupUser(u);
-    } else alert("ভুল তথ্য");
+    if(users[u]===p){ localStorage.setItem("loggedInUser", u); setupUser(u); }
+    else alert("ভুল তথ্য!");
 }
 
 function setupUser(u) {
-    user = u;
-    loginDiv.style.display="none"; container.style.display="block";
+    user = u; loginDiv.style.display="none"; container.style.display="block";
     header.style.display="block"; menuBtn.style.display="block";
-    userShow.innerText="👤 "+u.toUpperCase();
-    loadRates(); loadEntries(); showSection('dashboard');
-}
-
-function logout() {
-    if(confirm("লগআউট করতে চান?")) {
-        localStorage.removeItem("loggedInUser");
-        location.reload();
-    }
-}
-
-function openSidebar(){sidebar.style.left="0";overlay.style.display="block"}
-function closeSidebar(){sidebar.style.left="-260px";overlay.style.display="none"}
-function showSection(id){
-    document.querySelectorAll('.section').forEach(s=>s.style.display="none");
-    document.getElementById(id).style.display="block"; closeSidebar();
+    userShow.innerHTML=`ইউজার: <b>${u.toUpperCase()}</b>`;
+    loadRates(); loadEntries(); loadStock(); showSection('dashboard');
 }
 
 function loadRates(){
     db.ref("rates").on("value", s => {
         const defaultRates = {
-            "Print": {"A4 প্রিন্ট": 10, "কালার": 30},
-            "Typing": {"আবেদন": 100, "ডিড": 300},
-            "Online": {"NID": 100, "ভর্তি": 150},
-            "Photocopy": {"কপি": 5},
-            "Laminating": {"সাধারণ": 20}
+            "প্রিন্ট": {"A4 সাদা-কালো": 10, "কালার প্রিন্ট": 30},
+            "টাইপিং": {"আবেদনপত্র": 100, "দলিল টাইপ": 300},
+            "অনলাইন": {"NID ডাউনলোড": 100, "ভর্তি আবেদন": 150},
+            "ফটোকপি": {"প্রতি কপি": 5},
+            "ল্যামিনেটিং": {"সাধারণ": 20}
         };
         const dbData = s.val() || {};
         rates = { ...defaultRates, ...dbData };
-        
-        category.innerHTML = "<option value=''>ক্যাটাগরি</option>";
+        category.innerHTML = "<option value=''>সিলেক্ট</option>";
         Object.keys(rates).forEach(c => category.innerHTML += `<option>${c}</option>`);
-        category.innerHTML += `<option value="add">➕ নতুন ক্যাটাগরি</option>`;
+        category.innerHTML += `<option value="add">+ নতুন ক্যাটাগরি</option>`;
     });
 }
 
 function catChange(){
     if(category.value==="add"){
-        const c=prompt("নতুন ক্যাটাগরি নাম:");
-        if(c) db.ref("rates/"+c).set({"নতুন কাজ":0});
-        return;
+        const c=prompt("নাম:"); if(c) db.ref("rates/"+c).set({"নতুন":0}); return;
     }
-    const cat = category.value;
-    work.innerHTML="<option value=''>কাজ সিলেক্ট করুন</option>";
-    if(cat && rates[cat]){
-        Object.keys(rates[cat]).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
-        work.innerHTML+=`<option value="add">➕ নতুন কাজ</option>`;
+    work.innerHTML="<option value=''>সিলেক্ট</option>";
+    if(category.value && rates[category.value]){
+        Object.keys(rates[category.value]).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
+        work.innerHTML+=`<option value="add">+ নতুন কাজ</option>`;
         work.disabled=false;
-    } else { work.disabled=true; }
+    }
 }
 
 function workChange(){
     if(work.value==="add"){
-        const w=prompt("নতুন কাজের নাম:"), r=prompt("দর (Rate):");
-        if(w) db.ref(`rates/${category.value}/${w}`).set(+r||0);
-        return;
+        const w=prompt("নাম:"), r=prompt("দর:");
+        if(w) db.ref(`rates/${category.value}/${w}`).set(+r||0); return;
     }
     rate.value=rates[category.value][work.value]||0;
-    calc();
 }
 
-function deleteCategory(){
-    const cat = category.value;
-    if(!cat || cat==="add") return alert("আগে ক্যাটাগরি সিলেক্ট করুন");
-    if(confirm(`${cat} মুছে ফেলবেন?`)){
-        db.ref("rates/"+cat).remove();
-        category.value=""; catChange();
-    }
+function deleteCategory(){ if(confirm("ক্যাটাগরি মুছে ফেলবেন?")) db.ref("rates/"+category.value).remove(); }
+function deleteWork(){ if(confirm("কাজটি মুছে ফেলবেন?")) db.ref(`rates/${category.value}/${work.value}`).remove(); }
+
+function addToCart(){
+    if(!work.value || !rate.value) return alert("কাজ ও দর সঠিক দিন");
+    const item = { work: work.value, qty: +qty.value, rate: +rate.value, sub: qty.value * rate.value };
+    cart.push(item);
+    renderCart();
+    qty.value=1; 
 }
 
-function deleteWork(){
-    const cat = category.value;
-    const wrk = work.value;
-    if(!wrk || wrk==="add") return alert("আগে কাজ সিলেক্ট করুন");
-    if(confirm(`${wrk} মুছে ফেলবেন?`)){
-        db.ref(`rates/${cat}/${wrk}`).remove();
-        work.value="";
-    }
+function renderCart(){
+    cartArea.style.display = cart.length ? "block" : "none";
+    cartList.innerHTML = "";
+    let grandTotal = 0;
+    cart.forEach((item, index) => {
+        grandTotal += item.sub;
+        cartList.innerHTML += `
+            <div class="cart-item">
+                <span>${item.work} (${item.qty} x ${item.rate})</span> 
+                <span><b>৳${item.sub}</b> <span onclick="removeCart(${index})" style="color:red;cursor:pointer;margin-left:5px">×</span></span>
+            </div>`;
+    });
+    total.value = grandTotal; 
+    calcLoss();
 }
 
-function calc(){
-    total.value = qty.value * (rate.value || 0);
-    loss.value = total.value - (taken.value || 0);
-}
+function removeCart(index){ cart.splice(index,1); renderCart(); }
+function calcLoss(){ loss.value = (total.value || 0) - (taken.value || 0); }
 
-function saveEntry(){
-    if(!work.value || work.value==="add") return alert("কাজ সিলেক্ট করুন");
-    const d=new Date();
-    db.ref("entries").push({
-        date: d.toLocaleDateString("en-GB"),
-        time: d.toLocaleTimeString("en-US",{hour:'2-digit',minute:'2-digit'}),
-        work: work.value, qty: qty.value, rate: rate.value, total: total.value,
-        taken: taken.value||0, loss: loss.value||0,
-        user: user, note: note.value
-    }).then(()=>{
-        alert("সেভ হয়েছে");
-        taken.value=""; note.value="";
-        showSection('dashboard');
+function saveBulkEntry(showMemoFlag){
+    if(!cart.length) return;
+    const entryData = {
+        date: new Date().toLocaleDateString("en-GB"),
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        items: cart,
+        total: +total.value,
+        taken: +taken.value || 0,
+        loss: +loss.value || 0,
+        user: user,
+        note: note.value || "General Customer"
+    };
+    db.ref("entries").push(entryData).then(() => {
+        if(showMemoFlag) {
+            showMemo(entryData);
+        } else {
+            alert("ডাটা সফলভাবে সেভ হয়েছে!");
+        }
+        cart = []; renderCart(); note.value = ""; taken.value = ""; loss.value = "0";
     });
 }
 
-function loadEntries(){
-    db.ref("entries").on("value",s=>renderTable(s.val()));
+function showMemo(e){
+    mDate.innerText = e.date; mUser.innerText = e.user; mNote.innerText = e.note;
+    mTotal.innerText = e.total; mPaid.innerText = e.taken; mDue.innerText = e.loss;
+    mItems.innerHTML = "";
+    if(e.items){
+        e.items.forEach(i => {
+            mItems.innerHTML += `<tr><td>${i.work}</td><td>${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`;
+        });
+    } else {
+        mItems.innerHTML += `<tr><td>${e.work}</td><td>${e.qty}</td><td style="text-align:right">${e.total}</td></tr>`;
+    }
+    memoModal.style.display="block"; overlay.style.display="block";
 }
 
 function renderTable(data){
-    let c=0,t=0,k=0,l=0;
-    tableBody.innerHTML="";
-    if(!data) return;
+    tableBody.innerHTML=""; if(!data) return;
+    let t=0, k=0, l=0, dailyData={};
     Object.keys(data).reverse().forEach(key=>{
         const e = data[key];
-        c++; t+=+e.total; k+=+e.taken; l+=+e.loss;
-        tableBody.innerHTML+=`<tr>
-            <td>${e.time}<br><small>${e.date}</small></td>
-            <td>${e.work}<br><small>${e.note||''}</small></td>
-            <td>${e.qty}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td>
-            <td class="noPrint"><button class="btn-del" onclick="del('${key}')">❌</button></td>
-        </tr>`;
+        t += +e.total; k += +e.taken; l += +e.loss;
+        const itemNames = e.items ? e.items.map(i => i.work).join(", ") : e.work;
+        const canEdit = (user === e.user);
+        const actions = canEdit ? `<button class="btn-del" onclick="delEntry('${key}')">❌</button>` : `<small>🔒</small>`;
+        tableBody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px">${itemNames}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint">${actions}</td></tr>`;
+        dailyData[e.date] = (dailyData[e.date]||0) + (+e.total);
     });
-    cCount.innerText=c; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
+    cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
+    updateChart(dailyData);
 }
 
-function searchByDate(){
-    if(!sDate.value) return alert("তারিখ দিন");
-    const d = sDate.value.split("-").reverse().join("/");
-    db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{
-        renderTable(s.val());
-        showSection('dashboard');
+function updateChart(data){
+    const labels = Object.keys(data).slice(-7); const values = Object.values(data).slice(-7);
+    if(salesChart) salesChart.destroy();
+    const ctx = document.getElementById('salesChart');
+    if(ctx) { salesChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Sales (৳)', data: values, borderColor: '#2ecc71', tension: 0.3, fill:true, backgroundColor:'rgba(46,204,113,0.1)' }] }, options: { responsive: true, plugins: { legend: { display: false } } } }); }
+}
+
+function delEntry(key){
+    db.ref("entries/"+key).once("value", s => {
+        const e = s.val();
+        if(e.user !== user) return alert("আপনি অন্যের ডাটা ডিলিট করতে পারবেন না!");
+        if(confirm("মুছে ফেলবেন?")) db.ref("entries/"+key).remove();
     });
 }
 
-function del(key){
-    if(confirm("মুছে ফেলবেন?")) db.ref("entries/"+key).remove();
-}
+function addStock(){ const name = itemName.value, qty = itemStock.value; if(name && qty) { db.ref("inventory").push({name, qty}); itemName.value=""; itemStock.value=""; } }
+function loadStock(){ db.ref("inventory").on("value", s=>{ stockBody.innerHTML=""; const data = s.val(); if(data){ Object.keys(data).forEach(key=>{ const i = data[key]; stockBody.innerHTML+=`<tr><td>${i.name}</td><td>${i.qty}</td><td><button class="btn-del" onclick="delInv('${key}')">🗑️</button></td></tr>`; }); } }); }
+function delInv(key){ if(user==='owner' && confirm("মুছে ফেলবেন?")) db.ref("inventory/"+key).remove(); }
+
+function loadEntries(){ db.ref("entries").on("value", s => renderTable(s.val())); }
+function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.style.display="none"); document.getElementById(id).style.display="block"; closeSidebar(); }
+function closeSidebar(){ sidebar.style.left="-280px"; overlay.style.display="none"; }
+function openSidebar(){ sidebar.style.left="0"; overlay.style.display="block"; }
+function closeMemo(){ memoModal.style.display="none"; overlay.style.display="none"; }
+function logout() { localStorage.removeItem("loggedInUser"); location.reload(); }
+function searchByDate(){ const d = sDate.value.split("-").reverse().join("/"); db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val()); showSection('dashboard'); }); }
 
 function downloadExcel(){
-    db.ref("entries").once("value",s=>{
-        let csv="Date,Time,Work,Qty,Total,Cash,Loss,User,Note\n";
-        Object.values(s.val()||{}).forEach(e=>{
-            csv+=`${e.date},${e.time},${e.work},${e.qty},${e.total},${e.taken},${e.loss},${e.user},${e.note||''}\n`;
+    db.ref("entries").once("value", s => {
+        const data = s.val(); if(!data) return alert("ডাটা নেই!");
+        let csv = "\ufeffতারিখ,সময়,বিবরণ,মোট টাকা,নগদ গ্রহণ,বাকি টাকা,ইউজার,নোট\n";
+        Object.keys(data).forEach(key => {
+            const e = data[key];
+            const itemNames = e.items ? e.items.map(i => `${i.work}(${i.qty})`).join(" + ") : `${e.work}(${e.qty})`;
+            csv += `${e.date},${e.time},"${itemNames}",${e.total},${e.taken},${e.loss},${e.user},${e.note||''}\n`;
         });
-        const a=document.createElement("a");
-        a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-        a.download="report.csv"; a.click();
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "sheikh_computer_report.csv"; link.click();
     });
 }
 </script>
