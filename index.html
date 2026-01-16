@@ -37,7 +37,7 @@
 <div id="overlay" onclick="closeSidebar()"></div>
 
 <div id="loginDiv">
-    <h2>লগইন</h2>
+    <h2>লগইন করুন</h2>
     <input id="uName" placeholder="ইউজারনেম">
     <input id="uPass" type="password" placeholder="পাসওয়ার্ড">
     <button onclick="login()">লগইন</button>
@@ -51,7 +51,7 @@
         <a onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড</a>
         <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি</a>
         <a onclick="showSection('oldEntry')">📄 রিপোর্ট / সার্চ</a>
-        <a onclick="location.reload()" style="color:#ff7675">🚪 লগআউট</a>
+        <a onclick="logout()" style="color:#ff7675">🚪 লগআউট</a>
     </div>
 
     <div id="dashboard" class="section">
@@ -74,14 +74,23 @@
     <div id="newEntry" class="section">
         <div class="noPrint" style="max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:10px">
             <h3>নতুন এন্ট্রি যোগ করুন</h3>
-            <select id="category" onchange="catChange()"></select>
-            <select id="work" disabled onchange="workChange()"></select>
+            
+            <div style="display:flex; gap:5px; align-items:center;">
+                <select id="category" onchange="catChange()" style="flex:1"></select>
+                <button onclick="deleteCategory()" title="ক্যাটাগরি মুছুন" class="btn-del noPrint" style="padding:10px; margin-top:10px;">🗑️</button>
+            </div>
+
+            <div style="display:flex; gap:5px; align-items:center;">
+                <select id="work" disabled onchange="workChange()" style="flex:1"></select>
+                <button onclick="deleteWork()" title="কাজ মুছুন" class="btn-del noPrint" style="padding:10px; margin-top:10px;">🗑️</button>
+            </div>
+
             <input id="qty" type="number" value="1" class="en" placeholder="পরিমাণ" oninput="calc()">
             <input id="rate" type="number" class="en" placeholder="দর" oninput="calc()">
             <input id="total" readonly class="en" placeholder="মোট" style="background:#eee">
-            <input id="taken" type="number" class="en" placeholder="কত টাকা ক্যাশ নিলেন?" oninput="calc()">
+            <input id="taken" type="number" class="en" placeholder="ক্যাশ" oninput="calc()">
             <input id="loss" readonly class="en" placeholder="লস" style="background:#eee">
-            <input id="note" placeholder="নোট (যেমন কাস্টমারের নাম)">
+            <input id="note" placeholder="নোট (কাস্টমারের নাম)">
             <button onclick="saveEntry()">সেভ করুন</button>
         </div>
     </div>
@@ -94,7 +103,6 @@
             <button onclick="downloadExcel()" style="margin:0;background:#3498db">Excel</button>
             <button onclick="window.print()" style="margin:0;background:#2ecc71">প্রিন্ট</button>
         </div>
-        <p>সার্চ রেজাল্ট বা রিপোর্ট নিচের ড্যাশবোর্ডে দেখা যাবে।</p>
     </div>
 </div>
 
@@ -111,32 +119,55 @@ firebase.initializeApp({
 const db=firebase.database();
 let user="", rates={};
 
+// সেশন চেক (রিফ্রেশ করলে লগইন ধরে রাখার জন্য)
+window.onload = function() {
+    const savedUser = localStorage.getItem("loggedInUser");
+    if(savedUser) {
+        setupUser(savedUser);
+    }
+};
+
 function login(){
     const u=uName.value, p=uPass.value;
     const users={admin:"123",owner:"456",roky:"789"};
     if(users[u]===p){
-        user=u;
-        loginDiv.style.display="none";
-        container.style.display="block";
-        header.style.display="block";
-        menuBtn.style.display="block";
-        userShow.innerText="👤 "+u.toUpperCase();
-        loadRates(); loadEntries();
-        showSection('dashboard');
+        localStorage.setItem("loggedInUser", u);
+        setupUser(u);
     } else alert("ভুল তথ্য");
+}
+
+function setupUser(u) {
+    user = u;
+    loginDiv.style.display="none"; container.style.display="block";
+    header.style.display="block"; menuBtn.style.display="block";
+    userShow.innerText="👤 "+u.toUpperCase();
+    loadRates(); loadEntries(); showSection('dashboard');
+}
+
+function logout() {
+    if(confirm("লগআউট করতে চান?")) {
+        localStorage.removeItem("loggedInUser");
+        location.reload();
+    }
 }
 
 function openSidebar(){sidebar.style.left="0";overlay.style.display="block"}
 function closeSidebar(){sidebar.style.left="-260px";overlay.style.display="none"}
 function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.style.display="none");
-    document.getElementById(id).style.display="block";
-    closeSidebar();
+    document.getElementById(id).style.display="block"; closeSidebar();
 }
 
 function loadRates(){
     db.ref("rates").on("value",s=>{
-        rates=s.val()||{"অন্যান্য":{"কপি":10}};
+        const defaultRates = {
+            "Print": {"A4 প্রিন্ট": 10, "কালার": 30},
+            "Typing": {"আবেদন": 100, "ডিড": 300},
+            "Online": {"NID": 100, "ভর্তি": 150},
+            "Photocopy": {"কপি": 5},
+            "Laminating": {"সাধারণ": 20}
+        };
+        rates=s.val()||defaultRates;
         category.innerHTML="<option value=''>ক্যাটাগরি</option>";
         Object.keys(rates).forEach(c=>category.innerHTML+=`<option>${c}</option>`);
         category.innerHTML+=`<option value="add">➕ নতুন ক্যাটাগরি</option>`;
@@ -145,24 +176,46 @@ function loadRates(){
 
 function catChange(){
     if(category.value==="add"){
-        const c=prompt("ক্যাটাগরি নাম");
-        if(c) db.ref("rates/"+c).set({"নতুন কাজ":0});
+        const c=prompt("নতুন ক্যাটাগরি নাম:");
+        if(c) db.ref("rates/"+c).set({"ডিফল্ট কাজ":0});
         return;
     }
+    const cat = category.value;
     work.innerHTML="<option value=''>কাজ সিলেক্ট করুন</option>";
-    Object.keys(rates[category.value]||{}).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
-    work.innerHTML+=`<option value="add">➕ নতুন কাজ</option>`;
-    work.disabled=false;
+    if(cat && rates[cat]){
+        Object.keys(rates[cat]).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
+        work.innerHTML+=`<option value="add">➕ নতুন কাজ</option>`;
+        work.disabled=false;
+    } else { work.disabled=true; }
 }
 
 function workChange(){
     if(work.value==="add"){
-        const w=prompt("কাজের নাম"),r=prompt("দর (Rate)");
+        const w=prompt("নতুন কাজের নাম:"), r=prompt("দর (Rate):");
         if(w) db.ref(`rates/${category.value}/${w}`).set(+r||0);
         return;
     }
     rate.value=rates[category.value][work.value]||0;
     calc();
+}
+
+function deleteCategory(){
+    const cat = category.value;
+    if(!cat || cat==="add") return alert("আগে ক্যাটাগরি সিলেক্ট করুন");
+    if(confirm(`${cat} মুছে ফেলবেন?`)){
+        db.ref("rates/"+cat).remove();
+        category.value=""; catChange();
+    }
+}
+
+function deleteWork(){
+    const cat = category.value;
+    const wrk = work.value;
+    if(!wrk || wrk==="add") return alert("আগে কাজ সিলেক্ট করুন");
+    if(confirm(`${wrk} মুছে ফেলবেন?`)){
+        db.ref(`rates/${cat}/${wrk}`).remove();
+        work.value="";
+    }
 }
 
 function calc(){
@@ -176,8 +229,7 @@ function saveEntry(){
     db.ref("entries").push({
         date: d.toLocaleDateString("en-GB"),
         time: d.toLocaleTimeString("en-US",{hour:'2-digit',minute:'2-digit'}),
-        work: work.value,
-        qty: qty.value, rate: rate.value, total: total.value,
+        work: work.value, qty: qty.value, rate: rate.value, total: total.value,
         taken: taken.value||0, loss: loss.value||0,
         user: user, note: note.value
     }).then(()=>{
