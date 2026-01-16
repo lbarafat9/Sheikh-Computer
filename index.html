@@ -97,10 +97,11 @@ button:hover { background: #45a049; }
 </div>
 
 <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script type="module">
+// Import modular Firebase SDK
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-<script>
 // Users
 const users = [
     {username:"admin", password:"admin123"},
@@ -120,18 +121,19 @@ const rates = {
 let currentUser = "";
 let entries = [];
 
-// Firebase config
+// Firebase config (আপনার প্রদান করা অনুযায়ী)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID"
+  apiKey: "AIzaSyCvNH_VOQm3_FYKQocEVlFN1DTYMy-BPlM",
+  authDomain: "sheikh-computer-b41d5.firebaseapp.com",
+  databaseURL: "https://sheikh-computer-b41d5-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sheikh-computer-b41d5",
+  storageBucket: "sheikh-computer-b41d5.firebasestorage.app",
+  messagingSenderId: "349264039976",
+  appId: "1:349264039976:web:c43d75ef351066b44be51d"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 // Login
 function login() {
@@ -210,7 +212,7 @@ function saveEntry() {
         notes: document.getElementById("notes").value,
         user: currentUser
     };
-    db.ref('entries').push(entry);
+    push(ref(db, 'entries'), entry);
 
     // Reset form
     document.getElementById("quantity").value = 1;
@@ -223,7 +225,8 @@ function saveEntry() {
 
 // Load live entries
 function loadEntries() {
-    db.ref('entries').on('value', snapshot => {
+    const entriesRef = ref(db, 'entries');
+    onValue(entriesRef, snapshot => {
         entries = [];
         snapshot.forEach(child => { entries.push(child.val()); });
         renderTable();
