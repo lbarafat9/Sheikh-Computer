@@ -5,246 +5,316 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sheikh Computer – Live Entry System</title>
 <style>
-body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-.container { max-width: 1000px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
-h2 { text-align: center; color: #333; }
-label { display: block; margin-top: 10px; font-weight: bold; }
-select, input { width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; }
-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-th { background: #4CAF50; color: white; }
-button { padding: 10px 20px; margin-top: 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
-button:hover { background: #45a049; }
-.login { max-width: 350px; margin: 50px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 0 10px #ccc; }
-#entryDiv { display: none; }
+body{margin:0;font-family:Arial,sans-serif;background:#f5f5f5;}
+header{background:#4CAF50;color:white;padding:15px;text-align:left;display:flex;align-items:center;}
+header span{font-size:24px;cursor:pointer;margin-right:20px;}
+#sidebar{position:fixed;left:-250px;top:0;width:250px;height:100%;background:#333;color:white;transition:0.3s;padding-top:60px;}
+#sidebar ul{list-style:none;padding:0;}
+#sidebar ul li{padding:15px;cursor:pointer;border-bottom:1px solid #444;}
+#sidebar ul li:hover{background:#444;}
+.container{margin-left:0;padding:20px;transition:margin-left 0.3s;}
+h2{text-align:center;color:#333;}
+label{display:block;margin-top:10px;font-weight:bold;}
+select,input{width:100%;padding:8px;margin-top:5px;border-radius:4px;border:1px solid #ccc;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #ccc;padding:8px;text-align:center;}
+th{background:#4CAF50;color:white;}
+button{padding:10px 20px;margin-top:20px;background:#4CAF50;color:white;border:none;border-radius:5px;cursor:pointer;}
+button:hover{background:#45a049;}
+.login{max-width:350px;margin:50px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 0 10px #ccc;}
+#entryDiv,#manageDiv,#oldDiv{display:none;}
 </style>
 </head>
 <body>
 
-<!-- Login Page -->
+<!-- Header -->
+<header>
+<span onclick="toggleSidebar()">☰</span>
+শেখ কম্পিউটার Live Entry System
+</header>
+
+<!-- Sidebar -->
+<div id="sidebar">
+<ul>
+<li onclick="showSection('entryDiv')">New Entry</li>
+<li onclick="showSection('oldDiv')">Old Entry</li>
+<li onclick="showSection('manageDiv')">Manage Categories</li>
+<li onclick="logout()">Logout</li>
+</ul>
+</div>
+
+<!-- Login -->
 <div id="loginDiv" class="login">
-    <h2>শেখ কম্পিউটার লগইন</h2>
-    <label>ইউজারনেম:</label>
-    <input type="text" id="username" placeholder="আপনার নাম লিখুন">
-    <label>পাসওয়ার্ড:</label>
-    <input type="password" id="password" placeholder="Password">
-    <button id="loginBtn">লগইন</button>
-    <p id="loginError" style="color:red;"></p>
+<h2>লগইন</h2>
+<label>ইউজারনেম:</label>
+<input type="text" id="username" placeholder="আপনার নাম লিখুন">
+<label>পাসওয়ার্ড:</label>
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">লগইন</button>
+<p id="loginError" style="color:red;"></p>
 </div>
 
-<!-- Entry Page -->
+<!-- New Entry -->
 <div id="entryDiv" class="container">
-    <h2>নতুন এন্ট্রি</h2>
-    <p><strong>Login হয়েছে: </strong><span id="currentUser"></span></p>
+<h2>নতুন এন্ট্রি</h2>
+<p><strong>Login হয়েছে: </strong><span id="currentUser"></span></p>
+<label>তারিখ ও সময়:</label>
+<input type="text" id="datetime" readonly>
+<label>ক্যাটাগরি:</label>
+<select id="category" onchange="populateWork()"></select>
+<label>কাজ:</label>
+<select id="work" onchange="setRate()" disabled></select>
+<label>পরিমাণ (Qty / Page / Copy):</label>
+<input type="number" id="quantity" min="1" value="1" oninput="calculateTotalLive()">
+<label>দর (Rate / প্রতি ইউনিট):</label>
+<input type="number" id="rate" value="0" oninput="calculateTotalLive()">
+<label>মোট (Total):</label>
+<input type="number" id="total" readonly>
+<label>গ্রাহক কত দিয়েছেন (Taken Amount):</label>
+<input type="number" id="taken" value="0" oninput="calculateTotalLive()">
+<label>ছাড় (Discount):</label>
+<input type="number" id="discount" readonly>
+<label>নোট (Optional):</label>
+<input type="text" id="notes">
+<button onclick="saveEntry()">এন্ট্রি সংরক্ষণ করুন</button>
 
-    <label>তারিখ ও সময়:</label>
-    <input type="text" id="datetime" readonly>
-
-    <label>ক্যাটাগরি:</label>
-    <select id="category">
-        <option value="">-- নির্বাচন করুন --</option>
-        <option value="Print">প্রিন্ট</option>
-        <option value="Typing">টাইপিং</option>
-        <option value="Online">অনলাইন</option>
-        <option value="Photocopy">ফটোকপি</option>
-        <option value="Laminating">ল্যামিনেটিং</option>
-    </select>
-
-    <label>কাজ:</label>
-    <select id="work" disabled>
-        <option value="">-- প্রথমে ক্যাটাগরি নির্বাচন করুন --</option>
-    </select>
-
-    <label>পরিমাণ (Qty / Page / Copy):</label>
-    <input type="number" id="quantity" min="1" value="1">
-
-    <label>দর (Rate / প্রতি ইউনিট):</label>
-    <input type="number" id="rate" value="0">
-
-    <label>মোট (Total):</label>
-    <input type="number" id="total" readonly>
-
-    <label>গ্রাহক কত দিয়েছেন (Taken Amount):</label>
-    <input type="number" id="taken" value="0">
-
-    <label>ছাড় (Discount):</label>
-    <input type="number" id="discount" readonly>
-
-    <label>নোট (Optional):</label>
-    <input type="text" id="notes">
-
-    <button id="saveBtn">এন্ট্রি সংরক্ষণ করুন</button>
-
-    <h3>আজকের এন্ট্রি (Live Table)</h3>
-    <table id="entryTable">
-        <thead>
-            <tr>
-                <th>ক্রমিক</th>
-                <th>সময়</th>
-                <th>ক্যাটাগরি</th>
-                <th>কাজ</th>
-                <th>পরিমাণ</th>
-                <th>Rate</th>
-                <th>Total</th>
-                <th>Taken</th>
-                <th>Discount</th>
-                <th>Notes</th>
-                <th>User</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+<h3>আজকের এন্ট্রি (Live Table)</h3>
+<table id="entryTable">
+<thead>
+<tr>
+<th>ক্রমিক</th><th>সময়</th><th>ক্যাটাগরি</th><th>কাজ</th><th>পরিমাণ</th><th>Rate</th><th>Total</th><th>Taken</th><th>Discount</th><th>Notes</th><th>User</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
 </div>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+<!-- Manage Categories -->
+<div id="manageDiv" class="container">
+<h2>Manage Categories & Works</h2>
+<label>নতুন ক্যাটাগরি যোগ করুন:</label>
+<input type="text" id="newCategory">
+<button onclick="addCategory()">Add Category</button>
 
+<label>নতুন কাজ যোগ করুন:</label>
+<select id="selectCategoryForWork"></select>
+<input type="text" id="newWork">
+<input type="number" id="newRate" placeholder="Rate">
+<button onclick="addWork()">Add Work</button>
+</div>
+
+<!-- Old Entries -->
+<div id="oldDiv" class="container">
+<h2>পুরনো এন্ট্রি</h2>
+<label>তারিখ নির্বাচন করুন:</label>
+<input type="date" id="filterDate">
+<button onclick="filterEntries()">Show</button>
+<button onclick="downloadExcel()">Download Excel</button>
+<table id="oldEntryTable">
+<thead>
+<tr>
+<th>ক্রমিক</th><th>সময়</th><th>ক্যাটাগরি</th><th>কাজ</th><th>পরিমাণ</th><th>Rate</th><th>Total</th><th>Taken</th><th>Discount</th><th>Notes</th><th>User</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
 // Users
-const users = [
-    {username:"admin", password:"admin123"},
-    {username:"owner", password:"owner123"},
-    {username:"roky", password:"roky123"}
-];
-
-// Rate List
-const rates = {
-    "Print": {"A4 প্রিন্ট":10},
-    "Typing": {"আবেদনপত্র":50,"ডিড":150},
-    "Online": {"নতুন NID":100,"NID হালনাগাদ":120,"জন্মসনদ কপি":30,"চাকরির আবেদন":500},
-    "Photocopy": {"কপি":5},
-    "Laminating": {"ল্যামিনেটিং":20}
-};
-
-let currentUser = "";
-let entries = [];
+const users=[{username:"admin",password:"admin123"},{username:"owner",password:"owner123"},{username:"roky",password:"roky123"}];
+let currentUser=""; let entries=[]; let rates={};
 
 // Firebase config
-const firebaseConfig = {
-  apiKey: "AIzaSyCvNH_VOQm3_FYKQocEVlFN1DTYMy-BPlM",
-  authDomain: "sheikh-computer-b41d5.firebaseapp.com",
-  databaseURL: "https://sheikh-computer-b41d5-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "sheikh-computer-b41d5",
-  storageBucket: "sheikh-computer-b41d5.firebasestorage.app",
-  messagingSenderId: "349264039976",
-  appId: "1:349264039976:web:c43d75ef351066b44be51d"
+const firebaseConfig={
+apiKey:"AIzaSyCvNH_VOQm3_FYKQocEVlFN1DTYMy-BPlM",
+authDomain:"sheikh-computer-b41d5.firebaseapp.com",
+databaseURL:"https://sheikh-computer-b41d5-default-rtdb.asia-southeast1.firebasedatabase.app",
+projectId:"sheikh-computer-b41d5",
+storageBucket:"sheikh-computer-b41d5.firebasestorage.app",
+messagingSenderId:"349264039976",
+appId:"1:349264039976:web:c43d75ef351066b44be51d"
 };
+firebase.initializeApp(firebaseConfig);
+const db=firebase.database();
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// Functions
-function login() {
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value.trim();
-    const found = users.find(u => u.username === user && u.password === pass);
-    if(found) {
-        currentUser = user;
-        document.getElementById("loginDiv").style.display = "none";
-        document.getElementById("entryDiv").style.display = "block";
-        document.getElementById("currentUser").innerText = currentUser;
-        setDateTime();
-        loadEntries();
-    } else {
-        document.getElementById("loginError").innerText = "ইউজারনেম বা পাসওয়ার্ড ভুল!";
-    }
+// Sidebar toggle
+function toggleSidebar(){
+const sidebar=document.getElementById("sidebar");
+sidebar.style.left=(sidebar.style.left=="0px")?"-250px":"0px";
 }
 
-function setDateTime() {
-    const now = new Date();
-    document.getElementById("datetime").value = now.toLocaleString("bn-BD");
+// Show section
+function showSection(id){
+document.getElementById("entryDiv").style.display="none";
+document.getElementById("manageDiv").style.display="none";
+document.getElementById("oldDiv").style.display="none";
+document.getElementById(id).style.display="block";
 }
 
-function populateWork() {
-    const category = document.getElementById("category").value;
-    const workSelect = document.getElementById("work");
-    workSelect.innerHTML = "";
-    if(category && rates[category]) {
-        Object.keys(rates[category]).forEach(w => {
-            const option = document.createElement("option");
-            option.value = w;
-            option.innerText = w;
-            workSelect.appendChild(option);
-        });
-        workSelect.disabled = false;
-    } else {
-        workSelect.disabled = true;
-    }
-    document.getElementById("rate").value = 0;
-    calculateTotalLive();
+// Login
+function login(){
+const user=document.getElementById("username").value.trim();
+const pass=document.getElementById("password").value.trim();
+const found=users.find(u=>u.username===user&&u.password===pass);
+if(found){
+currentUser=user;
+document.getElementById("loginDiv").style.display="none";
+document.getElementById("entryDiv").style.display="block";
+document.getElementById("currentUser").innerText=currentUser;
+setDateTime();
+loadCategories();
+loadEntries();
+}else{
+document.getElementById("loginError").innerText="ইউজারনেম বা পাসওয়ার্ড ভুল!";
+}
 }
 
-function setRate() {
-    const category = document.getElementById("category").value;
-    const work = document.getElementById("work").value;
-    if(category && work && rates[category][work]) {
-        document.getElementById("rate").value = rates[category][work];
-        calculateTotalLive();
-    }
+function logout(){location.reload();}
+function setDateTime(){document.getElementById("datetime").value=new Date().toLocaleString("bn-BD");}
+
+// Populate work
+function populateWork(){
+const category=document.getElementById("category").value;
+const workSelect=document.getElementById("work");
+workSelect.innerHTML="";
+if(category && rates[category]){
+Object.keys(rates[category]).forEach(work=>{
+let option=document.createElement("option"); option.value=work; option.innerText=work;
+workSelect.appendChild(option);
+});
+workSelect.disabled=false;
+}else{workSelect.disabled=true;}
+document.getElementById("rate").value=0;
+calculateTotalLive();
 }
 
-function calculateTotalLive() {
-    const qty = parseFloat(document.getElementById("quantity").value) || 0;
-    const rate = parseFloat(document.getElementById("rate").value) || 0;
-    const taken = parseFloat(document.getElementById("taken").value) || 0;
-    const total = qty * rate;
-    document.getElementById("total").value = total;
-    document.getElementById("discount").value = total - taken;
+// Set Rate
+function setRate(){
+const cat=document.getElementById("category").value;
+const work=document.getElementById("work").value;
+if(cat && work && rates[cat][work]){
+document.getElementById("rate").value=rates[cat][work];
+calculateTotalLive();
+}
 }
 
-function saveEntry() {
-    const entry = {
-        time: new Date().toLocaleString("bn-BD"),
-        category: document.getElementById("category").value,
-        work: document.getElementById("work").value,
-        quantity: document.getElementById("quantity").value,
-        rate: document.getElementById("rate").value,
-        total: document.getElementById("total").value,
-        taken: document.getElementById("taken").value,
-        discount: document.getElementById("discount").value,
-        notes: document.getElementById("notes").value,
-        user: currentUser
-    };
-    push(ref(db,'entries'), entry);
-
-    // Reset form
-    document.getElementById("quantity").value = 1;
-    document.getElementById("rate").value = 0;
-    document.getElementById("total").value = 0;
-    document.getElementById("taken").value = 0;
-    document.getElementById("discount").value = 0;
-    document.getElementById("notes").value = "";
+// Calculate
+function calculateTotalLive(){
+const qty=parseFloat(document.getElementById("quantity").value)||0;
+const rate=parseFloat(document.getElementById("rate").value)||0;
+const taken=parseFloat(document.getElementById("taken").value)||0;
+const total=qty*rate;
+document.getElementById("total").value=total;
+document.getElementById("discount").value=total-taken;
 }
 
-function loadEntries() {
-    const entriesRef = ref(db,'entries');
-    onValue(entriesRef, snapshot => {
-        entries = [];
-        snapshot.forEach(child => { entries.push(child.val()); });
-        renderTable();
-    });
+// Save Entry
+function saveEntry(){
+const entry={
+time:new Date().toLocaleString("bn-BD"),
+category:document.getElementById("category").value,
+work:document.getElementById("work").value,
+quantity:document.getElementById("quantity").value,
+rate:document.getElementById("rate").value,
+total:document.getElementById("total").value,
+taken:document.getElementById("taken").value,
+discount:document.getElementById("discount").value,
+notes:document.getElementById("notes").value,
+user:currentUser
+};
+db.ref('entries').push(entry);
+document.getElementById("quantity").value=1;
+document.getElementById("rate").value=0;
+document.getElementById("total").value=0;
+document.getElementById("taken").value=0;
+document.getElementById("discount").value=0;
+document.getElementById("notes").value="";
 }
 
-function renderTable() {
-    const tbody = document.querySelector("#entryTable tbody");
-    tbody.innerHTML = "";
-    entries.forEach((e, index) => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${index+1}</td><td>${e.time}</td><td>${e.category}</td><td>${e.work}</td><td>${e.quantity}</td><td>${e.rate}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.discount}</td><td>${e.notes}</td><td>${e.user}</td>`;
-        tbody.appendChild(tr);
-    });
+// Load Entries
+function loadEntries(){
+db.ref('entries').on('value',snapshot=>{
+entries=[];
+snapshot.forEach(child=>{entries.push(child.val());});
+renderTable();
+});
 }
 
-// Event Listeners
-document.getElementById("loginBtn").addEventListener("click", login);
-document.getElementById("category").addEventListener("change", populateWork);
-document.getElementById("work").addEventListener("change", setRate);
-document.getElementById("quantity").addEventListener("input", calculateTotalLive);
-document.getElementById("rate").addEventListener("input", calculateTotalLive);
-document.getElementById("taken").addEventListener("input", calculateTotalLive);
-document.getElementById("saveBtn").addEventListener("click", saveEntry);
+// Render Live Table
+function renderTable(){
+const tbody=document.querySelector("#entryTable tbody");
+tbody.innerHTML="";
+entries.forEach((e,i)=>{
+const tr=document.createElement("tr");
+tr.innerHTML=`<td>${i+1}</td><td>${e.time}</td><td>${e.category}</td><td>${e.work}</td><td>${e.quantity}</td><td>${e.rate}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.discount}</td><td>${e.notes}</td><td>${e.user}</td>`;
+tbody.appendChild(tr);
+});
+}
+
+// Manage Categories
+function loadCategories(){
+db.ref('categories').once('value').then(snapshot=>{
+rates=snapshot.val()||{};
+const catSelect=document.getElementById("category");
+const catWorkSelect=document.getElementById("selectCategoryForWork");
+catSelect.innerHTML=""; catWorkSelect.innerHTML="";
+Object.keys(rates).forEach(cat=>{
+let option=document.createElement("option"); option.value=cat; option.innerText=cat;
+catSelect.appendChild(option);
+let option2=document.createElement("option"); option2.value=cat; option2.innerText=cat;
+catWorkSelect.appendChild(option2);
+});
+populateWork();
+});
+}
+
+function addCategory(){
+const newCat=document.getElementById("newCategory").value.trim();
+if(!newCat)return alert("Category লিখুন!");
+rates[newCat]={};
+db.ref('categories/'+newCat).set({});
+document.getElementById("newCategory").value="";
+loadCategories();
+}
+
+function addWork(){
+const cat=document.getElementById("selectCategoryForWork").value;
+const work=document.getElementById("newWork").value.trim();
+const rate=parseFloat(document.getElementById("newRate").value)||0;
+if(!cat||!work)return alert("Category & Work দিতে হবে!");
+rates[cat][work]=rate;
+db.ref('categories/'+cat+'/'+work).set(rate);
+document.getElementById("newWork").value=""; document.getElementById("newRate").value="";
+loadCategories();
+}
+
+// Old entries filter
+function filterEntries(){
+const date=document.getElementById("filterDate").value;
+const tbody=document.querySelector("#oldEntryTable tbody");
+tbody.innerHTML="";
+entries.forEach((e,i)=>{
+if(e.time.startsWith(date)){
+const tr=document.createElement("tr");
+tr.innerHTML=`<td>${i+1}</td><td>${e.time}</td><td>${e.category}</td><td>${e.work}</td><td>${e.quantity}</td><td>${e.rate}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.discount}</td><td>${e.notes}</td><td>${e.user}</td>`;
+tbody.appendChild(tr);
+}
+});
+}
+
+// Excel download
+function downloadExcel(){
+let csv="ক্রমিক,সময়,ক্যাটাগরি,কাজ,পরিমাণ,Rate,Total,Taken,Discount,Notes,User\n";
+entries.forEach((e,i)=>{csv+=`${i+1},${e.time},${e.category},${e.work},${e.quantity},${e.rate},${e.total},${e.taken},${e.discount},${e.notes},${e.user}\n`;});
+const blob=new Blob([csv],{type:"text/csv"});
+const link=document.createElement("a");
+link.href=URL.createObjectURL(blob); link.download="entries.csv"; link.click();
+}
 </script>
 </body>
 </html>
