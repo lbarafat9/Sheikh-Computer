@@ -11,7 +11,8 @@
         body{margin:0;background:#f4f7f6;color:#2c3e50}
         .en{font-family:Arial, sans-serif}
         
-        header{background:#2ecc71;color:#fff;padding:15px;text-align:center;font-size:22px;font-weight:bold;display:none;position:fixed;top:0;width:100%;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+        /* Header Fixed Fix */
+        header{background:#2ecc71;color:#fff;padding:15px;text-align:center;font-size:22px;font-weight:bold;display:none;position:fixed;top:0;width:100%;z-index:1000;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
         
         #loginDiv{max-width:400px;margin:120px auto;background:#fff;padding:35px;border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,0.1);text-align:center}
         #container{display:none;padding:20px;padding-top:85px;max-width:1200px;margin:auto}
@@ -27,12 +28,13 @@
         .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;margin-bottom:25px}
         .card{background:#fff;padding:20px;border-radius:12px;text-align:center;box-shadow:0 4px 6px rgba(0,0,0,0.05);border-top:4px solid #2ecc71}
         
-        #menuBtn{position:fixed;top:18px;left:20px;font-size:28px;color:#fff;cursor:pointer;display:none;z-index:150}
-        #sidebar{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#ffffff;transition:.3s;z-index:200;padding-top:20px;box-shadow:2px 0 10px rgba(0,0,0,0.1)}
+        /* Z-Index Fix for Sidebar */
+        #menuBtn{position:fixed;top:18px;left:20px;font-size:28px;color:#fff;cursor:pointer;display:none;z-index:1100}
+        #sidebar{position:fixed;top:0;left:-280px;width:280px;height:100%;background:#ffffff;transition:.3s;z-index:1200;padding-top:20px;box-shadow:2px 0 10px rgba(0,0,0,0.1)}
         #sidebar a{display:block;color:#34495e;text-decoration:none;padding:15px 25px;border-bottom:1px solid #f1f1f1;cursor:pointer;font-weight:600}
         #sidebar a:hover{background:#f9f9f9;color:#2ecc71}
         
-        #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:150}
+        #overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);display:none;z-index:1150}
         .section{display:none;animation:fadeIn 0.5s}
         @keyframes fadeIn {from{opacity:0} to{opacity:1}}
         
@@ -46,7 +48,7 @@
         .cart-box {margin-top:20px; border:2px dashed #2ecc71; padding:15px; border-radius:12px; background:#f9fff9}
         .cart-item {display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px}
         
-        #memoModal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:300;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
+        #memoModal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
         .chart-container{background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
 
         @media print{
@@ -106,7 +108,7 @@
                 <label>ক্যাটাগরি:</label>
                 <div style="display:flex;gap:5px">
                     <select id="category" onchange="catChange()"></select>
-                    <button onclick="deleteCategory()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                    <button onclick="deleteCategory()" class="btn-del" style="margin-top:0; background:#e74c3c" title="Delete Category">🗑️</button>
                 </div>
             </div>
 
@@ -114,12 +116,12 @@
                 <label>কাজ/পণ্য:</label>
                 <div style="display:flex;gap:5px">
                     <select id="work" disabled onchange="workChange()"></select>
-                    <button onclick="deleteWork()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                    <button onclick="deleteWork()" class="btn-del" style="margin-top:0; background:#e74c3c" title="Delete Item">🗑️</button>
                 </div>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                <div class="form-group"><label>পরিমাণ:</label><input id="qty" type="number" value="1" class="en"></div>
+                <div class="form-group"><label>পরিমাণ:</label><input id="qty" type="number" value="1" min="1" class="en"></div>
                 <div class="form-group"><label>দর (৳):</label><input id="rate" type="number" class="en"></div>
             </div>
             
@@ -134,9 +136,9 @@
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
                     <div class="form-group"><label>সাব-টোটাল:</label><input id="total" readonly class="en" value="0" style="background:#f0f0f0"></div>
-                    <div class="form-group"><label>নগদ গ্রহণ:</label><input id="taken" type="number" class="en" oninput="calcLoss()"></div>
+                    <div class="form-group"><label>নগদ গ্রহণ:</label><input id="taken" type="number" class="en" oninput="calcLoss()" placeholder="0"></div>
                 </div>
-                 <div class="form-group"><label>বাকি টাকা:</label><input id="loss" readonly class="en" value="0" style="background:#f0f0f0"></div>
+                 <div class="form-group"><label>বাকি টাকা:</label><input id="loss" readonly class="en" value="0" style="background:#f0f0f0; color:#e74c3c; font-weight:bold;"></div>
 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px">
                     <button onclick="saveBulkEntry(false)" style="background:#f39c12">💾 শুধুমাত্র সেভ</button>
@@ -224,7 +226,7 @@ window.onload = function() {
 };
 
 function login(){
-    const u=uName.value.toLowerCase(), p=uPass.value;
+    const u=uName.value.toLowerCase().trim(), p=uPass.value.trim();
     const users={admin:"123",owner:"456",roky:"789"};
     if(users[u]===p){ localStorage.setItem("loggedInUser", u); setupUser(u); }
     else alert("ভুল তথ্য!");
@@ -248,38 +250,61 @@ function loadRates(){
         };
         const dbData = s.val() || {};
         rates = { ...defaultRates, ...dbData };
-        category.innerHTML = "<option value=''>সিলেক্ট</option>";
-        Object.keys(rates).forEach(c => category.innerHTML += `<option>${c}</option>`);
-        category.innerHTML += `<option value="add">+ নতুন ক্যাটাগরি</option>`;
+        
+        let catHtml = "<option value=''>সিলেক্ট</option>";
+        Object.keys(rates).forEach(c => catHtml += `<option>${c}</option>`);
+        catHtml += `<option value="add">+ নতুন ক্যাটাগরি</option>`;
+        category.innerHTML = catHtml;
     });
 }
 
 function catChange(){
     if(category.value==="add"){
-        const c=prompt("নাম:"); if(c) db.ref("rates/"+c).set({"নতুন":0}); return;
+        const c=prompt("নতুন ক্যাটাগরির নাম:"); 
+        if(c) db.ref("rates/"+c).set({"নতুন":0}); 
+        else category.value = "";
+        return;
     }
     work.innerHTML="<option value=''>সিলেক্ট</option>";
     if(category.value && rates[category.value]){
         Object.keys(rates[category.value]).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
         work.innerHTML+=`<option value="add">+ নতুন কাজ</option>`;
         work.disabled=false;
+    } else {
+        work.disabled=true;
     }
 }
 
 function workChange(){
     if(work.value==="add"){
-        const w=prompt("নাম:"), r=prompt("দর:");
-        if(w) db.ref(`rates/${category.value}/${w}`).set(+r||0); return;
+        const w=prompt("কাজের নাম:"), r=prompt("দর:");
+        if(w && r) db.ref(`rates/${category.value}/${w}`).set(+r||0); 
+        else work.value = "";
+        return;
     }
-    rate.value=rates[category.value][work.value]||0;
+    if(category.value && rates[category.value]) {
+        rate.value=rates[category.value][work.value]||0;
+    }
 }
 
-function deleteCategory(){ if(confirm("ক্যাটাগরি মুছে ফেলবেন?")) db.ref("rates/"+category.value).remove(); }
-function deleteWork(){ if(confirm("কাজটি মুছে ফেলবেন?")) db.ref(`rates/${category.value}/${work.value}`).remove(); }
+function deleteCategory(){ 
+    if(!category.value || category.value === "add") return alert("সঠিক ক্যাটাগরি সিলেক্ট করুন");
+    if(confirm(`"${category.value}" মুছে ফেলবেন?`)) db.ref("rates/"+category.value).remove(); 
+}
+
+function deleteWork(){ 
+    if(!work.value || work.value === "add") return alert("সঠিক কাজ সিলেক্ট করুন");
+    if(confirm(`"${work.value}" মুছে ফেলবেন?`)) db.ref(`rates/${category.value}/${work.value}`).remove(); 
+}
 
 function addToCart(){
     if(!work.value || !rate.value) return alert("কাজ ও দর সঠিক দিন");
-    const item = { work: work.value, qty: +qty.value, rate: +rate.value, sub: qty.value * rate.value };
+    const q = parseFloat(qty.value);
+    const r = parseFloat(rate.value);
+    
+    if(q <= 0) return alert("পরিমাণ অন্তত ১ হতে হবে");
+
+    const item = { work: work.value, qty: q, rate: r, sub: q * r };
     cart.push(item);
     renderCart();
     qty.value=1; 
@@ -294,7 +319,7 @@ function renderCart(){
         cartList.innerHTML += `
             <div class="cart-item">
                 <span>${item.work} (${item.qty} x ${item.rate})</span> 
-                <span><b>৳${item.sub}</b> <span onclick="removeCart(${index})" style="color:red;cursor:pointer;margin-left:5px">×</span></span>
+                <span><b>৳${item.sub}</b> <span onclick="removeCart(${index})" style="color:red;cursor:pointer;margin-left:5px" title="Remove">×</span></span>
             </div>`;
     });
     total.value = grandTotal; 
@@ -302,56 +327,88 @@ function renderCart(){
 }
 
 function removeCart(index){ cart.splice(index,1); renderCart(); }
-function calcLoss(){ loss.value = (total.value || 0) - (taken.value || 0); }
+
+function calcLoss(){ 
+    const t = parseFloat(total.value) || 0;
+    const p = parseFloat(taken.value) || 0;
+    loss.value = (t - p); 
+}
 
 function saveBulkEntry(showMemoFlag){
-    if(!cart.length) return;
+    if(!cart.length) return alert("কার্ট খালি!");
+    
+    const finalTotal = parseFloat(total.value) || 0;
+    const finalTaken = parseFloat(taken.value) || 0;
+    const finalLoss = finalTotal - finalTaken;
+
     const entryData = {
         date: new Date().toLocaleDateString("en-GB"),
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
         items: cart,
-        total: +total.value,
-        taken: +taken.value || 0,
-        loss: +loss.value || 0,
+        total: finalTotal,
+        taken: finalTaken,
+        loss: finalLoss,
         user: user,
         note: note.value || "General Customer"
     };
+
     db.ref("entries").push(entryData).then(() => {
         if(showMemoFlag) {
             showMemo(entryData);
         } else {
             alert("ডাটা সফলভাবে সেভ হয়েছে!");
         }
-        cart = []; renderCart(); note.value = ""; taken.value = ""; loss.value = "0";
-    });
+        // Reset Form
+        cart = []; renderCart(); 
+        note.value = ""; taken.value = ""; loss.value = "0";
+    }).catch(e => alert("Error: " + e.message));
 }
 
 function showMemo(e){
     mDate.innerText = e.date; mUser.innerText = e.user; mNote.innerText = e.note;
     mTotal.innerText = e.total; mPaid.innerText = e.taken; mDue.innerText = e.loss;
     mItems.innerHTML = "";
-    if(e.items){
+    
+    // Support both Legacy (single item) and New (cart array)
+    if(e.items && Array.isArray(e.items)){
         e.items.forEach(i => {
             mItems.innerHTML += `<tr><td>${i.work}</td><td>${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`;
         });
     } else {
+        // Legacy fallback
         mItems.innerHTML += `<tr><td>${e.work}</td><td>${e.qty}</td><td style="text-align:right">${e.total}</td></tr>`;
     }
     memoModal.style.display="block"; overlay.style.display="block";
 }
 
 function renderTable(data){
-    tableBody.innerHTML=""; if(!data) return;
+    tableBody.innerHTML=""; 
+    if(!data) {
+        cCount.innerText=0; cTotal.innerText=0; cTaken.innerText=0; cLoss.innerText=0;
+        return;
+    }
+    
     let t=0, k=0, l=0, dailyData={};
     Object.keys(data).reverse().forEach(key=>{
         const e = data[key];
-        t += +e.total; k += +e.taken; l += +e.loss;
-        const itemNames = e.items ? e.items.map(i => i.work).join(", ") : e.work;
+        t += (+e.total || 0); k += (+e.taken || 0); l += (+e.loss || 0);
+        
+        // Handle Legacy Data vs New Array Data
+        let itemNames = "";
+        if(e.items && Array.isArray(e.items)){
+            itemNames = e.items.map(i => i.work).join(", ");
+        } else {
+            itemNames = e.work || "Unknown";
+        }
+
         const canEdit = (user === e.user);
         const actions = canEdit ? `<button class="btn-del" onclick="delEntry('${key}')">❌</button>` : `<small>🔒</small>`;
+        
         tableBody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px">${itemNames}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint">${actions}</td></tr>`;
-        dailyData[e.date] = (dailyData[e.date]||0) + (+e.total);
+        
+        dailyData[e.date] = (dailyData[e.date]||0) + (+e.total || 0);
     });
+    
     cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
     updateChart(dailyData);
 }
@@ -371,9 +428,12 @@ function delEntry(key){
     });
 }
 
-function addStock(){ const name = itemName.value, qty = itemStock.value; if(name && qty) { db.ref("inventory").push({name, qty}); itemName.value=""; itemStock.value=""; } }
+function addStock(){ 
+    const name = itemName.value, qty = itemStock.value; 
+    if(name && qty) { db.ref("inventory").push({name, qty}); itemName.value=""; itemStock.value=""; } 
+}
 function loadStock(){ db.ref("inventory").on("value", s=>{ stockBody.innerHTML=""; const data = s.val(); if(data){ Object.keys(data).forEach(key=>{ const i = data[key]; stockBody.innerHTML+=`<tr><td>${i.name}</td><td>${i.qty}</td><td><button class="btn-del" onclick="delInv('${key}')">🗑️</button></td></tr>`; }); } }); }
-function delInv(key){ if(user==='owner' && confirm("মুছে ফেলবেন?")) db.ref("inventory/"+key).remove(); }
+function delInv(key){ if(user==='owner' && confirm("স্টক আইটেমটি মুছে ফেলবেন?")) db.ref("inventory/"+key).remove(); }
 
 function loadEntries(){ db.ref("entries").on("value", s => renderTable(s.val())); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.style.display="none"); document.getElementById(id).style.display="block"; closeSidebar(); }
@@ -381,7 +441,11 @@ function closeSidebar(){ sidebar.style.left="-280px"; overlay.style.display="non
 function openSidebar(){ sidebar.style.left="0"; overlay.style.display="block"; }
 function closeMemo(){ memoModal.style.display="none"; overlay.style.display="none"; }
 function logout() { localStorage.removeItem("loggedInUser"); location.reload(); }
-function searchByDate(){ const d = sDate.value.split("-").reverse().join("/"); db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val()); showSection('dashboard'); }); }
+function searchByDate(){ 
+    if(!sDate.value) return alert("তারিখ দিন!");
+    const d = sDate.value.split("-").reverse().join("/"); 
+    db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val()); showSection('dashboard'); }); 
+}
 
 function downloadExcel(){
     db.ref("entries").once("value", s => {
@@ -389,7 +453,12 @@ function downloadExcel(){
         let csv = "\ufeffতারিখ,সময়,বিবরণ,মোট টাকা,নগদ গ্রহণ,বাকি টাকা,ইউজার,নোট\n";
         Object.keys(data).forEach(key => {
             const e = data[key];
-            const itemNames = e.items ? e.items.map(i => `${i.work}(${i.qty})`).join(" + ") : `${e.work}(${e.qty})`;
+            let itemNames = "";
+            if(e.items && Array.isArray(e.items)){
+                itemNames = e.items.map(i => `${i.work}(${i.qty})`).join(" + ");
+            } else {
+                itemNames = `${e.work}(${e.qty})`;
+            }
             csv += `${e.date},${e.time},"${itemNames}",${e.total},${e.taken},${e.loss},${e.user},${e.note||''}\n`;
         });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
