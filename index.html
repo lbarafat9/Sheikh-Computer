@@ -28,7 +28,7 @@ button:hover { background: #45a049; }
     <input type="text" id="username" placeholder="আপনার নাম লিখুন">
     <label>পাসওয়ার্ড:</label>
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">লগইন</button>
+    <button id="loginBtn">লগইন</button>
     <p id="loginError" style="color:red;"></p>
 </div>
 
@@ -41,7 +41,7 @@ button:hover { background: #45a049; }
     <input type="text" id="datetime" readonly>
 
     <label>ক্যাটাগরি:</label>
-    <select id="category" onchange="populateWork()">
+    <select id="category">
         <option value="">-- নির্বাচন করুন --</option>
         <option value="Print">প্রিন্ট</option>
         <option value="Typing">টাইপিং</option>
@@ -51,21 +51,21 @@ button:hover { background: #45a049; }
     </select>
 
     <label>কাজ:</label>
-    <select id="work" onchange="setRate()" disabled>
+    <select id="work" disabled>
         <option value="">-- প্রথমে ক্যাটাগরি নির্বাচন করুন --</option>
     </select>
 
     <label>পরিমাণ (Qty / Page / Copy):</label>
-    <input type="number" id="quantity" min="1" value="1" oninput="calculateTotalLive()">
+    <input type="number" id="quantity" min="1" value="1">
 
     <label>দর (Rate / প্রতি ইউনিট):</label>
-    <input type="number" id="rate" value="0" oninput="calculateTotalLive()">
+    <input type="number" id="rate" value="0">
 
     <label>মোট (Total):</label>
     <input type="number" id="total" readonly>
 
     <label>গ্রাহক কত দিয়েছেন (Taken Amount):</label>
-    <input type="number" id="taken" value="0" oninput="calculateTotalLive()">
+    <input type="number" id="taken" value="0">
 
     <label>ছাড় (Discount):</label>
     <input type="number" id="discount" readonly>
@@ -73,7 +73,7 @@ button:hover { background: #45a049; }
     <label>নোট (Optional):</label>
     <input type="text" id="notes">
 
-    <button onclick="saveEntry()">এন্ট্রি সংরক্ষণ করুন</button>
+    <button id="saveBtn">এন্ট্রি সংরক্ষণ করুন</button>
 
     <h3>আজকের এন্ট্রি (Live Table)</h3>
     <table id="entryTable">
@@ -98,7 +98,6 @@ button:hover { background: #45a049; }
 
 <!-- Firebase SDK -->
 <script type="module">
-// Import modular Firebase SDK
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -121,7 +120,7 @@ const rates = {
 let currentUser = "";
 let entries = [];
 
-// Firebase config (আপনার প্রদান করা অনুযায়ী)
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCvNH_VOQm3_FYKQocEVlFN1DTYMy-BPlM",
   authDomain: "sheikh-computer-b41d5.firebaseapp.com",
@@ -132,10 +131,11 @@ const firebaseConfig = {
   appId: "1:349264039976:web:c43d75ef351066b44be51d"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// Login
+// Functions
 function login() {
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value.trim();
@@ -152,13 +152,11 @@ function login() {
     }
 }
 
-// Set Date & Time
 function setDateTime() {
     const now = new Date();
     document.getElementById("datetime").value = now.toLocaleString("bn-BD");
 }
 
-// Populate Work dropdown
 function populateWork() {
     const category = document.getElementById("category").value;
     const workSelect = document.getElementById("work");
@@ -178,7 +176,6 @@ function populateWork() {
     calculateTotalLive();
 }
 
-// Set Rate Auto
 function setRate() {
     const category = document.getElementById("category").value;
     const work = document.getElementById("work").value;
@@ -188,7 +185,6 @@ function setRate() {
     }
 }
 
-// Live Total + Discount calculation
 function calculateTotalLive() {
     const qty = parseFloat(document.getElementById("quantity").value) || 0;
     const rate = parseFloat(document.getElementById("rate").value) || 0;
@@ -198,7 +194,6 @@ function calculateTotalLive() {
     document.getElementById("discount").value = total - taken;
 }
 
-// Save Entry
 function saveEntry() {
     const entry = {
         time: new Date().toLocaleString("bn-BD"),
@@ -212,7 +207,7 @@ function saveEntry() {
         notes: document.getElementById("notes").value,
         user: currentUser
     };
-    push(ref(db, 'entries'), entry);
+    push(ref(db,'entries'), entry);
 
     // Reset form
     document.getElementById("quantity").value = 1;
@@ -223,9 +218,8 @@ function saveEntry() {
     document.getElementById("notes").value = "";
 }
 
-// Load live entries
 function loadEntries() {
-    const entriesRef = ref(db, 'entries');
+    const entriesRef = ref(db,'entries');
     onValue(entriesRef, snapshot => {
         entries = [];
         snapshot.forEach(child => { entries.push(child.val()); });
@@ -233,7 +227,6 @@ function loadEntries() {
     });
 }
 
-// Render Table
 function renderTable() {
     const tbody = document.querySelector("#entryTable tbody");
     tbody.innerHTML = "";
@@ -243,6 +236,15 @@ function renderTable() {
         tbody.appendChild(tr);
     });
 }
+
+// Event Listeners
+document.getElementById("loginBtn").addEventListener("click", login);
+document.getElementById("category").addEventListener("change", populateWork);
+document.getElementById("work").addEventListener("change", setRate);
+document.getElementById("quantity").addEventListener("input", calculateTotalLive);
+document.getElementById("rate").addEventListener("input", calculateTotalLive);
+document.getElementById("taken").addEventListener("input", calculateTotalLive);
+document.getElementById("saveBtn").addEventListener("click", saveEntry);
 </script>
 </body>
 </html>
