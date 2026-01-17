@@ -533,47 +533,74 @@ function autoFillPrice(){
     }
 }
 
-// --- UPDATED ROBUST SEARCH FUNCTION ---
+// --- FIXED SEARCH FUNCTION ---
 function searchProduct(query){
     if(!query) return;
     query = query.toString().toLowerCase().trim();
     
-    // Search by Serial OR Name (Partial match)
+    // Search by Serial, Name OR Firebase Key
     const product = allProducts.find(p => 
-        (p.serial && String(p.serial).toLowerCase() === query) || 
-        (p.name && p.name.toLowerCase().includes(query))
+        (p.serial && String(p.serial).toLowerCase().includes(query)) || 
+        (p.name && p.name.toLowerCase().includes(query)) ||
+        (p.key && p.key.toLowerCase().includes(query))
     );
 
     if(product){
+        console.log("Found product:", product); // Debug log
+        
         // 1. Set Category
         const catSelect = document.getElementById("category");
         catSelect.value = product.category;
         
-        // 2. Force Filter
-        filterProducts(); 
-
-        // 3. Set Product (Check if category match failed, then reset to All)
-        const workSelect = document.getElementById("work");
-        workSelect.value = product.key;
+        // 2. Filter products based on selected category
+        filterProducts();
         
-        if(workSelect.value !== product.key){
-             catSelect.value = ""; // Reset category
-             filterProducts();
-             workSelect.value = product.key;
-        }
-        
-        // 4. Set Price & Qty
-        document.getElementById("rate").value = product.sellPrice;
-        document.getElementById("qty").value = 1;
-        document.getElementById("searchSerial").value = ""; 
+        // 3. Wait for dropdown to populate then select product
+        setTimeout(() => {
+            const workSelect = document.getElementById("work");
+            let found = false;
+            
+            // Find the product in the dropdown
+            for(let i = 0; i < workSelect.options.length; i++){
+                if(workSelect.options[i].value === product.key){
+                    workSelect.selectedIndex = i;
+                    found = true;
+                    break;
+                }
+            }
+            
+            // If not found in filtered list, reset category and search again
+            if(!found){
+                catSelect.value = ""; // Reset category
+                filterProducts(); // Show all products
+                
+                setTimeout(() => {
+                    for(let i = 0; i < workSelect.options.length; i++){
+                        if(workSelect.options[i].value === product.key){
+                            workSelect.selectedIndex = i;
+                            autoFillPrice();
+                            break;
+                        }
+                    }
+                }, 100);
+            } else {
+                autoFillPrice();
+            }
+            
+            // 4. Set Price & Qty
+            document.getElementById("rate").value = product.sellPrice;
+            document.getElementById("qty").value = 1;
+            document.getElementById("searchSerial").value = ""; 
 
-        // 5. UX Focus
-        const qtyBox = document.getElementById("qty");
-        qtyBox.focus();
-        qtyBox.select(); 
+            // 5. UX Focus
+            const qtyBox = document.getElementById("qty");
+            qtyBox.focus();
+            qtyBox.select(); 
+
+        }, 150); // Wait for DOM to update
 
     } else {
-        alert("কোনো পণ্য পাওয়া যায়নি!");
+        alert("কোনো পণ্য পাওয়া যায়নি! Serial, Name অথবা ID চেক করুন।");
         document.getElementById("searchSerial").value = "";
         document.getElementById("searchSerial").focus();
     }
