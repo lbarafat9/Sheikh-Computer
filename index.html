@@ -41,18 +41,25 @@
         th,td{padding:12px;border-bottom:1px solid #f0f0f0;text-align:left}
         th{background:#f9f9f9;color:#7f8c8d;font-size:13px}
         
-        .btn-del{background:#e74c3c;padding:5px 10px;width:auto;font-size:12px;border-radius:5px; margin:0;}
+        .btn-action{padding:5px 8px; font-size:14px; margin:0 2px; border-radius:4px;}
+        .btn-del{background:#e74c3c; color:white;}
+        .btn-edit{background:#f39c12; color:white;}
+        .btn-print{background:#3498db; color:white;}
         
         .cart-box {margin-top:20px; border:2px dashed #2ecc71; padding:15px; border-radius:12px; background:#f9fff9}
         .cart-item {display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px}
         
-        #memoModal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
+        .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
         .chart-container{background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
+
+        /* New Style for User Summary */
+        .user-summary-box { background:#fff; padding:15px; border-radius:12px; margin-bottom:25px; border-left: 5px solid #9b59b6; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
+        .low-stock { color: #e74c3c; font-weight: bold; }
 
         @media print{
             body *{visibility:hidden}
             #memoModal, #memoModal *{visibility:visible}
-            #memoModal{position:absolute;left:0;top:0;transform:none;box-shadow:none;width:100%}
+            #memoModal{position:absolute;left:0;top:0;transform:none;box-shadow:none;width:100%;display:block!important}
             .noPrint{display:none!important}
         }
     </style>
@@ -83,16 +90,37 @@
 
     <div id="dashboard" class="section">
         <div class="stats en">
-            <div class="card" style="border-top-color:#3498db">এন্ট্রি<br><b id="cCount">0</b></div>
-            <div class="card" style="border-top-color:#2ecc71">মোট (৳)<br><b id="cTotal">0</b></div>
-            <div class="card" style="border-top-color:#f1c40f">নগদ (৳)<br><b id="cTaken">0</b></div>
-            <div class="card" style="border-top-color:#e74c3c">বাকি (৳)<br><b id="cLoss">0</b></div>
+            <div class="card" style="border-top-color:#3498db">মোট এন্ট্রি<br><b id="cCount">0</b></div>
+            <div class="card" style="border-top-color:#2ecc71">সর্বমোট (৳)<br><b id="cTotal">0</b></div>
+            <div class="card" style="border-top-color:#f1c40f">নগদ গ্রহণ (৳)<br><b id="cTaken">0</b></div>
+            <div class="card" style="border-top-color:#e74c3c">মোট বাকি (৳)<br><b id="cLoss">0</b></div>
         </div>
+
+        <div class="user-summary-box">
+            <h4 style="margin:0 0 10px 0; color:#8e44ad">📅 আজকের দিনের ইউজার হিসাব</h4>
+            <div class="table-box" style="box-shadow:none; border:1px solid #eee;">
+                <table class="en">
+                    <thead>
+                        <tr>
+                            <th>ইউজার</th>
+                            <th>মোট কাজ (৳)</th>
+                            <th>নগদ গ্রহণ (৳)</th>
+                            <th>বাকি দিয়েছে (৳)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userSummaryBody">
+                        <tr><td colspan="4" style="text-align:center">আজকের কোনো ডাটা নেই</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="chart-container"><canvas id="salesChart" height="100"></canvas></div>
+        
         <div class="table-box">
             <h4 style="padding:15px; margin:0">সাম্প্রতিক কার্যক্রম</h4>
             <table class="en">
-                <thead><tr><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">X</th></tr></thead>
+                <thead><tr><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
@@ -106,7 +134,7 @@
                 <label>ক্যাটাগরি:</label>
                 <div style="display:flex;gap:5px">
                     <select id="category" onchange="catChange()"></select>
-                    <button onclick="deleteCategory()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                    <button onclick="deleteCategory()" class="btn-action btn-del" style="margin-top:0;">🗑️</button>
                 </div>
             </div>
 
@@ -114,7 +142,7 @@
                 <label>কাজ/পণ্য:</label>
                 <div style="display:flex;gap:5px">
                     <select id="work" disabled onchange="workChange()"></select>
-                    <button onclick="deleteWork()" class="btn-del" style="margin-top:0; background:#e74c3c">🗑️</button>
+                    <button onclick="deleteWork()" class="btn-action btn-del" style="margin-top:0;">🗑️</button>
                 </div>
             </div>
 
@@ -167,22 +195,29 @@
     </div>
 
     <div id="reports" class="section">
-        <div class="noPrint" style="max-width: 800px; margin: auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
+        <div class="noPrint" style="max-width: 900px; margin: auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
             <h3 style="text-align:center; margin-top:0">রিপোর্ট ডাউনলোড ও সার্চ</h3>
             <div style="display:grid; grid-template-columns: 1fr auto; gap:10px; margin-bottom: 20px">
                 <input type="date" id="sDate" class="en" style="margin:0">
                 <button onclick="searchByDate()" style="width:auto;margin:0;padding:0 25px">সার্চ করুন</button>
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                <button onclick="loadEntries()" style="background:#95a5a6">সব ডাটা লোড করুন</button>
-                <button onclick="downloadExcel()" style="background:#27ae60">📊 এক্সেল ফাইল ডাউনলোড</button>
-                <button onclick="window.print()" style="background:#9b59b6; grid-column: span 2">পৃষ্ঠাটি প্রিন্ট করুন</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px">
+                <button onclick="loadReportData()" style="background:#95a5a6">সব ডাটা লোড করুন</button>
+                <button onclick="downloadExcel()" style="background:#27ae60">📊 এক্সেল</button>
+                <button onclick="window.print()" style="background:#9b59b6;">🖨️ প্রিন্ট</button>
+            </div>
+            
+            <div class="table-box" style="margin-top:25px; border:1px solid #eee">
+                <table class="en">
+                    <thead><tr><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
+                    <tbody id="reportTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
-<div id="memoModal">
+<div id="memoModal" class="modal">
     <div style="text-align:center">
         <h3 style="margin:0; color:#2ecc71">শেখ কম্পিউটার</h3>
         <p style="font-size:11px;margin:2px">কাশিয়ানী উপজেলার সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
@@ -215,7 +250,26 @@
     <hr>
     <p style="text-align:center; font-size:10px">ধন্যবাদ, আবার আসবেন!</p>
     <button onclick="window.print()" class="noPrint">প্রিন্ট</button>
-    <button onclick="closeMemo()" class="noPrint" style="background:#7f8c8d">বন্ধ করুন</button>
+    <button onclick="closeModal('memoModal')" class="noPrint" style="background:#7f8c8d">বন্ধ করুন</button>
+</div>
+
+<div id="editModal" class="modal">
+    <h3 style="margin-top:0; color:#f39c12">এন্ট্রি এডিট করুন</h3>
+    <input type="hidden" id="editKey">
+    <div class="form-group">
+        <label>কাস্টমারের নাম:</label>
+        <input id="editNote">
+    </div>
+    <div class="form-group">
+        <label>মোবাইল:</label>
+        <input id="editPhone" class="en">
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+        <div class="form-group"><label>মোট টাকা:</label><input id="editTotal" type="number" class="en"></div>
+        <div class="form-group"><label>নগদ:</label><input id="editTaken" type="number" class="en"></div>
+    </div>
+    <button onclick="updateEntry()" style="background:#f39c12; margin-top:15px">আপডেট করুন</button>
+    <button onclick="closeModal('editModal')" style="background:#e74c3c">বাতিল</button>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -310,6 +364,20 @@ function renderCart(){
 function removeCart(index){ cart.splice(index,1); renderCart(); }
 function calcLoss(){ loss.value = (parseFloat(total.value) || 0) - (parseFloat(taken.value) || 0); }
 
+function deductStock(cartItems) {
+    db.ref("inventory").once("value", s => {
+        const stockData = s.val();
+        if(!stockData) return;
+        cartItems.forEach(cItem => {
+            const key = Object.keys(stockData).find(k => stockData[k].name === cItem.work);
+            if(key) {
+                const newQty = parseFloat(stockData[key].qty) - parseFloat(cItem.qty);
+                db.ref("inventory/" + key).update({ qty: newQty });
+            }
+        });
+    });
+}
+
 function saveBulkEntry(showMemoFlag){
     if(!cart.length) return;
     const entryData = {
@@ -324,41 +392,145 @@ function saveBulkEntry(showMemoFlag){
         phone: phone.value || ""
     };
     db.ref("entries").push(entryData).then(() => {
+        deductStock(cart);
         if(showMemoFlag) showMemo(entryData);
         else alert("সেভ হয়েছে!");
         cart = []; renderCart(); note.value = ""; phone.value = ""; taken.value = ""; loss.value="0";
     });
 }
 
-function showMemo(e){
-    mDate.innerText = e.date; mUser.innerText = e.user; mNote.innerText = e.note;
-    mPhoneDisp.innerText = e.phone ? `(${e.phone})` : "";
-    mTotal.innerText = e.total; mPaid.innerText = e.taken; mDue.innerText = e.loss;
-    mItems.innerHTML = "";
-    e.items.forEach(i => mItems.innerHTML += `<tr><td>${i.work}</td><td>${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`);
+function viewMemo(key) {
+    db.ref("entries/" + key).once("value", s => {
+        if(s.val()) showMemo(s.val());
+    });
+}
 
+function showMemo(e){
+    document.getElementById("mDate").innerText = e.date;
+    document.getElementById("mUser").innerText = e.user;
+    document.getElementById("mNote").innerText = e.note;
+    document.getElementById("mPhoneDisp").innerText = e.phone ? `(${e.phone})` : "";
+    document.getElementById("mTotal").innerText = e.total;
+    document.getElementById("mPaid").innerText = e.taken;
+    document.getElementById("mDue").innerText = e.loss;
+    const mItems = document.getElementById("mItems");
+    mItems.innerHTML = "";
+    if(e.items && Array.isArray(e.items)){
+        e.items.forEach(i => mItems.innerHTML += `<tr><td>${i.work}</td><td>${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`);
+    } else {
+        mItems.innerHTML += `<tr><td>${e.work}</td><td>-</td><td style="text-align:right">${e.total}</td></tr>`;
+    }
     let signs = {owner:["Toosher Ahmed","01913-812765"], admin:["Arafat Sikder","016749-44985"], roky:["Roky","01878-149052"]};
     let s = signs[e.user] || [e.user.toUpperCase(), ""];
     document.getElementById("signatureName").innerText = s[0];
     document.getElementById("signatureContact").innerText = s[1];
-
-    memoModal.style.display="block"; overlay.style.display="block";
+    document.getElementById("memoModal").style.display="block";
+    document.getElementById("overlay").style.display="block";
 }
 
-function renderTable(data){
-    tableBody.innerHTML=""; if(!data) return;
+function closeModal(id) {
+    document.getElementById(id).style.display="none";
+    document.getElementById("overlay").style.display="none";
+}
+
+function openEdit(key) {
+    db.ref("entries/" + key).once("value", s => {
+        const d = s.val();
+        document.getElementById("editKey").value = key;
+        document.getElementById("editNote").value = d.note;
+        document.getElementById("editPhone").value = d.phone;
+        document.getElementById("editTotal").value = d.total;
+        document.getElementById("editTaken").value = d.taken;
+        document.getElementById("editModal").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    });
+}
+
+function updateEntry() {
+    const key = document.getElementById("editKey").value;
+    const t = parseFloat(document.getElementById("editTotal").value) || 0;
+    const k = parseFloat(document.getElementById("editTaken").value) || 0;
+    db.ref("entries/" + key).update({
+        note: document.getElementById("editNote").value,
+        phone: document.getElementById("editPhone").value,
+        total: t,
+        taken: k,
+        loss: t - k
+    }).then(() => { alert("আপডেট হয়েছে!"); closeModal("editModal"); });
+}
+
+// *** Calculate and Render User Summary ***
+function renderUserStats(data) {
+    const today = new Date().toLocaleDateString("en-GB");
+    let stats = {};
+    let hasData = false;
+
+    // Default users
+    ['admin', 'owner', 'roky'].forEach(u => stats[u] = {total:0, taken:0, loss:0});
+
+    if(data) {
+        Object.keys(data).forEach(key => {
+            const e = data[key];
+            // Only process TODAY's data for this summary
+            if(e.date === today) {
+                hasData = true;
+                const u = e.user.toLowerCase();
+                if(!stats[u]) stats[u] = {total:0, taken:0, loss:0};
+                stats[u].total += (+e.total || 0);
+                stats[u].taken += (+e.taken || 0);
+                stats[u].loss += (+e.loss || 0);
+            }
+        });
+    }
+
+    const tbody = document.getElementById("userSummaryBody");
+    tbody.innerHTML = "";
+
+    if(!hasData) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#777">আজকের কোনো এন্ট্রি নেই</td></tr>`;
+        return;
+    }
+
+    Object.keys(stats).forEach(u => {
+        if(stats[u].total > 0 || stats[u].taken > 0) { // Only show users with activity
+            tbody.innerHTML += `<tr>
+                <td style="text-transform:capitalize; font-weight:bold">${u}</td>
+                <td>${stats[u].total}</td>
+                <td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td>
+                <td style="color:#e74c3c">${stats[u].loss}</td>
+            </tr>`;
+        }
+    });
+}
+
+function renderTable(data, tableId = "tableBody"){
+    const tbody = document.getElementById(tableId);
+    tbody.innerHTML=""; 
+    if(!data) {
+        if(tableId === "reportTableBody") tbody.innerHTML = "<tr><td colspan='8' style='text-align:center'>কোনো ডাটা পাওয়া যায়নি</td></tr>";
+        return;
+    }
+    
     let t=0, k=0, l=0, dailyData={};
     Object.keys(data).reverse().forEach(key=>{
         const e = data[key];
         t += +e.total || 0; k += +e.taken || 0; l += +e.loss || 0;
         const itemNames = (e.items && Array.isArray(e.items)) ? e.items.map(i => i.work).join(", ") : e.work;
         const phone = e.phone || "-";
-        const actions = (user === e.user) ? `<button class="btn-del" onclick="delEntry('${key}')">❌</button>` : `<small>🔒</small>`;
-        tableBody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px"><b>${e.note}</b><br>${itemNames}</td><td class="en">${phone}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint">${actions}</td></tr>`;
+        const btnMemo = `<button class="btn-action btn-print" onclick="viewMemo('${key}')" title="মেমো">🖨️</button>`;
+        const btnEdit = `<button class="btn-action btn-edit" onclick="openEdit('${key}')" title="এডিট">✏️</button>`;
+        const btnDel = (user === e.user) ? `<button class="btn-action btn-del" onclick="delEntry('${key}')" title="ডিলিট">❌</button>` : ``;
+        
+        tbody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px"><b>${e.note}</b><br>${itemNames}</td><td class="en">${phone}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint" style="display:flex">${btnMemo}${btnEdit}${btnDel}</td></tr>`;
         dailyData[e.date] = (dailyData[e.date]||0) + (+e.total||0);
     });
-    cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
-    updateChart(dailyData);
+    
+    if(tableId === "tableBody") {
+        cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
+        updateChart(dailyData);
+        // *** Trigger User Stats Update ***
+        renderUserStats(data);
+    }
 }
 
 function updateChart(data){
@@ -375,23 +547,39 @@ function delEntry(key){
     });
 }
 function addStock(){ if(itemName.value && itemStock.value) { db.ref("inventory").push({name:itemName.value, qty:itemStock.value}); itemName.value=""; itemStock.value=""; } }
-function loadStock(){ db.ref("inventory").on("value", s=>{ stockBody.innerHTML=""; const d = s.val(); if(d) Object.keys(d).forEach(k=>{ stockBody.innerHTML+=`<tr><td>${d[k].name}</td><td>${d[k].qty}</td><td><button class="btn-del" onclick="delInv('${k}')">🗑️</button></td></tr>`; }); }); }
+
+function loadStock(){ 
+    db.ref("inventory").on("value", s=>{ 
+        stockBody.innerHTML=""; 
+        const d = s.val(); 
+        if(d) Object.keys(d).forEach(k=>{ 
+            const q = d[k].qty;
+            const lowClass = q < 5 ? "low-stock" : ""; // Warning if less than 5
+            stockBody.innerHTML+=`<tr class="${lowClass}">
+                <td>${d[k].name}</td>
+                <td>${q} ${q < 5 ? '⚠️' : ''}</td>
+                <td><button class="btn-action btn-del" onclick="delInv('${k}')">🗑️</button></td>
+            </tr>`; 
+        }); 
+    }); 
+}
+
 function delInv(k){ if(user==='owner' && confirm("মুছবেন?")) db.ref("inventory/"+k).remove(); }
-function loadEntries(){ db.ref("entries").on("value", s => renderTable(s.val())); }
+function loadEntries(){ db.ref("entries").on("value", s => renderTable(s.val(), "tableBody")); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.style.display="none"); document.getElementById(id).style.display="block"; closeSidebar(); }
 function closeSidebar(){ sidebar.style.left="-280px"; overlay.style.display="none"; }
 function openSidebar(){ sidebar.style.left="0"; overlay.style.display="block"; }
-function closeMemo(){ memoModal.style.display="none"; overlay.style.display="none"; }
 function logout() { localStorage.removeItem("loggedInUser"); location.reload(); }
+
 function searchByDate(){ 
     if(!sDate.value) return; 
     const d = sDate.value.split("-").reverse().join("/"); 
-    db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val()); showSection('dashboard'); }); 
+    db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val(), "reportTableBody"); }); 
 }
-
+function loadReportData() { db.ref("entries").once("value", s => renderTable(s.val(), "reportTableBody")); }
 function downloadExcel(){
     db.ref("entries").once("value", s => {
-        const d = s.val(); if(!d) return;
+        const d = s.val(); if(!d) return alert("কোনো ডাটা নেই");
         let csv = "\ufeffতারিখ,সময়,কাস্টমার,মোবাইল,বিবরণ,মোট,নগদ,বাকি,ইউজার\n";
         Object.keys(d).forEach(k => { 
             const e = d[k]; 
