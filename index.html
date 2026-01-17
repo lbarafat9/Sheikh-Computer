@@ -522,21 +522,26 @@ function filterProducts(){
     filtered.forEach(p => { 
         workSelect.innerHTML += `<option value="${p.key}" data-price="${p.sellPrice}">${p.name} (${p.serial || '-'})</option>`; 
     });
+    
+    // Return promise for better async handling
+    return new Promise(resolve => setTimeout(resolve, 50));
 }
 
 function autoFillPrice(){
     const workSelect = document.getElementById("work");
     const selectedOption = workSelect.options[workSelect.selectedIndex];
-    if(selectedOption.value){
-        document.getElementById("rate").value = selectedOption.getAttribute("data-price");
-        document.getElementById("qty").focus(); // UX: Focus quantity after selecting product
+    if(selectedOption && selectedOption.value){
+        document.getElementById("rate").value = selectedOption.getAttribute("data-price") || "";
+        document.getElementById("qty").focus();
     }
 }
 
 // --- FIXED SEARCH FUNCTION ---
 function searchProduct(query){
-    if(!query) return;
+    if(!query || query.trim() === "") return;
     query = query.toString().toLowerCase().trim();
+    
+    console.log("Searching for:", query);
     
     // Search by Serial, Name OR Firebase Key
     const product = allProducts.find(p => 
@@ -546,58 +551,48 @@ function searchProduct(query){
     );
 
     if(product){
-        console.log("Found product:", product); // Debug log
+        console.log("Found product:", product.name, "Key:", product.key);
         
-        // 1. Set Category
-        const catSelect = document.getElementById("category");
-        catSelect.value = product.category;
+        // Clear search input immediately
+        document.getElementById("searchSerial").value = "";
         
-        // 2. Filter products based on selected category
-        filterProducts();
+        // First, set category to empty to show all products
+        document.getElementById("category").value = "";
         
-        // 3. Wait for dropdown to populate then select product
+        // Wait a bit for category change to take effect
         setTimeout(() => {
-            const workSelect = document.getElementById("work");
-            let found = false;
-            
-            // Find the product in the dropdown
-            for(let i = 0; i < workSelect.options.length; i++){
-                if(workSelect.options[i].value === product.key){
-                    workSelect.selectedIndex = i;
-                    found = true;
-                    break;
-                }
-            }
-            
-            // If not found in filtered list, reset category and search again
-            if(!found){
-                catSelect.value = ""; // Reset category
-                filterProducts(); // Show all products
+            filterProducts().then(() => {
+                // After filtering, find and select the product
+                const workSelect = document.getElementById("work");
                 
-                setTimeout(() => {
-                    for(let i = 0; i < workSelect.options.length; i++){
-                        if(workSelect.options[i].value === product.key){
-                            workSelect.selectedIndex = i;
-                            autoFillPrice();
-                            break;
-                        }
+                // Try to find the product in dropdown
+                for(let i = 0; i < workSelect.options.length; i++){
+                    if(workSelect.options[i].value === product.key){
+                        workSelect.selectedIndex = i;
+                        
+                        // Now set the category based on selected product
+                        document.getElementById("category").value = product.category;
+                        
+                        // Fill price
+                        document.getElementById("rate").value = product.sellPrice;
+                        document.getElementById("qty").value = 1;
+                        
+                        // Focus on quantity
+                        setTimeout(() => {
+                            const qtyBox = document.getElementById("qty");
+                            qtyBox.focus();
+                            qtyBox.select();
+                        }, 100);
+                        
+                        console.log("Product selected successfully");
+                        return;
                     }
-                }, 100);
-            } else {
-                autoFillPrice();
-            }
-            
-            // 4. Set Price & Qty
-            document.getElementById("rate").value = product.sellPrice;
-            document.getElementById("qty").value = 1;
-            document.getElementById("searchSerial").value = ""; 
-
-            // 5. UX Focus
-            const qtyBox = document.getElementById("qty");
-            qtyBox.focus();
-            qtyBox.select(); 
-
-        }, 150); // Wait for DOM to update
+                }
+                
+                // If not found, show error
+                alert("পণ্যটি ড্রপডাউনে পাওয়া যায়নি!");
+            });
+        }, 100);
 
     } else {
         alert("কোনো পণ্য পাওয়া যায়নি! Serial, Name অথবা ID চেক করুন।");
@@ -605,6 +600,55 @@ function searchProduct(query){
         document.getElementById("searchSerial").focus();
     }
 }
+
+// Alternative simpler search function
+function searchProductSimple(query){
+    if(!query || query.trim() === "") return;
+    query = query.toString().toLowerCase().trim();
+    
+    console.log("Simple search for:", query);
+    
+    // Find product
+    const product = allProducts.find(p => 
+        (p.serial && String(p.serial).toLowerCase().includes(query)) || 
+        (p.name && p.name.toLowerCase().includes(query)) ||
+        (p.key && p.key.toLowerCase().includes(query))
+    );
+
+    if(product){
+        console.log("Found:", product.name);
+        
+        // DIRECT APPROACH - Manually create option
+        const workSelect = document.getElementById("work");
+        
+        // Clear and add our product as option
+        workSelect.innerHTML = `<option value="${product.key}" data-price="${product.sellPrice}">${product.name} (${product.serial || '-'})</option>`;
+        
+        // Select it
+        workSelect.selectedIndex = 0;
+        
+        // Set category
+        document.getElementById("category").value = product.category;
+        
+        // Set price and quantity
+        document.getElementById("rate").value = product.sellPrice;
+        document.getElementById("qty").value = 1;
+        document.getElementById("searchSerial").value = "";
+        
+        // Focus
+        setTimeout(() => {
+            document.getElementById("qty").focus();
+            document.getElementById("qty").select();
+        }, 50);
+        
+    } else {
+        alert("কোনো পণ্য পাওয়া যায়নি!");
+        document.getElementById("searchSerial").focus();
+    }
+}
+
+// Use this updated version in your HTML
+// Change line 180 to: <input id="searchSerial" ... onkeydown="if(event.key === 'Enter'){ searchProductSimple(this.value); }">
 
 function addToCart(){
     const workSelect = document.getElementById("work");
@@ -1040,6 +1084,19 @@ function downloadExcel(){
         link.click();
     });
 }
+
+// Temporary fix - update the onkeydown event in the HTML
+window.addEventListener('load', function() {
+    // Update the search input to use the simple function
+    const searchInput = document.getElementById("searchSerial");
+    if(searchInput) {
+        searchInput.onkeydown = function(event) {
+            if(event.key === 'Enter') {
+                searchProductSimple(this.value);
+            }
+        };
+    }
+});
 </script>
 </body>
 </html>
