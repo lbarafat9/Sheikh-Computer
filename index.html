@@ -49,38 +49,56 @@
         .cart-box {margin-top:20px; border:2px dashed #2ecc71; padding:15px; border-radius:12px; background:#f9fff9}
         .cart-item {display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; font-size:14px}
         
-        .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
+        .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:600px; max-width: 95%; padding:30px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
         .chart-container{background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
 
         .user-summary-box { background:#fff; padding:15px; border-radius:12px; margin-bottom:25px; border-left: 5px solid #9b59b6; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
         .low-stock { color: #e74c3c; font-weight: bold; }
         .service-badge { background: #3498db; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
 
-        /* PRINT CSS FOR POS PRINTER */
+        /* A4 PRINT CSS */
         @media print {
-            @page { size: auto; margin: 0; }
-            body { margin: 0; padding: 0; background: white; }
+            @page { size: A4; margin: 1.5cm; }
+            body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; }
             body * { visibility: hidden; }
+            
             #memoModal, #memoModal * { visibility: visible !important; }
             #memoModal {
                 display: block !important; 
                 position: absolute; 
                 left: 0; top: 0;
-                width: 72mm; /* Standard POS Width */
+                width: 100%;
                 margin: 0; 
-                padding: 10px; 
+                padding: 0; 
                 transform: none; 
                 box-shadow: none; 
                 border: none;
-                font-size: 12px;
+                background: white;
             }
-            #memoModal h2 { font-size: 18px !important; margin-bottom: 2px; color: #000 !important; font-weight: 700; }
-            #memoModal p { font-size: 11px !important; color: #000 !important; margin: 2px 0; }
-            #memoModal hr { border-color: #000 !important; border-width: 1px; border-style:dashed; margin: 5px 0;}
-            #memoModal table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-            #memoModal th { font-size: 12px !important; border-bottom: 1px dashed #000 !important; padding: 4px 0; color: #000 !important; }
-            #memoModal td { font-size: 12px !important; padding: 4px 0; border-bottom: 1px dotted #ddd; color: #000; }
-            #mTotal, #mPaid, #mDue { font-size: 14px !important; font-weight: bold; }
+            
+            /* Print Header */
+            #memoModal h2 { font-size: 32px !important; margin-bottom: 5px; color: #2c3e50 !important; text-align: center; }
+            #memoModal p { color: #34495e !important; }
+            #memoModal .address { font-size: 16px !important; text-align: center; margin-bottom: 20px; }
+            
+            /* Print Meta Info */
+            .memo-meta { display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #2c3e50; padding-bottom: 10px; }
+            .memo-meta div { font-size: 16px !important; }
+
+            /* Print Table */
+            #memoModal table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 16px; }
+            #memoModal th { background: #eee !important; color: #000 !important; border: 1px solid #000; padding: 10px; font-weight: bold; }
+            #memoModal td { border: 1px solid #000; padding: 10px; }
+            
+            /* Print Totals */
+            .memo-total-area { margin-top: 20px; text-align: right; font-size: 18px !important; }
+            .memo-total-area p { margin: 5px 0; }
+            
+            /* Signature */
+            .signature-area { margin-top: 60px; display: flex; justify-content: space-between; }
+            .signature-box { text-align: center; width: 200px; }
+            .signature-line { border-top: 1px solid #000; margin-top: 50px; padding-top: 5px; font-size: 14px; }
+
             .noPrint { display: none !important; }
         }
     </style>
@@ -249,43 +267,55 @@
 
 <div id="memoModal" class="modal">
     <div style="text-align:center">
-        <h2 style="margin:0; color:#2ecc71">শেখ ফটোকপি</h2>
-        <p style="font-size:12px;margin:2px">কাশিয়ানী উপজেলা পরিষদের সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
-        <hr>
+        <h2 style="margin:0; color:#2ecc71">শেখ ফটোকপি এন্ড স্টেশনারি</h2>
+        <p class="address" style="margin:2px">কাশিয়ানী উপজেলা পরিষদের সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
     </div>
-    <div style="font-size:14px; text-align:left; padding-top:5px" class="en">
-        <div style="display:flex; justify-content:space-between;">
-            <span>তারিখ: <span id="mDate"></span></span>
-            <span>ইউজার: <span id="mUser"></span></span>
+    
+    <div class="memo-meta en" style="margin-top:20px;">
+        <div style="text-align:left">
+            <p style="margin:2px"><strong>তারিখ:</strong> <span id="mDate"></span></p>
+            <p style="margin:2px"><strong>তৈরি করেছেন:</strong> <span id="mUser" style="text-transform:uppercase"></span></p>
         </div>
-        <p style="margin-top:5px">কাস্টমার: <b id="mNote"></b> <span id="mPhoneDisp"></span></p>
-        
-        <table style="width:100%; font-size:14px; margin-top:5px">
-            <thead style="border-bottom:1px solid #000"><tr><th style="text-align:left">বিবরণ</th><th style="text-align:center">পরিমাণ</th><th style="text-align:right">টাকা</th></tr></thead>
-            <tbody id="mItems"></tbody>
-        </table>
-        <hr style="margin-top:10px; margin-bottom:5px">
         <div style="text-align:right">
-            <p>মোট: ৳<b id="mTotal" style="font-size:16px"></b></p>
-            <p>নগদ: ৳<span id="mPaid"></span></p>
-            <p>বাকি: ৳<b id="mDue"></b></p>
+            <p style="margin:2px"><strong>কাস্টমার:</strong> <span id="mNote"></span></p>
+            <p style="margin:2px"><strong>মোবাইল:</strong> <span id="mPhoneDisp"></span></p>
         </div>
     </div>
-    <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
-        <div style="text-align: center; width: 150px;">
-            <p style="margin: 0; font-size: 13px; font-weight: bold;" id="signatureName" class="en"></p>
-            <div style="border-top: 1px solid #000; margin-top: 5px;"></div>
-            <p style="margin: 0; font-size: 10px; color: #7f8c8d;">স্বাক্ষর</p>
+        
+    <table style="width:100%; border-collapse:collapse; margin-top:10px">
+        <thead>
+            <tr style="background:#f9f9f9">
+                <th style="border:1px solid #ddd; padding:8px; text-align:left">বিবরণ</th>
+                <th style="border:1px solid #ddd; padding:8px; text-align:center; width:100px">পরিমাণ</th>
+                <th style="border:1px solid #ddd; padding:8px; text-align:right; width:120px">টাকা</th>
+            </tr>
+        </thead>
+        <tbody id="mItems" class="en"></tbody>
+    </table>
+    
+    <div class="memo-total-area en" style="margin-top:15px; text-align:right">
+        <p>মোট টাকা: ৳<b id="mTotal"></b></p>
+        <p>জমা/নগদ: ৳<span id="mPaid"></span></p>
+        <p>বাকি: ৳<b id="mDue" style="color:red"></b></p>
+    </div>
+    
+    <div class="signature-area" style="margin-top: 50px; display: flex; justify-content: space-between;">
+        <div class="signature-box" style="text-align:center; width:200px">
+            <p class="signature-line" style="border-top:1px solid #000; padding-top:5px; margin-top:40px">কাস্টমারের স্বাক্ষর</p>
+        </div>
+        <div class="signature-box" style="text-align:center; width:200px">
+            <p style="margin:0; font-weight:bold" id="signatureName" class="en"></p>
+            <p class="signature-line" style="border-top:1px solid #000; padding-top:5px; margin-top:5px">কর্তৃপক্ষের স্বাক্ষর</p>
         </div>
     </div>
-    <div style="margin-top:20px; text-align:center; border-top:1px dashed #ccc; padding-top:5px"><p style="text-align:center; font-size:12px; margin:0">ধন্যবাদ, আবার আসবেন!</p></div>
-    <div style="margin-top:15px; text-align:center" class="noPrint">
-        <button onclick="window.print()" style="width:auto; padding:8px 20px">🖨️ প্রিন্ট করুন</button>
-        <button onclick="closeModal('memoModal')" style="background:#e74c3c; width:auto; padding:8px 20px">বন্ধ করুন</button>
+    
+    <div style="margin-top:30px; text-align:center; border-top:1px dashed #ccc; padding-top:10px" class="noPrint">
+        <button onclick="window.print()" style="width:auto; padding:8px 25px">🖨️ প্রিন্ট করুন</button>
+        <button onclick="closeModal('memoModal')" style="background:#e74c3c; width:auto; padding:8px 25px">বন্ধ করুন</button>
     </div>
 </div>
 
-<div id="editModal" class="modal">
+<div id="editModal" class="modal" style="width:350px">
     <h3 style="margin-top:0; color:#f39c12">এন্ট্রি এডিট করুন</h3>
     <input type="hidden" id="editKey">
     <div class="form-group"><label>কাস্টমারের নাম:</label><input id="editNote"></div>
@@ -333,51 +363,31 @@ function setupUser(u) {
 // ============== NEW UNIFIED PRODUCT LOGIC ==============
 
 function loadAllProducts(){
-    // Fetch all products for both Stock Table & Entry Dropdown
     db.ref("products").on("value", s => {
         allProducts = [];
         const stockBody = document.getElementById("stockBody");
         stockBody.innerHTML = "";
-        
-        // Setup Category Dropdown
         const categories = new Set();
-
         s.forEach(child => {
             const p = child.val();
             const key = child.key;
-            p.key = key; // Save firebase key
+            p.key = key; 
             allProducts.push(p);
             categories.add(p.category);
-
-            // Populate Stock Table
             let stockDisplay = "";
             let rowClass = "";
-
             if(p.isService) {
                 stockDisplay = `<span class="service-badge">Service</span>`;
             } else {
                 stockDisplay = `${p.qty} ${p.qty < 5 ? '⚠️' : ''}`;
                 if(p.qty < 5) rowClass = "low-stock";
             }
-
-            stockBody.innerHTML += `<tr class="${rowClass}">
-                <td>${p.serial || '-'}</td>
-                <td>${p.category}</td>
-                <td>${p.name}</td>
-                <td>${stockDisplay}</td>
-                <td>${p.sellPrice}</td>
-                <td><button class="btn-action btn-del" onclick="delProduct('${key}')">🗑️</button></td>
-            </tr>`;
+            stockBody.innerHTML += `<tr class="${rowClass}"><td>${p.serial || '-'}</td><td>${p.category}</td><td>${p.name}</td><td>${stockDisplay}</td><td>${p.sellPrice}</td><td><button class="btn-action btn-del" onclick="delProduct('${key}')">🗑️</button></td></tr>`;
         });
-
-        // Populate New Entry Category Select
         const catSelect = document.getElementById("category");
         catSelect.innerHTML = "<option value=''>সব ক্যাটাগরি</option>";
-        categories.forEach(c => {
-            catSelect.innerHTML += `<option value="${c}">${c}</option>`;
-        });
-        
-        filterProducts(); // Reset product dropdown
+        categories.forEach(c => { catSelect.innerHTML += `<option value="${c}">${c}</option>`; });
+        filterProducts(); 
     });
 }
 
@@ -385,66 +395,30 @@ function toggleStockInput(){
     const isService = document.getElementById("stIsService").checked;
     const qtyInput = document.getElementById("stQty");
     const costInput = document.getElementById("stCost");
-
     if(isService){
-        // Disable Qty
-        qtyInput.value = "";
-        qtyInput.placeholder = "প্রযোজ্য নয়";
-        qtyInput.disabled = true;
-        qtyInput.style.background = "#eee";
-        
-        // Disable Cost
-        costInput.value = "";
-        costInput.placeholder = "প্রযোজ্য নয়";
-        costInput.disabled = true;
-        costInput.style.background = "#eee";
+        qtyInput.value = ""; qtyInput.placeholder = "প্রযোজ্য নয়"; qtyInput.disabled = true; qtyInput.style.background = "#eee";
+        costInput.value = ""; costInput.placeholder = "প্রযোজ্য নয়"; costInput.disabled = true; costInput.style.background = "#eee";
     } else {
-        // Enable Qty
-        qtyInput.disabled = false;
-        qtyInput.placeholder = "Qty";
-        qtyInput.style.background = "#fff";
-        
-        // Enable Cost
-        costInput.disabled = false;
-        costInput.placeholder = "Cost";
-        costInput.style.background = "#fff";
+        qtyInput.disabled = false; qtyInput.placeholder = "Qty"; qtyInput.style.background = "#fff";
+        costInput.disabled = false; costInput.placeholder = "Cost"; costInput.style.background = "#fff";
     }
 }
 
-// Stock Management Functions
 function addNewProduct(){
     const serial = document.getElementById("stSerial").value.trim();
     const cat = document.getElementById("stCategory").value.trim();
     const name = document.getElementById("stName").value.trim();
-    
-    // Only get Sell Price initially
     const sell = parseFloat(document.getElementById("stSell").value) || 0;
     const isService = document.getElementById("stIsService").checked;
-    
-    // If not service, get Qty & Cost. If service, set 0
-    let qty = 0;
-    let cost = 0;
-
+    let qty = 0, cost = 0;
     if(!isService) {
         qty = parseFloat(document.getElementById("stQty").value) || 0;
         cost = parseFloat(document.getElementById("stCost").value) || 0;
     }
-
     if(!cat || !name || !sell) return alert("Category, Name এবং Sell Price অবশ্যই দিতে হবে!");
-
-    const newProd = {
-        serial: serial,
-        category: cat,
-        name: name,
-        qty: qty,
-        isService: isService, // Store if it is a service
-        costPrice: cost,
-        sellPrice: sell
-    };
-
+    const newProd = { serial: serial, category: cat, name: name, qty: qty, isService: isService, costPrice: cost, sellPrice: sell };
     db.ref("products").push(newProd).then(()=>{
         alert(isService ? "সার্ভিস যুক্ত হয়েছে!" : "পণ্য স্টকে যুক্ত হয়েছে!");
-        // Clear fields
         document.getElementById("stSerial").value = "";
         document.getElementById("stCategory").value = "";
         document.getElementById("stName").value = "";
@@ -457,24 +431,16 @@ function addNewProduct(){
 }
 
 function delProduct(key){
-    if(user === 'owner' || user === 'admin'){
-        if(confirm("আইটেমটি ডিলিট করতে চান?")) db.ref("products/"+key).remove();
-    } else {
-        alert("আপনার ডিলিট করার পারমিশন নেই!");
-    }
+    if(user === 'owner' || user === 'admin'){ if(confirm("আইটেমটি ডিলিট করতে চান?")) db.ref("products/"+key).remove(); } 
+    else { alert("আপনার ডিলিট করার পারমিশন নেই!"); }
 }
 
-// New Entry Logic with Search & Auto-fill
 function filterProducts(){
     const cat = document.getElementById("category").value;
     const workSelect = document.getElementById("work");
     workSelect.innerHTML = "<option value=''>প্রোডাক্ট সিলেক্ট করুন</option>";
-    
     const filtered = cat ? allProducts.filter(p => p.category === cat) : allProducts;
-    
-    filtered.forEach(p => {
-        workSelect.innerHTML += `<option value="${p.key}" data-price="${p.sellPrice}">${p.name} (${p.serial || ''})</option>`;
-    });
+    filtered.forEach(p => { workSelect.innerHTML += `<option value="${p.key}" data-price="${p.sellPrice}">${p.name} (${p.serial || ''})</option>`; });
 }
 
 function autoFillPrice(){
@@ -482,14 +448,13 @@ function autoFillPrice(){
     const selectedOption = workSelect.options[workSelect.selectedIndex];
     if(selectedOption.value){
         document.getElementById("rate").value = selectedOption.getAttribute("data-price");
-        document.getElementById("qty").focus(); // Move focus to qty
+        document.getElementById("qty").focus(); 
     }
 }
 
 function searchProduct(serial){
     if(!serial) return;
     const product = allProducts.find(p => p.serial && p.serial.toLowerCase() === serial.toLowerCase());
-    
     if(product){
         document.getElementById("category").value = product.category;
         filterProducts();
@@ -500,34 +465,17 @@ function searchProduct(serial){
     }
 }
 
-// ============== CART & TRANSACTION LOGIC ==============
-
 function addToCart(){
     const workSelect = document.getElementById("work");
     const pKey = workSelect.value;
     const pName = workSelect.options[workSelect.selectedIndex]?.text;
     const r = parseFloat(document.getElementById("rate").value);
     const q = parseFloat(document.getElementById("qty").value);
-
     if(!pKey || !r) return alert("পণ্য এবং দর সঠিক দিন");
     if(q <= 0) return alert("পরিমাণ অন্তত ১ হতে হবে");
-    
     const stockItem = allProducts.find(p => p.key === pKey);
-    
-    // Check Stock ONLY if it is NOT a service
-    if(stockItem && !stockItem.isService && stockItem.qty < q) {
-        alert("সতর্কতা: স্টকে পর্যাপ্ত পণ্য নেই! (স্টক: " + stockItem.qty + ")");
-    }
-
-    cart.push({ 
-        key: pKey, 
-        work: pName.split('(')[0].trim(), 
-        qty: q, 
-        rate: r, 
-        sub: q * r,
-        isService: stockItem ? stockItem.isService : false
-    });
-    
+    if(stockItem && !stockItem.isService && stockItem.qty < q) { alert("সতর্কতা: স্টকে পর্যাপ্ত পণ্য নেই! (স্টক: " + stockItem.qty + ")"); }
+    cart.push({ key: pKey, work: pName.split('(')[0].trim(), qty: q, rate: r, sub: q * r, isService: stockItem ? stockItem.isService : false });
     renderCart(); 
     document.getElementById("qty").value=1; 
 }
@@ -547,7 +495,6 @@ function removeCart(index){ cart.splice(index,1); renderCart(); }
 function calcLoss(){ loss.value = (parseFloat(total.value) || 0) - (parseFloat(taken.value) || 0); }
 
 function deductStock(cartItems) {
-    // Only deduct stock if item is NOT a service
     cartItems.forEach(cItem => {
         const product = allProducts.find(p => p.key === cItem.key);
         if(product && !product.isService) {
@@ -578,13 +525,7 @@ function saveBulkEntry(showMemoFlag){
     });
 }
 
-// ============== VIEW & REPORT LOGIC ==============
-
-function viewMemo(key) {
-    db.ref("entries/" + key).once("value", s => {
-        if(s.val()) showMemo(s.val());
-    });
-}
+function viewMemo(key) { db.ref("entries/" + key).once("value", s => { if(s.val()) showMemo(s.val()); }); }
 
 function showMemo(e){
     document.getElementById("mDate").innerText = e.date;
@@ -597,9 +538,9 @@ function showMemo(e){
     const mItems = document.getElementById("mItems");
     mItems.innerHTML = "";
     if(e.items && Array.isArray(e.items)){
-        e.items.forEach(i => mItems.innerHTML += `<tr><td>${i.work}</td><td style="text-align:center">${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`);
+        e.items.forEach(i => mItems.innerHTML += `<tr><td style="border:1px solid #ddd; padding:8px">${i.work} (${i.rate})</td><td style="text-align:center; border:1px solid #ddd; padding:8px">${i.qty}</td><td style="text-align:right; border:1px solid #ddd; padding:8px">${i.sub}</td></tr>`);
     } else {
-        mItems.innerHTML += `<tr><td>${e.work}</td><td>-</td><td style="text-align:right">${e.total}</td></tr>`;
+        mItems.innerHTML += `<tr><td style="border:1px solid #ddd; padding:8px">${e.work}</td><td style="text-align:center; border:1px solid #ddd; padding:8px">-</td><td style="text-align:right; border:1px solid #ddd; padding:8px">${e.total}</td></tr>`;
     }
     let signs = {owner:["Toosher Ahmed","01913-812765"], admin:["Arafat Sikder","016749-44985"], roky:["Roky","01878-149052"]};
     let s = signs[e.user] || [e.user.toUpperCase(), ""];
@@ -608,11 +549,7 @@ function showMemo(e){
     document.getElementById("overlay").style.display="block";
 }
 
-function closeModal(id) {
-    document.getElementById(id).style.display="none";
-    document.getElementById("overlay").style.display="none";
-}
-
+function closeModal(id) { document.getElementById(id).style.display="none"; document.getElementById("overlay").style.display="none"; }
 function openEdit(key) {
     db.ref("entries/" + key).once("value", s => {
         const d = s.val();
@@ -625,55 +562,38 @@ function openEdit(key) {
         document.getElementById("overlay").style.display = "block";
     });
 }
-
 function updateEntry() {
     const key = document.getElementById("editKey").value;
     const t = parseFloat(document.getElementById("editTotal").value) || 0;
     const k = parseFloat(document.getElementById("editTaken").value) || 0;
-    db.ref("entries/" + key).update({
-        note: document.getElementById("editNote").value,
-        phone: document.getElementById("editPhone").value,
-        total: t,
-        taken: k,
-        loss: t - k
+    db.ref("entries/" + key).update({ note: document.getElementById("editNote").value, phone: document.getElementById("editPhone").value, total: t, taken: k, loss: t - k
     }).then(() => { alert("আপডেট হয়েছে!"); closeModal("editModal"); });
 }
-
 function renderUserStats(data) {
     const today = new Date().toLocaleDateString("en-GB");
-    let stats = {};
-    let hasData = false;
+    let stats = {}; let hasData = false;
     ['admin', 'owner', 'roky'].forEach(u => stats[u] = {total:0, taken:0, loss:0});
-
     if(data) {
         Object.keys(data).forEach(key => {
             const e = data[key];
             if(e.date === today) {
-                hasData = true;
-                const u = e.user.toLowerCase();
+                hasData = true; const u = e.user.toLowerCase();
                 if(!stats[u]) stats[u] = {total:0, taken:0, loss:0};
-                stats[u].total += (+e.total || 0);
-                stats[u].taken += (+e.taken || 0);
-                stats[u].loss += (+e.loss || 0);
+                stats[u].total += (+e.total || 0); stats[u].taken += (+e.taken || 0); stats[u].loss += (+e.loss || 0);
             }
         });
     }
-
     const tbody = document.getElementById("userSummaryBody");
     tbody.innerHTML = "";
     if(!hasData) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#777">আজকের কোনো এন্ট্রি নেই</td></tr>`; return; }
     Object.keys(stats).forEach(u => {
-        if(stats[u].total > 0 || stats[u].taken > 0) { 
-            tbody.innerHTML += `<tr><td style="text-transform:capitalize; font-weight:bold">${u}</td><td>${stats[u].total}</td><td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td><td style="color:#e74c3c">${stats[u].loss}</td></tr>`;
-        }
+        if(stats[u].total > 0 || stats[u].taken > 0) { tbody.innerHTML += `<tr><td style="text-transform:capitalize; font-weight:bold">${u}</td><td>${stats[u].total}</td><td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td><td style="color:#e74c3c">${stats[u].loss}</td></tr>`; }
     });
 }
-
 function renderTable(data, tableId = "tableBody"){
     const tbody = document.getElementById(tableId);
     tbody.innerHTML=""; 
     if(!data) { if(tableId === "reportTableBody") tbody.innerHTML = "<tr><td colspan='8' style='text-align:center'>কোনো ডাটা পাওয়া যায়নি</td></tr>"; return; }
-    
     let t=0, k=0, l=0, dailyData={};
     Object.keys(data).reverse().forEach(key=>{
         const e = data[key];
@@ -686,50 +606,27 @@ function renderTable(data, tableId = "tableBody"){
         tbody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px"><b>${e.note}</b><br>${itemNames}</td><td class="en">${phone}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint" style="display:flex">${btnMemo}${btnEdit}${btnDel}</td></tr>`;
         dailyData[e.date] = (dailyData[e.date]||0) + (+e.total||0);
     });
-    
-    if(tableId === "tableBody") {
-        cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
-        updateChart(dailyData);
-        renderUserStats(data);
-    }
+    if(tableId === "tableBody") { cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l; updateChart(dailyData); renderUserStats(data); }
 }
-
 function updateChart(data){
     const labels = Object.keys(data).slice(-7); const values = Object.values(data).slice(-7);
     if(salesChart) salesChart.destroy();
     const ctx = document.getElementById('salesChart');
     if(ctx) { salesChart = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Sales', data: values, borderColor: '#2ecc71', tension: 0.3, fill:true, backgroundColor:'rgba(46,204,113,0.1)' }] }, options: { responsive: true, plugins: { legend: { display: false } } } }); }
 }
-
-function delEntry(key){ 
-    db.ref("entries/"+key).once("value", s => {
-        if(s.val().user !== user) return alert("অন্যের ডাটা ডিলিট করা যাবে না!");
-        if(confirm("মুছে ফেলবেন?")) db.ref("entries/"+key).remove();
-    });
-}
-function loadEntries(){ 
-    // performance fix: only load last 100 entries
-    db.ref("entries").limitToLast(100).on("value", s => renderTable(s.val(), "tableBody")); 
-}
+function delEntry(key){ db.ref("entries/"+key).once("value", s => { if(s.val().user !== user) return alert("অন্যের ডাটা ডিলিট করা যাবে না!"); if(confirm("মুছে ফেলবেন?")) db.ref("entries/"+key).remove(); }); }
+function loadEntries(){ db.ref("entries").limitToLast(100).on("value", s => renderTable(s.val(), "tableBody")); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.style.display="none"); document.getElementById(id).style.display="block"; closeSidebar(); }
 function closeSidebar(){ sidebar.style.left="-280px"; overlay.style.display="none"; }
 function openSidebar(){ sidebar.style.left="0"; overlay.style.display="block"; }
 function logout() { localStorage.removeItem("loggedInUser"); location.reload(); }
-function searchByDate(){ 
-    if(!sDate.value) return; 
-    const d = sDate.value.split("-").reverse().join("/"); 
-    db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val(), "reportTableBody"); }); 
-}
+function searchByDate(){ if(!sDate.value) return; const d = sDate.value.split("-").reverse().join("/"); db.ref("entries").orderByChild("date").equalTo(d).once("value",s=>{ renderTable(s.val(), "reportTableBody"); }); }
 function loadReportData() { db.ref("entries").once("value", s => renderTable(s.val(), "reportTableBody")); }
 function downloadExcel(){
     db.ref("entries").once("value", s => {
         const d = s.val(); if(!d) return alert("কোনো ডাটা নেই");
         let csv = "\ufeffতারিখ,সময়,কাস্টমার,মোবাইল,বিবরণ,মোট,নগদ,বাকি,ইউজার\n";
-        Object.keys(d).forEach(k => { 
-            const e = d[k]; 
-            const items = (e.items && Array.isArray(e.items)) ? e.items.map(i=>`${i.work}(${i.qty})`).join("+") : e.work;
-            csv += `${e.date},${e.time},${e.note},${e.phone||'-'},"${items}",${e.total},${e.taken},${e.loss},${e.user}\n`; 
-        });
+        Object.keys(d).forEach(k => { const e = d[k]; const items = (e.items && Array.isArray(e.items)) ? e.items.map(i=>`${i.work}(${i.qty})`).join("+") : e.work; csv += `${e.date},${e.time},${e.note},${e.phone||'-'},"${items}",${e.total},${e.taken},${e.loss},${e.user}\n`; });
         const link = document.createElement("a"); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })); link.download = "report.csv"; link.click();
     });
 }
