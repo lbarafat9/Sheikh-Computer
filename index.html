@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>শেখ কম্পিউটার ম্যানেজমেন্ট</title>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600&display=swap" rel="stylesheet">
+    <title>শেখ ফটোকপি ম্যানেজমেন্ট</title>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         *{box-sizing:border-box;font-family:'Hind Siliguri', sans-serif}
@@ -52,21 +52,94 @@
         .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:350px;padding:20px;z-index:1500;box-shadow:0 0 100px rgba(0,0,0,0.5);border-radius:10px}
         .chart-container{background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)}
 
-        /* New Style for User Summary */
         .user-summary-box { background:#fff; padding:15px; border-radius:12px; margin-bottom:25px; border-left: 5px solid #9b59b6; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
         .low-stock { color: #e74c3c; font-weight: bold; }
 
-        @media print{
-            body *{visibility:hidden}
-            #memoModal, #memoModal *{visibility:visible}
-            #memoModal{position:absolute;left:0;top:0;transform:none;box-shadow:none;width:100%;display:block!important}
-            .noPrint{display:none!important}
+        /* ================= PRINT CSS (UPDATED) ================= */
+        @media print {
+            @page { 
+                size: A4; 
+                margin: 0.5in; /* মার্জিন ফিক্স যাতে ২য় পেজ না আসে */
+            }
+            body { 
+                margin: 0; 
+                padding: 0;
+                background: white;
+            }
+            body * { 
+                visibility: hidden; /* বাকি সব লুকানো */
+            }
+            
+            #memoModal {
+                visibility: visible !important;
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
+                transform: none; /* পজিশন রিসেট */
+                box-shadow: none;
+                border: none;
+                overflow: visible;
+            }
+            
+            #memoModal * { 
+                visibility: visible !important; 
+            }
+
+            /* মেমোর ভেতরের স্টাইল - বড় এবং ক্লিয়ার */
+            #memoModal h2 {
+                font-size: 32px !important;
+                margin-bottom: 5px;
+                color: #000 !important;
+                font-weight: 700;
+            }
+            #memoModal p {
+                font-size: 16px !important;
+                color: #000 !important;
+                margin: 4px 0;
+            }
+            #memoModal hr {
+                border-color: #000 !important;
+                border-width: 1.5px;
+            }
+            #memoModal table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 15px;
+            }
+            #memoModal th {
+                font-size: 18px !important;
+                font-weight: bold;
+                border-bottom: 2px solid #000 !important;
+                padding: 8px 0;
+                color: #000 !important;
+                background: transparent !important;
+            }
+            #memoModal td {
+                font-size: 18px !important;
+                padding: 8px 0;
+                border-bottom: 1px solid #ddd;
+                color: #000;
+            }
+            #mTotal, #mPaid, #mDue {
+                font-size: 20px !important;
+                font-weight: bold;
+            }
+            
+            /* অপ্রয়োজনীয় বাটন লুকানো */
+            .noPrint { 
+                display: none !important; 
+            }
         }
     </style>
 </head>
 <body>
 
-<header id="header">শেখ কম্পিউটার ম্যানেজমেন্ট</header>
+<header id="header">শেখ ফটোকপি ম্যানেজমেন্ট</header>
 <div id="menuBtn" onclick="openSidebar()">☰</div>
 <div id="overlay" onclick="closeSidebar()"></div>
 
@@ -219,38 +292,54 @@
 
 <div id="memoModal" class="modal">
     <div style="text-align:center">
-        <h3 style="margin:0; color:#2ecc71">শেখ কম্পিউটার</h3>
-        <p style="font-size:11px;margin:2px">কাশিয়ানী উপজেলার সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
+        <h2 style="margin:0; color:#2ecc71">শেখ ফটোকপি</h2>
+        <p style="font-size:12px;margin:2px">কাশিয়ানী উপজেলা পরিষদের সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
         <hr>
     </div>
-    <div style="font-size:13px; text-align:left" class="en">
-        <p>তারিখ: <span id="mDate"></span> | ইউজার: <span id="mUser"></span></p>
-        <p>কাস্টমার: <b id="mNote"></b> <span id="mPhoneDisp"></span></p>
-        <table style="width:100%; font-size:12px; border-top:1px solid #000; margin-top:10px">
-            <thead style="border-bottom:1px solid #ddd"><tr><th>বিবরণ</th><th>পরিমাণ</th><th style="text-align:right">টাকা</th></tr></thead>
+    <div style="font-size:14px; text-align:left; padding-top:10px" class="en">
+        <div style="display:flex; justify-content:space-between;">
+            <span>তারিখ: <span id="mDate"></span></span>
+            <span>ইউজার: <span id="mUser"></span></span>
+        </div>
+        <p style="margin-top:5px">কাস্টমার: <b id="mNote"></b> <span id="mPhoneDisp"></span></p>
+        
+        <table style="width:100%; font-size:14px; margin-top:10px">
+            <thead style="border-bottom:1px solid #000">
+                <tr>
+                    <th style="text-align:left">বিবরণ</th>
+                    <th style="text-align:center">পরিমাণ</th>
+                    <th style="text-align:right">টাকা</th>
+                </tr>
+            </thead>
             <tbody id="mItems"></tbody>
         </table>
-        <hr>
+        
+        <hr style="margin-top:15px; margin-bottom:5px">
+        
         <div style="text-align:right">
-            <p>মোট: ৳<b id="mTotal" style="font-size:15px"></b></p>
+            <p>মোট: ৳<b id="mTotal" style="font-size:16px"></b></p>
             <p>নগদ: ৳<span id="mPaid"></span></p>
             <p>বাকি: ৳<b id="mDue"></b></p>
         </div>
     </div>
     
-    <div style="margin-top: 40px; display: flex; justify-content: flex-end;">
-        <div style="text-align: center; width: 150px;">
-            <p style="margin: 0; font-size: 11px; font-weight: bold;" id="signatureName" class="en"></p>
-            <p style="margin: 0; font-size: 10px;" id="signatureContact" class="en"></p>
+    <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
+        <div style="text-align: center; width: 180px;">
+            <p style="margin: 0; font-size: 13px; font-weight: bold;" id="signatureName" class="en"></p>
+            <p style="margin: 0; font-size: 11px;" id="signatureContact" class="en"></p>
             <div style="border-top: 1px solid #000; margin-top: 5px;"></div>
-            <p style="margin: 0; font-size: 9px; color: #7f8c8d;">কর্তৃপক্ষের স্বাক্ষর</p>
+            <p style="margin: 0; font-size: 10px; color: #7f8c8d;">কর্তৃপক্ষের স্বাক্ষর</p>
         </div>
     </div>
     
-    <hr>
-    <p style="text-align:center; font-size:10px">ধন্যবাদ, আবার আসবেন!</p>
-    <button onclick="window.print()" class="noPrint">প্রিন্ট</button>
-    <button onclick="closeModal('memoModal')" class="noPrint" style="background:#7f8c8d">বন্ধ করুন</button>
+    <div style="margin-top:30px; text-align:center; border-top:1px dashed #ccc; padding-top:5px">
+        <p style="text-align:center; font-size:12px; margin:0">ধন্যবাদ, আবার আসবেন!</p>
+    </div>
+
+    <div style="margin-top:15px; text-align:center" class="noPrint">
+        <button onclick="window.print()" style="width:auto; padding:8px 20px">🖨️ প্রিন্ট করুন</button>
+        <button onclick="closeModal('memoModal')" style="background:#e74c3c; width:auto; padding:8px 20px">বন্ধ করুন</button>
+    </div>
 </div>
 
 <div id="editModal" class="modal">
@@ -416,7 +505,7 @@ function showMemo(e){
     const mItems = document.getElementById("mItems");
     mItems.innerHTML = "";
     if(e.items && Array.isArray(e.items)){
-        e.items.forEach(i => mItems.innerHTML += `<tr><td>${i.work}</td><td>${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`);
+        e.items.forEach(i => mItems.innerHTML += `<tr><td>${i.work}</td><td style="text-align:center">${i.qty}</td><td style="text-align:right">${i.sub}</td></tr>`);
     } else {
         mItems.innerHTML += `<tr><td>${e.work}</td><td>-</td><td style="text-align:right">${e.total}</td></tr>`;
     }
@@ -459,19 +548,15 @@ function updateEntry() {
     }).then(() => { alert("আপডেট হয়েছে!"); closeModal("editModal"); });
 }
 
-// *** Calculate and Render User Summary ***
 function renderUserStats(data) {
     const today = new Date().toLocaleDateString("en-GB");
     let stats = {};
     let hasData = false;
-
-    // Default users
     ['admin', 'owner', 'roky'].forEach(u => stats[u] = {total:0, taken:0, loss:0});
 
     if(data) {
         Object.keys(data).forEach(key => {
             const e = data[key];
-            // Only process TODAY's data for this summary
             if(e.date === today) {
                 hasData = true;
                 const u = e.user.toLowerCase();
@@ -492,7 +577,7 @@ function renderUserStats(data) {
     }
 
     Object.keys(stats).forEach(u => {
-        if(stats[u].total > 0 || stats[u].taken > 0) { // Only show users with activity
+        if(stats[u].total > 0 || stats[u].taken > 0) { 
             tbody.innerHTML += `<tr>
                 <td style="text-transform:capitalize; font-weight:bold">${u}</td>
                 <td>${stats[u].total}</td>
@@ -528,7 +613,6 @@ function renderTable(data, tableId = "tableBody"){
     if(tableId === "tableBody") {
         cCount.innerText=Object.keys(data).length; cTotal.innerText=t; cTaken.innerText=k; cLoss.innerText=l;
         updateChart(dailyData);
-        // *** Trigger User Stats Update ***
         renderUserStats(data);
     }
 }
@@ -554,7 +638,7 @@ function loadStock(){
         const d = s.val(); 
         if(d) Object.keys(d).forEach(k=>{ 
             const q = d[k].qty;
-            const lowClass = q < 5 ? "low-stock" : ""; // Warning if less than 5
+            const lowClass = q < 5 ? "low-stock" : ""; 
             stockBody.innerHTML+=`<tr class="${lowClass}">
                 <td>${d[k].name}</td>
                 <td>${q} ${q < 5 ? '⚠️' : ''}</td>
