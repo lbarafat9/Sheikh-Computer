@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>শেখ ফটোকপি ম্যানেজমেন্ট</title>
+    <title>শেখ ফটোকপি ও স্টেশনারি</title>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -54,86 +54,34 @@
 
         .user-summary-box { background:#fff; padding:15px; border-radius:12px; margin-bottom:25px; border-left: 5px solid #9b59b6; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
         .low-stock { color: #e74c3c; font-weight: bold; }
+        .service-badge { background: #3498db; color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
 
-        /* ================= PRINT CSS (UPDATED) ================= */
+        /* PRINT CSS FOR POS PRINTER */
         @media print {
-            @page { 
-                size: A4; 
-                margin: 0.5in; /* মার্জিন ফিক্স যাতে ২য় পেজ না আসে */
-            }
-            body { 
-                margin: 0; 
-                padding: 0;
-                background: white;
-            }
-            body * { 
-                visibility: hidden; /* বাকি সব লুকানো */
-            }
-            
+            @page { size: auto; margin: 0; }
+            body { margin: 0; padding: 0; background: white; }
+            body * { visibility: hidden; }
+            #memoModal, #memoModal * { visibility: visible !important; }
             #memoModal {
-                visibility: visible !important;
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: auto;
-                margin: 0;
-                padding: 0;
-                transform: none; /* পজিশন রিসেট */
-                box-shadow: none;
+                display: block !important; 
+                position: absolute; 
+                left: 0; top: 0;
+                width: 72mm; /* Standard POS Width */
+                margin: 0; 
+                padding: 10px; 
+                transform: none; 
+                box-shadow: none; 
                 border: none;
-                overflow: visible;
+                font-size: 12px;
             }
-            
-            #memoModal * { 
-                visibility: visible !important; 
-            }
-
-            /* মেমোর ভেতরের স্টাইল - বড় এবং ক্লিয়ার */
-            #memoModal h2 {
-                font-size: 32px !important;
-                margin-bottom: 5px;
-                color: #000 !important;
-                font-weight: 700;
-            }
-            #memoModal p {
-                font-size: 16px !important;
-                color: #000 !important;
-                margin: 4px 0;
-            }
-            #memoModal hr {
-                border-color: #000 !important;
-                border-width: 1.5px;
-            }
-            #memoModal table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 15px;
-            }
-            #memoModal th {
-                font-size: 18px !important;
-                font-weight: bold;
-                border-bottom: 2px solid #000 !important;
-                padding: 8px 0;
-                color: #000 !important;
-                background: transparent !important;
-            }
-            #memoModal td {
-                font-size: 18px !important;
-                padding: 8px 0;
-                border-bottom: 1px solid #ddd;
-                color: #000;
-            }
-            #mTotal, #mPaid, #mDue {
-                font-size: 20px !important;
-                font-weight: bold;
-            }
-            
-            /* অপ্রয়োজনীয় বাটন লুকানো */
-            .noPrint { 
-                display: none !important; 
-            }
+            #memoModal h2 { font-size: 18px !important; margin-bottom: 2px; color: #000 !important; font-weight: 700; }
+            #memoModal p { font-size: 11px !important; color: #000 !important; margin: 2px 0; }
+            #memoModal hr { border-color: #000 !important; border-width: 1px; border-style:dashed; margin: 5px 0;}
+            #memoModal table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            #memoModal th { font-size: 12px !important; border-bottom: 1px dashed #000 !important; padding: 4px 0; color: #000 !important; }
+            #memoModal td { font-size: 12px !important; padding: 4px 0; border-bottom: 1px dotted #ddd; color: #000; }
+            #mTotal, #mPaid, #mDue { font-size: 14px !important; font-weight: bold; }
+            .noPrint { display: none !important; }
         }
     </style>
 </head>
@@ -155,8 +103,8 @@
         <div style="text-align:right;padding:15px;font-size:30px;cursor:pointer;color:#e74c3c" onclick="closeSidebar()">×</div>
         <div style="text-align:center;padding:10px;margin-bottom:10px;border-bottom:2px solid #2ecc71" id="userShow"></div>
         <a onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড</a>
-        <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (মাল্টি)</a>
-        <a onclick="showSection('inventory')">📦 ইনভেন্টরি স্টক</a>
+        <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (সেলস)</a>
+        <a onclick="showSection('inventory')">📦 স্টক/সার্ভিস ম্যানেজমেন্ট</a>
         <a onclick="showSection('reports')">📊 রিপোর্ট</a>
         <a onclick="logout()" style="color:#ff7675">🚪 লগআউট</a>
     </div>
@@ -173,17 +121,8 @@
             <h4 style="margin:0 0 10px 0; color:#8e44ad">📅 আজকের দিনের ইউজার হিসাব</h4>
             <div class="table-box" style="box-shadow:none; border:1px solid #eee;">
                 <table class="en">
-                    <thead>
-                        <tr>
-                            <th>ইউজার</th>
-                            <th>মোট কাজ (৳)</th>
-                            <th>নগদ গ্রহণ (৳)</th>
-                            <th>বাকি দিয়েছে (৳)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userSummaryBody">
-                        <tr><td colspan="4" style="text-align:center">আজকের কোনো ডাটা নেই</td></tr>
-                    </tbody>
+                    <thead><tr><th>ইউজার</th><th>মোট কাজ (৳)</th><th>নগদ গ্রহণ (৳)</th><th>বাকি (৳)</th></tr></thead>
+                    <tbody id="userSummaryBody"><tr><td colspan="4" style="text-align:center">আজকের কোনো ডাটা নেই</td></tr></tbody>
                 </table>
             </div>
         </div>
@@ -191,7 +130,7 @@
         <div class="chart-container"><canvas id="salesChart" height="100"></canvas></div>
         
         <div class="table-box">
-            <h4 style="padding:15px; margin:0">সাম্প্রতিক কার্যক্রম</h4>
+            <h4 style="padding:15px; margin:0">সাম্প্রতিক কার্যক্রম (শেষ ১০০টি)</h4>
             <table class="en">
                 <thead><tr><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
                 <tbody id="tableBody"></tbody>
@@ -203,20 +142,21 @@
         <div style="max-width:550px;margin:auto;background:#fff;padding:25px;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.05)">
             <h3 style="margin-top:0; color:#2c3e50">নতুন ভাউচার তৈরি</h3>
             
+            <div class="form-group" style="background:#f0fff4; padding:10px; border:1px dashed #2ecc71; border-radius:8px">
+                <label>🔍 সিরিয়াল দিয়ে সার্চ করুন:</label>
+                <input id="searchSerial" placeholder="সিরিয়াল নম্বর লিখুন..." class="en" oninput="searchProduct(this.value)">
+            </div>
+
+            <hr style="border:0; border-top:1px solid #eee; margin:15px 0">
+
             <div class="form-group">
                 <label>ক্যাটাগরি:</label>
-                <div style="display:flex;gap:5px">
-                    <select id="category" onchange="catChange()"></select>
-                    <button onclick="deleteCategory()" class="btn-action btn-del" style="margin-top:0;">🗑️</button>
-                </div>
+                <select id="category" onchange="filterProducts()"><option value="">সব ক্যাটাগরি</option></select>
             </div>
 
             <div class="form-group">
                 <label>কাজ/পণ্য:</label>
-                <div style="display:flex;gap:5px">
-                    <select id="work" disabled onchange="workChange()"></select>
-                    <button onclick="deleteWork()" class="btn-action btn-del" style="margin-top:0;">🗑️</button>
-                </div>
+                <select id="work" onchange="autoFillPrice()"><option value="">প্রোডাক্ট সিলেক্ট করুন</option></select>
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
@@ -233,7 +173,7 @@
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
                     <div class="form-group"><label>কাস্টমারের নাম:</label><input id="note" placeholder="নাম..."></div>
-                    <div class="form-group"><label>মোবাইল (ঐচ্ছিক):</label><input id="phone" placeholder="নম্বর..." class="en"></div>
+                    <div class="form-group"><label>মোবাইল:</label><input id="phone" placeholder="নম্বর..." class="en"></div>
                 </div>
                 
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
@@ -251,16 +191,33 @@
     </div>
 
     <div id="inventory" class="section">
-        <div style="max-width:600px;margin:auto;background:#fff;padding:25px;border-radius:15px">
-            <h3>স্টক ম্যানেজমেন্ট</h3>
-            <div style="display:flex;gap:10px">
-                <input id="itemName" placeholder="মালামালের নাম">
-                <input id="itemStock" type="number" placeholder="পরিমাণ">
-                <button onclick="addStock()" style="width:auto;padding:0 20px">যোগ</button>
+        <div style="max-width:800px;margin:auto;background:#fff;padding:25px;border-radius:15px">
+            <h3 style="border-bottom:2px solid #eee; padding-bottom:10px">📦 স্টক ও সার্ভিস ম্যানেজমেন্ট</h3>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom:10px">
+                <div class="form-group"><label>সিরিয়াল (Optional):</label><input id="stSerial" class="en" placeholder="Code/Serial"></div>
+                <div class="form-group"><label>ক্যাটাগরি:</label><input id="stCategory" placeholder="e.g. Paper, Service"></div>
+                <div class="form-group"><label>পণ্যের নাম:</label><input id="stName" placeholder="Product Name"></div>
             </div>
+            
+            <div style="background:#eaf2f8; padding:10px; border-radius:8px; margin-bottom:10px; border:1px solid #d6eaf8;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="checkbox" id="stIsService" style="width:20px; height:20px; margin:0" onchange="toggleStockInput()">
+                    <label for="stIsService" style="margin:0; cursor:pointer; font-weight:bold; color:#2980b9">এটি একটি সেবা/সার্ভিস (ফটোকপি, প্রিন্ট, অনলাইন ইত্যাদি)</label>
+                </div>
+                <small style="color:#7f8c8d; padding-left:34px;">টিক দিলে স্টক এবং কেনা দামের প্রয়োজন হবে না।</small>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; align-items:end">
+                <div class="form-group"><label>স্টক পরিমাণ:</label><input id="stQty" type="number" class="en" placeholder="Qty"></div>
+                <div class="form-group"><label>কেনা দাম (Cost):</label><input id="stCost" type="number" class="en" placeholder="Cost"></div>
+                <div class="form-group"><label>বিক্রয় মূল্য (Sell):</label><input id="stSell" type="number" class="en" placeholder="Price"></div>
+                <button onclick="addNewProduct()" style="height:42px; margin-bottom:12px">+ সংরক্ষণ</button>
+            </div>
+
             <div class="table-box" style="margin-top:20px">
                 <table>
-                    <thead><tr><th>নাম</th><th>স্টক</th><th>অ্যাকশন</th></tr></thead>
+                    <thead><tr><th>Serial</th><th>Category</th><th>Name</th><th>Stock</th><th>Sell Price</th><th>Action</th></tr></thead>
                     <tbody id="stockBody" class="en"></tbody>
                 </table>
             </div>
@@ -296,46 +253,32 @@
         <p style="font-size:12px;margin:2px">কাশিয়ানী উপজেলা পরিষদের সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
         <hr>
     </div>
-    <div style="font-size:14px; text-align:left; padding-top:10px" class="en">
+    <div style="font-size:14px; text-align:left; padding-top:5px" class="en">
         <div style="display:flex; justify-content:space-between;">
             <span>তারিখ: <span id="mDate"></span></span>
             <span>ইউজার: <span id="mUser"></span></span>
         </div>
         <p style="margin-top:5px">কাস্টমার: <b id="mNote"></b> <span id="mPhoneDisp"></span></p>
         
-        <table style="width:100%; font-size:14px; margin-top:10px">
-            <thead style="border-bottom:1px solid #000">
-                <tr>
-                    <th style="text-align:left">বিবরণ</th>
-                    <th style="text-align:center">পরিমাণ</th>
-                    <th style="text-align:right">টাকা</th>
-                </tr>
-            </thead>
+        <table style="width:100%; font-size:14px; margin-top:5px">
+            <thead style="border-bottom:1px solid #000"><tr><th style="text-align:left">বিবরণ</th><th style="text-align:center">পরিমাণ</th><th style="text-align:right">টাকা</th></tr></thead>
             <tbody id="mItems"></tbody>
         </table>
-        
-        <hr style="margin-top:15px; margin-bottom:5px">
-        
+        <hr style="margin-top:10px; margin-bottom:5px">
         <div style="text-align:right">
             <p>মোট: ৳<b id="mTotal" style="font-size:16px"></b></p>
             <p>নগদ: ৳<span id="mPaid"></span></p>
             <p>বাকি: ৳<b id="mDue"></b></p>
         </div>
     </div>
-    
-    <div style="margin-top: 50px; display: flex; justify-content: flex-end;">
-        <div style="text-align: center; width: 180px;">
+    <div style="margin-top: 30px; display: flex; justify-content: flex-end;">
+        <div style="text-align: center; width: 150px;">
             <p style="margin: 0; font-size: 13px; font-weight: bold;" id="signatureName" class="en"></p>
-            <p style="margin: 0; font-size: 11px;" id="signatureContact" class="en"></p>
             <div style="border-top: 1px solid #000; margin-top: 5px;"></div>
-            <p style="margin: 0; font-size: 10px; color: #7f8c8d;">কর্তৃপক্ষের স্বাক্ষর</p>
+            <p style="margin: 0; font-size: 10px; color: #7f8c8d;">স্বাক্ষর</p>
         </div>
     </div>
-    
-    <div style="margin-top:30px; text-align:center; border-top:1px dashed #ccc; padding-top:5px">
-        <p style="text-align:center; font-size:12px; margin:0">ধন্যবাদ, আবার আসবেন!</p>
-    </div>
-
+    <div style="margin-top:20px; text-align:center; border-top:1px dashed #ccc; padding-top:5px"><p style="text-align:center; font-size:12px; margin:0">ধন্যবাদ, আবার আসবেন!</p></div>
     <div style="margin-top:15px; text-align:center" class="noPrint">
         <button onclick="window.print()" style="width:auto; padding:8px 20px">🖨️ প্রিন্ট করুন</button>
         <button onclick="closeModal('memoModal')" style="background:#e74c3c; width:auto; padding:8px 20px">বন্ধ করুন</button>
@@ -345,14 +288,8 @@
 <div id="editModal" class="modal">
     <h3 style="margin-top:0; color:#f39c12">এন্ট্রি এডিট করুন</h3>
     <input type="hidden" id="editKey">
-    <div class="form-group">
-        <label>কাস্টমারের নাম:</label>
-        <input id="editNote">
-    </div>
-    <div class="form-group">
-        <label>মোবাইল:</label>
-        <input id="editPhone" class="en">
-    </div>
+    <div class="form-group"><label>কাস্টমারের নাম:</label><input id="editNote"></div>
+    <div class="form-group"><label>মোবাইল:</label><input id="editPhone" class="en"></div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
         <div class="form-group"><label>মোট টাকা:</label><input id="editTotal" type="number" class="en"></div>
         <div class="form-group"><label>নগদ:</label><input id="editTaken" type="number" class="en"></div>
@@ -372,7 +309,7 @@ firebase.initializeApp({
     projectId:"sheikh-computer-b41d5"
 });
 const db=firebase.database();
-let user="", rates={}, cart=[], salesChart=null;
+let user="", allProducts=[], cart=[], salesChart=null;
 
 window.onload = function() {
     const savedUser = localStorage.getItem("loggedInUser");
@@ -390,53 +327,209 @@ function setupUser(u) {
     user = u; loginDiv.style.display="none"; container.style.display="block";
     header.style.display="block"; menuBtn.style.display="block";
     userShow.innerHTML=`ইউজার: <b>${u.toUpperCase()}</b>`;
-    loadRates(); loadEntries(); loadStock(); showSection('dashboard');
+    loadAllProducts(); loadEntries(); showSection('dashboard');
 }
 
-function loadRates(){
-    db.ref("rates").on("value", s => {
-        const defaultRates = {"প্রিন্ট": {"A4 সাদা-কালো": 10}, "ফটোকপি": {"প্রতি কপি": 5}};
-        const dbData = s.val() || {};
-        rates = { ...defaultRates, ...dbData };
-        let catHtml = "<option value=''>সিলেক্ট</option>";
-        Object.keys(rates).forEach(c => catHtml += `<option>${c}</option>`);
-        catHtml += `<option value="add">+ নতুন ক্যাটাগরি</option>`;
-        category.innerHTML = catHtml;
+// ============== NEW UNIFIED PRODUCT LOGIC ==============
+
+function loadAllProducts(){
+    // Fetch all products for both Stock Table & Entry Dropdown
+    db.ref("products").on("value", s => {
+        allProducts = [];
+        const stockBody = document.getElementById("stockBody");
+        stockBody.innerHTML = "";
+        
+        // Setup Category Dropdown
+        const categories = new Set();
+
+        s.forEach(child => {
+            const p = child.val();
+            const key = child.key;
+            p.key = key; // Save firebase key
+            allProducts.push(p);
+            categories.add(p.category);
+
+            // Populate Stock Table
+            let stockDisplay = "";
+            let rowClass = "";
+
+            if(p.isService) {
+                stockDisplay = `<span class="service-badge">Service</span>`;
+            } else {
+                stockDisplay = `${p.qty} ${p.qty < 5 ? '⚠️' : ''}`;
+                if(p.qty < 5) rowClass = "low-stock";
+            }
+
+            stockBody.innerHTML += `<tr class="${rowClass}">
+                <td>${p.serial || '-'}</td>
+                <td>${p.category}</td>
+                <td>${p.name}</td>
+                <td>${stockDisplay}</td>
+                <td>${p.sellPrice}</td>
+                <td><button class="btn-action btn-del" onclick="delProduct('${key}')">🗑️</button></td>
+            </tr>`;
+        });
+
+        // Populate New Entry Category Select
+        const catSelect = document.getElementById("category");
+        catSelect.innerHTML = "<option value=''>সব ক্যাটাগরি</option>";
+        categories.forEach(c => {
+            catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+        });
+        
+        filterProducts(); // Reset product dropdown
     });
 }
 
-function catChange(){
-    if(category.value==="add"){
-        const c=prompt("নতুন ক্যাটাগরির নাম:"); 
-        if(c) db.ref("rates/"+c).set({"নতুন":0}); 
-        else category.value = ""; return;
+function toggleStockInput(){
+    const isService = document.getElementById("stIsService").checked;
+    const qtyInput = document.getElementById("stQty");
+    const costInput = document.getElementById("stCost");
+
+    if(isService){
+        // Disable Qty
+        qtyInput.value = "";
+        qtyInput.placeholder = "প্রযোজ্য নয়";
+        qtyInput.disabled = true;
+        qtyInput.style.background = "#eee";
+        
+        // Disable Cost
+        costInput.value = "";
+        costInput.placeholder = "প্রযোজ্য নয়";
+        costInput.disabled = true;
+        costInput.style.background = "#eee";
+    } else {
+        // Enable Qty
+        qtyInput.disabled = false;
+        qtyInput.placeholder = "Qty";
+        qtyInput.style.background = "#fff";
+        
+        // Enable Cost
+        costInput.disabled = false;
+        costInput.placeholder = "Cost";
+        costInput.style.background = "#fff";
     }
-    work.innerHTML="<option value=''>সিলেক্ট</option>";
-    if(category.value && rates[category.value]){
-        Object.keys(rates[category.value]).forEach(w=>work.innerHTML+=`<option>${w}</option>`);
-        work.innerHTML+=`<option value="add">+ নতুন কাজ</option>`;
-        work.disabled=false;
-    } else { work.disabled=true; }
 }
 
-function workChange(){
-    if(work.value==="add"){
-        const w=prompt("কাজের নাম:"), r=prompt("দর:");
-        if(w && r) db.ref(`rates/${category.value}/${w}`).set(+r||0); 
-        else work.value = ""; return;
+// Stock Management Functions
+function addNewProduct(){
+    const serial = document.getElementById("stSerial").value.trim();
+    const cat = document.getElementById("stCategory").value.trim();
+    const name = document.getElementById("stName").value.trim();
+    
+    // Only get Sell Price initially
+    const sell = parseFloat(document.getElementById("stSell").value) || 0;
+    const isService = document.getElementById("stIsService").checked;
+    
+    // If not service, get Qty & Cost. If service, set 0
+    let qty = 0;
+    let cost = 0;
+
+    if(!isService) {
+        qty = parseFloat(document.getElementById("stQty").value) || 0;
+        cost = parseFloat(document.getElementById("stCost").value) || 0;
     }
-    if(category.value && rates[category.value]) rate.value=rates[category.value][work.value]||0;
+
+    if(!cat || !name || !sell) return alert("Category, Name এবং Sell Price অবশ্যই দিতে হবে!");
+
+    const newProd = {
+        serial: serial,
+        category: cat,
+        name: name,
+        qty: qty,
+        isService: isService, // Store if it is a service
+        costPrice: cost,
+        sellPrice: sell
+    };
+
+    db.ref("products").push(newProd).then(()=>{
+        alert(isService ? "সার্ভিস যুক্ত হয়েছে!" : "পণ্য স্টকে যুক্ত হয়েছে!");
+        // Clear fields
+        document.getElementById("stSerial").value = "";
+        document.getElementById("stCategory").value = "";
+        document.getElementById("stName").value = "";
+        document.getElementById("stQty").value = "";
+        document.getElementById("stCost").value = "";
+        document.getElementById("stSell").value = "";
+        document.getElementById("stIsService").checked = false;
+        toggleStockInput();
+    });
 }
 
-function deleteCategory(){ if(confirm("ক্যাটাগরি মুছে ফেলবেন?")) db.ref("rates/"+category.value).remove(); }
-function deleteWork(){ if(confirm("কাজটি মুছে ফেলবেন?")) db.ref(`rates/${category.value}/${work.value}`).remove(); }
+function delProduct(key){
+    if(user === 'owner' || user === 'admin'){
+        if(confirm("আইটেমটি ডিলিট করতে চান?")) db.ref("products/"+key).remove();
+    } else {
+        alert("আপনার ডিলিট করার পারমিশন নেই!");
+    }
+}
+
+// New Entry Logic with Search & Auto-fill
+function filterProducts(){
+    const cat = document.getElementById("category").value;
+    const workSelect = document.getElementById("work");
+    workSelect.innerHTML = "<option value=''>প্রোডাক্ট সিলেক্ট করুন</option>";
+    
+    const filtered = cat ? allProducts.filter(p => p.category === cat) : allProducts;
+    
+    filtered.forEach(p => {
+        workSelect.innerHTML += `<option value="${p.key}" data-price="${p.sellPrice}">${p.name} (${p.serial || ''})</option>`;
+    });
+}
+
+function autoFillPrice(){
+    const workSelect = document.getElementById("work");
+    const selectedOption = workSelect.options[workSelect.selectedIndex];
+    if(selectedOption.value){
+        document.getElementById("rate").value = selectedOption.getAttribute("data-price");
+        document.getElementById("qty").focus(); // Move focus to qty
+    }
+}
+
+function searchProduct(serial){
+    if(!serial) return;
+    const product = allProducts.find(p => p.serial && p.serial.toLowerCase() === serial.toLowerCase());
+    
+    if(product){
+        document.getElementById("category").value = product.category;
+        filterProducts();
+        document.getElementById("work").value = product.key; 
+        document.getElementById("rate").value = product.sellPrice;
+        document.getElementById("qty").value = 1;
+        document.getElementById("searchSerial").value = ""; 
+    }
+}
+
+// ============== CART & TRANSACTION LOGIC ==============
 
 function addToCart(){
-    if(!work.value || !rate.value) return alert("কাজ ও দর সঠিক দিন");
-    const q = parseFloat(qty.value);
+    const workSelect = document.getElementById("work");
+    const pKey = workSelect.value;
+    const pName = workSelect.options[workSelect.selectedIndex]?.text;
+    const r = parseFloat(document.getElementById("rate").value);
+    const q = parseFloat(document.getElementById("qty").value);
+
+    if(!pKey || !r) return alert("পণ্য এবং দর সঠিক দিন");
     if(q <= 0) return alert("পরিমাণ অন্তত ১ হতে হবে");
-    cart.push({ work: work.value, qty: q, rate: +rate.value, sub: q * +rate.value });
-    renderCart(); qty.value=1; 
+    
+    const stockItem = allProducts.find(p => p.key === pKey);
+    
+    // Check Stock ONLY if it is NOT a service
+    if(stockItem && !stockItem.isService && stockItem.qty < q) {
+        alert("সতর্কতা: স্টকে পর্যাপ্ত পণ্য নেই! (স্টক: " + stockItem.qty + ")");
+    }
+
+    cart.push({ 
+        key: pKey, 
+        work: pName.split('(')[0].trim(), 
+        qty: q, 
+        rate: r, 
+        sub: q * r,
+        isService: stockItem ? stockItem.isService : false
+    });
+    
+    renderCart(); 
+    document.getElementById("qty").value=1; 
 }
 
 function renderCart(){
@@ -454,16 +547,13 @@ function removeCart(index){ cart.splice(index,1); renderCart(); }
 function calcLoss(){ loss.value = (parseFloat(total.value) || 0) - (parseFloat(taken.value) || 0); }
 
 function deductStock(cartItems) {
-    db.ref("inventory").once("value", s => {
-        const stockData = s.val();
-        if(!stockData) return;
-        cartItems.forEach(cItem => {
-            const key = Object.keys(stockData).find(k => stockData[k].name === cItem.work);
-            if(key) {
-                const newQty = parseFloat(stockData[key].qty) - parseFloat(cItem.qty);
-                db.ref("inventory/" + key).update({ qty: newQty });
-            }
-        });
+    // Only deduct stock if item is NOT a service
+    cartItems.forEach(cItem => {
+        const product = allProducts.find(p => p.key === cItem.key);
+        if(product && !product.isService) {
+            const newQty = parseFloat(product.qty) - parseFloat(cItem.qty);
+            db.ref("products/" + cItem.key).update({ qty: newQty });
+        }
     });
 }
 
@@ -487,6 +577,8 @@ function saveBulkEntry(showMemoFlag){
         cart = []; renderCart(); note.value = ""; phone.value = ""; taken.value = ""; loss.value="0";
     });
 }
+
+// ============== VIEW & REPORT LOGIC ==============
 
 function viewMemo(key) {
     db.ref("entries/" + key).once("value", s => {
@@ -512,7 +604,6 @@ function showMemo(e){
     let signs = {owner:["Toosher Ahmed","01913-812765"], admin:["Arafat Sikder","016749-44985"], roky:["Roky","01878-149052"]};
     let s = signs[e.user] || [e.user.toUpperCase(), ""];
     document.getElementById("signatureName").innerText = s[0];
-    document.getElementById("signatureContact").innerText = s[1];
     document.getElementById("memoModal").style.display="block";
     document.getElementById("overlay").style.display="block";
 }
@@ -570,20 +661,10 @@ function renderUserStats(data) {
 
     const tbody = document.getElementById("userSummaryBody");
     tbody.innerHTML = "";
-
-    if(!hasData) {
-        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#777">আজকের কোনো এন্ট্রি নেই</td></tr>`;
-        return;
-    }
-
+    if(!hasData) { tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:#777">আজকের কোনো এন্ট্রি নেই</td></tr>`; return; }
     Object.keys(stats).forEach(u => {
         if(stats[u].total > 0 || stats[u].taken > 0) { 
-            tbody.innerHTML += `<tr>
-                <td style="text-transform:capitalize; font-weight:bold">${u}</td>
-                <td>${stats[u].total}</td>
-                <td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td>
-                <td style="color:#e74c3c">${stats[u].loss}</td>
-            </tr>`;
+            tbody.innerHTML += `<tr><td style="text-transform:capitalize; font-weight:bold">${u}</td><td>${stats[u].total}</td><td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td><td style="color:#e74c3c">${stats[u].loss}</td></tr>`;
         }
     });
 }
@@ -591,10 +672,7 @@ function renderUserStats(data) {
 function renderTable(data, tableId = "tableBody"){
     const tbody = document.getElementById(tableId);
     tbody.innerHTML=""; 
-    if(!data) {
-        if(tableId === "reportTableBody") tbody.innerHTML = "<tr><td colspan='8' style='text-align:center'>কোনো ডাটা পাওয়া যায়নি</td></tr>";
-        return;
-    }
+    if(!data) { if(tableId === "reportTableBody") tbody.innerHTML = "<tr><td colspan='8' style='text-align:center'>কোনো ডাটা পাওয়া যায়নি</td></tr>"; return; }
     
     let t=0, k=0, l=0, dailyData={};
     Object.keys(data).reverse().forEach(key=>{
@@ -605,7 +683,6 @@ function renderTable(data, tableId = "tableBody"){
         const btnMemo = `<button class="btn-action btn-print" onclick="viewMemo('${key}')" title="মেমো">🖨️</button>`;
         const btnEdit = `<button class="btn-action btn-edit" onclick="openEdit('${key}')" title="এডিট">✏️</button>`;
         const btnDel = (user === e.user) ? `<button class="btn-action btn-del" onclick="delEntry('${key}')" title="ডিলিট">❌</button>` : ``;
-        
         tbody.innerHTML+=`<tr><td>${e.time}</td><td style="font-size:12px"><b>${e.note}</b><br>${itemNames}</td><td class="en">${phone}</td><td>${e.total}</td><td>${e.taken}</td><td>${e.loss}</td><td>${e.user}</td><td class="noPrint" style="display:flex">${btnMemo}${btnEdit}${btnDel}</td></tr>`;
         dailyData[e.date] = (dailyData[e.date]||0) + (+e.total||0);
     });
@@ -630,31 +707,14 @@ function delEntry(key){
         if(confirm("মুছে ফেলবেন?")) db.ref("entries/"+key).remove();
     });
 }
-function addStock(){ if(itemName.value && itemStock.value) { db.ref("inventory").push({name:itemName.value, qty:itemStock.value}); itemName.value=""; itemStock.value=""; } }
-
-function loadStock(){ 
-    db.ref("inventory").on("value", s=>{ 
-        stockBody.innerHTML=""; 
-        const d = s.val(); 
-        if(d) Object.keys(d).forEach(k=>{ 
-            const q = d[k].qty;
-            const lowClass = q < 5 ? "low-stock" : ""; 
-            stockBody.innerHTML+=`<tr class="${lowClass}">
-                <td>${d[k].name}</td>
-                <td>${q} ${q < 5 ? '⚠️' : ''}</td>
-                <td><button class="btn-action btn-del" onclick="delInv('${k}')">🗑️</button></td>
-            </tr>`; 
-        }); 
-    }); 
+function loadEntries(){ 
+    // performance fix: only load last 100 entries
+    db.ref("entries").limitToLast(100).on("value", s => renderTable(s.val(), "tableBody")); 
 }
-
-function delInv(k){ if(user==='owner' && confirm("মুছবেন?")) db.ref("inventory/"+k).remove(); }
-function loadEntries(){ db.ref("entries").on("value", s => renderTable(s.val(), "tableBody")); }
 function showSection(id){ document.querySelectorAll('.section').forEach(s=>s.style.display="none"); document.getElementById(id).style.display="block"; closeSidebar(); }
 function closeSidebar(){ sidebar.style.left="-280px"; overlay.style.display="none"; }
 function openSidebar(){ sidebar.style.left="0"; overlay.style.display="block"; }
 function logout() { localStorage.removeItem("loggedInUser"); location.reload(); }
-
 function searchByDate(){ 
     if(!sDate.value) return; 
     const d = sDate.value.split("-").reverse().join("/"); 
