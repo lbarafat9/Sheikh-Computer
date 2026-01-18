@@ -1085,18 +1085,88 @@ function downloadExcel(){
     });
 }
 
-// Temporary fix - update the onkeydown event in the HTML
+// --- MOBILE & PC UNIVERSAL SEARCH FIX ---
 window.addEventListener('load', function() {
-    // Update the search input to use the simple function
     const searchInput = document.getElementById("searchSerial");
     if(searchInput) {
-        searchInput.onkeydown = function(event) {
+        searchInput.addEventListener('keydown', function(event) {
             if(event.key === 'Enter') {
-                searchProductSimple(this.value);
+                event.preventDefault(); // ফোনের কীবোর্ড সাবমিট রোধ করবে
+                
+                const query = this.value.toString().toLowerCase().trim();
+                if(!query) return;
+
+                // ১. সিরিয়াল অনুযায়ী পণ্য খোঁজা
+                const product = allProducts.find(p => 
+                    p.serial && p.serial.toString().toLowerCase().trim() === query
+                );
+
+                if(product) {
+                    // ২. ক্যাটাগরি সেট করা
+                    const catSelect = document.getElementById("category");
+                    catSelect.value = product.category;
+
+                    // ৩. ফোনের জন্য কাজ/পণ্য ড্রপডাউনটি নতুন করে তৈরি করা
+                    const workSelect = document.getElementById("work");
+                    workSelect.innerHTML = ""; 
+                    
+                    const filtered = allProducts.filter(p => p.category === product.category);
+                    filtered.forEach(p => {
+                        const opt = document.createElement("option");
+                        opt.value = p.key;
+                        opt.text = `${p.name} (${p.serial || '-'})`;
+                        opt.setAttribute("data-price", p.sellPrice);
+                        if(p.key === product.key) opt.selected = true; 
+                        workSelect.appendChild(opt);
+                    });
+
+                    // ৪. ভ্যালু ও রেট বসানো
+                    workSelect.value = product.key;
+                    document.getElementById("rate").value = product.sellPrice;
+                    document.getElementById("qty").value = 1;
+                    this.value = ""; // সার্চ বক্স খালি করা
+
+                    // ৫. সরাসরি 'পরিমাণ' (Qty) বক্সে ফোকাস করা
+                    setTimeout(() => {
+                        const qtyBox = document.getElementById("qty");
+                        qtyBox.focus();
+                        if(typeof qtyBox.select === "function") qtyBox.select();
+                    }, 150);
+
+                } else {
+                    alert("সিরিয়াল '" + query + "' এর কোনো পণ্য নেই!");
+                    this.value = "";
+                    this.focus();
+                }
             }
-        };
+        });
     }
 });
 </script>
+
+<script>
+// === MOBILE + PC SEARCH FIX (FINAL) ===
+(function(){
+    const input = document.getElementById("searchSerial");
+    if(!input) return;
+
+    let lastVal = "";
+
+    input.addEventListener("input", function(){
+        const val = this.value.trim();
+        if(val === lastVal || val === "") return;
+        lastVal = val;
+        searchProductSimple(val);
+    });
+
+    input.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){
+            e.preventDefault();
+            if(this.value.trim()) searchProductSimple(this.value.trim());
+        }
+    });
+})();
+</script>
+
 </body>
 </html>
