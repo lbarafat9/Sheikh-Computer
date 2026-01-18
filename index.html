@@ -23,7 +23,7 @@
         #container{display:none;padding:20px;padding-top:90px;max-width:1250px;margin:auto}
         
         /* FORMS */
-        .form-group {margin-bottom: 15px; text-align: left;}
+        .form-group {margin-bottom: 15px; text-align: left; position: relative;}
         .form-group label {display: block; font-weight: 600; margin-bottom: 5px; color: #34495e; font-size: 14px;}
         
         input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid #ddd;outline:none;transition:0.3s;font-size:15px}
@@ -71,6 +71,79 @@
         .user-summary-box { background:#fff; padding:20px; border-radius:12px; margin-bottom:25px; border-left: 5px solid #8e44ad; box-shadow:0 4px 6px rgba(0,0,0,0.05); }
         .low-stock { background-color: #fff0f0; color: #c0392b; font-weight: bold; }
         .service-badge { background: #3498db; color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;}
+        
+        /* SEARCH RESULTS DROPDOWN */
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 250px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+        }
+        .search-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-item:hover {
+            background-color: #f8f9fa;
+        }
+        .search-item.active {
+            background-color: #e8f5e9;
+        }
+        .search-item .product-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .search-item .product-details {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3px;
+        }
+        .highlight {
+            background-color: #ffeb3b;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        .no-results {
+            padding: 15px;
+            text-align: center;
+            color: #777;
+            font-style: italic;
+        }
+
+        /* TEMPORARY MESSAGE */
+        .temp-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #2ecc71;
+            color: white;
+            border-radius: 6px;
+            z-index: 2000;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
 
         /* A4 PRINT CSS - STRICT */
         @media print {
@@ -177,8 +250,9 @@
             <h3 style="margin-top:0; color:#2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px;">নতুন ভাউচার তৈরি</h3>
             
             <div class="form-group" style="background:#e8f5e9; padding:15px; border:1px dashed #27ae60; border-radius:8px">
-                <label>🔍 স্মার্ট সার্চ (সিরিয়াল অথবা নাম লিখে Enter চাপুন):</label>
-                <input id="searchSerial" placeholder="উদাহরণ: 101 অথবা A4 Paper..." class="en" onkeydown="if(event.key === 'Enter'){ searchProduct(this.value); }">
+                <label>🔍 দ্রুত সার্চ (সিরিয়াল অথবা নাম লিখুন):</label>
+                <input id="searchSerial" type="text" placeholder="যেমন: 101 অথবা A4 Paper..." class="en" autocomplete="off">
+                <div id="searchResults" class="search-results"></div>
             </div>
 
             <div class="form-group">
@@ -368,18 +442,26 @@ let currentUser = "";
 let allProducts = [];
 let cart = [];
 let salesChart = null;
+let searchResultsDiv = null;
+let searchTimer = null;
+let selectedSearchIndex = -1;
 
 // --- INITIALIZATION ---
 window.onload = function() {
     const savedUser = localStorage.getItem("loggedInUser");
     if(savedUser) setupUser(savedUser);
+    
+    // Search results div reference
+    searchResultsDiv = document.getElementById("searchResults");
+    
+    // Setup search functionality
+    setupSearchFunctionality();
 };
 
 // --- AUTHENTICATION ---
 function login(){
     const u = document.getElementById("uName").value.toLowerCase().trim();
     const p = document.getElementById("uPass").value.trim();
-    // HARDCODED PASSWORDS (NOTE: Not secure for high-value targets, okay for internal shop use)
     const users = {admin:"123", owner:"456", roky:"789"};
     
     if(users[u] === p){ 
@@ -410,8 +492,171 @@ function logout() {
     location.reload(); 
 }
 
-// --- PRODUCT & STOCK MANAGEMENT ---
+// --- SEARCH FUNCTIONALITY ---
+function setupSearchFunctionality() {
+    const searchInput = document.getElementById("searchSerial");
+    
+    if (!searchInput) return;
+    
+    // Input event with debouncing
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const query = this.value.trim();
+        
+        if (query === "") {
+            hideSearchResults();
+            return;
+        }
+        
+        searchTimer = setTimeout(() => {
+            performLiveSearch(query);
+        }, 200);
+    });
+    
+    // Keydown for navigation
+    searchInput.addEventListener('keydown', function(e) {
+        const items = searchResultsDiv.querySelectorAll('.search-item');
+        
+        if (items.length === 0) return;
+        
+        switch(e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                selectedSearchIndex = (selectedSearchIndex + 1) % items.length;
+                updateSelectedItem(items);
+                break;
+                
+            case 'ArrowUp':
+                e.preventDefault();
+                selectedSearchIndex = selectedSearchIndex <= 0 ? items.length - 1 : selectedSearchIndex - 1;
+                updateSelectedItem(items);
+                break;
+                
+            case 'Enter':
+                e.preventDefault();
+                if (selectedSearchIndex >= 0 && selectedSearchIndex < items.length) {
+                    const item = items[selectedSearchIndex];
+                    selectProductFromSearch(item.getAttribute('data-key'));
+                    hideSearchResults();
+                } else if (items.length > 0) {
+                    // Select first item if none selected
+                    const firstItem = items[0];
+                    selectProductFromSearch(firstItem.getAttribute('data-key'));
+                    hideSearchResults();
+                }
+                break;
+                
+            case 'Escape':
+                hideSearchResults();
+                this.value = "";
+                break;
+        }
+    });
+    
+    // Hide results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResultsDiv.contains(e.target)) {
+            hideSearchResults();
+        }
+    });
+}
 
+function performLiveSearch(query) {
+    if (!query || query.trim() === "" || allProducts.length === 0) {
+        showNoResults("পণ্য লোড হচ্ছে...");
+        return;
+    }
+    
+    const q = query.toLowerCase().trim();
+    
+    // Find matches
+    const matches = allProducts.filter(product => {
+        // Check serial match
+        if (product.serial && String(product.serial).toLowerCase().includes(q)) {
+            return true;
+        }
+        
+        // Check name match
+        if (product.name && product.name.toLowerCase().includes(q)) {
+            return true;
+        }
+        
+        return false;
+    });
+    
+    // Show results
+    showSearchResults(matches, q);
+}
+
+function showSearchResults(matches, query) {
+    if (!searchResultsDiv) return;
+    
+    if (matches.length === 0) {
+        showNoResults(`"${query}" এর কোনো পণ্য পাওয়া যায়নি`);
+        return;
+    }
+    
+    let html = '';
+    matches.slice(0, 8).forEach((product, index) => {
+        const name = highlightText(product.name, query);
+        const serial = product.serial ? `(${product.serial})` : '';
+        const stockInfo = product.isService ? 
+            '<span class="service-badge">সার্ভিস</span>' : 
+            `<small>স্টক: ${product.qty}</small>`;
+        
+        html += `
+            <div class="search-item" data-key="${product.key}" 
+                 onclick="selectProductFromSearch('${product.key}')"
+                 onmouseover="this.classList.add('active')"
+                 onmouseout="this.classList.remove('active')">
+                <div class="product-name">${name} ${serial}</div>
+                <div class="product-details">
+                    <span>${product.category}</span>
+                    <span>৳${product.sellPrice} ${stockInfo}</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    searchResultsDiv.innerHTML = html;
+    searchResultsDiv.style.display = 'block';
+    selectedSearchIndex = -1;
+}
+
+function showNoResults(message) {
+    if (!searchResultsDiv) return;
+    
+    searchResultsDiv.innerHTML = `<div class="no-results">${message}</div>`;
+    searchResultsDiv.style.display = 'block';
+}
+
+function hideSearchResults() {
+    if (searchResultsDiv) {
+        searchResultsDiv.style.display = 'none';
+        searchResultsDiv.innerHTML = '';
+        selectedSearchIndex = -1;
+    }
+}
+
+function highlightText(text, query) {
+    if (!text || !query) return text;
+    
+    const regex = new RegExp(`(${query})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+}
+
+function updateSelectedItem(items) {
+    items.forEach((item, index) => {
+        if (index === selectedSearchIndex) {
+            item.classList.add('active');
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('active');
+        }
+    });
+}
+
+// --- PRODUCT & STOCK MANAGEMENT ---
 function loadAllProducts(){
     db.ref("products").on("value", snapshot => {
         allProducts = [];
@@ -421,7 +666,7 @@ function loadAllProducts(){
         
         snapshot.forEach(child => {
             const p = child.val();
-            p.key = child.key; // Store firebase key
+            p.key = child.key;
             allProducts.push(p);
             categories.add(p.category);
             
@@ -452,9 +697,9 @@ function loadAllProducts(){
         const currentCat = catSelect.value;
         catSelect.innerHTML = "<option value=''>সব ক্যাটাগরি</option>";
         categories.forEach(c => { catSelect.innerHTML += `<option value="${c}">${c}</option>`; });
-        catSelect.value = currentCat; // Restore selection if valid
+        catSelect.value = currentCat;
         
-        filterProducts(); // Refresh product dropdown
+        filterProducts();
     });
 }
 
@@ -490,9 +735,10 @@ function addNewProduct(){
     const newProd = { serial, category: cat, name, qty, isService, costPrice: cost, sellPrice: sell };
     
     db.ref("products").push(newProd).then(()=>{
-        alert(isService ? "সার্ভিস যুক্ত হয়েছে!" : "পণ্য স্টকে যুক্ত হয়েছে!");
-        // Clear fields
+        showTempMessage(isService ? "সার্ভিস যুক্ত হয়েছে!" : "পণ্য স্টকে যুক্ত হয়েছে!");
+        
         document.getElementById("stSerial").value = "";
+        document.getElementById("stCategory").value = "";
         document.getElementById("stName").value = "";
         document.getElementById("stQty").value = "";
         document.getElementById("stCost").value = "";
@@ -511,7 +757,6 @@ function delProduct(key){
 }
 
 // --- SALES & CART LOGIC ---
-
 function filterProducts(){
     const cat = document.getElementById("category").value;
     const workSelect = document.getElementById("work");
@@ -523,7 +768,6 @@ function filterProducts(){
         workSelect.innerHTML += `<option value="${p.key}" data-price="${p.sellPrice}">${p.name} (${p.serial || '-'})</option>`; 
     });
     
-    // Return promise for better async handling
     return new Promise(resolve => setTimeout(resolve, 50));
 }
 
@@ -536,119 +780,46 @@ function autoFillPrice(){
     }
 }
 
-// --- FIXED SEARCH FUNCTION ---
-function searchProduct(query){
-    if(!query || query.trim() === "") return;
-    query = query.toString().toLowerCase().trim();
+function selectProductFromSearch(productKey) {
+    const product = allProducts.find(p => p.key === productKey);
+    if (!product) return;
     
-    console.log("Searching for:", query);
+    // Set category
+    const catSelect = document.getElementById("category");
+    catSelect.value = product.category;
     
-    // Search by Serial, Name OR Firebase Key
-    const product = allProducts.find(p => 
-        (p.serial && String(p.serial).toLowerCase().includes(query)) || 
-        (p.name && p.name.toLowerCase().includes(query)) ||
-        (p.key && p.key.toLowerCase().includes(query))
-    );
-
-    if(product){
-        console.log("Found product:", product.name, "Key:", product.key);
-        
-        // Clear search input immediately
-        document.getElementById("searchSerial").value = "";
-        
-        // First, set category to empty to show all products
-        document.getElementById("category").value = "";
-        
-        // Wait a bit for category change to take effect
-        setTimeout(() => {
-            filterProducts().then(() => {
-                // After filtering, find and select the product
-                const workSelect = document.getElementById("work");
-                
-                // Try to find the product in dropdown
-                for(let i = 0; i < workSelect.options.length; i++){
-                    if(workSelect.options[i].value === product.key){
-                        workSelect.selectedIndex = i;
-                        
-                        // Now set the category based on selected product
-                        document.getElementById("category").value = product.category;
-                        
-                        // Fill price
-                        document.getElementById("rate").value = product.sellPrice;
-                        document.getElementById("qty").value = 1;
-                        
-                        // Focus on quantity
-                        setTimeout(() => {
-                            const qtyBox = document.getElementById("qty");
-                            qtyBox.focus();
-                            qtyBox.select();
-                        }, 100);
-                        
-                        console.log("Product selected successfully");
-                        return;
-                    }
+    // Refresh product dropdown
+    setTimeout(() => {
+        filterProducts().then(() => {
+            const workSelect = document.getElementById("work");
+            
+            // Select the product
+            for(let i = 0; i < workSelect.options.length; i++) {
+                if(workSelect.options[i].value === product.key) {
+                    workSelect.selectedIndex = i;
+                    
+                    // Set price and quantity
+                    document.getElementById("rate").value = product.sellPrice;
+                    document.getElementById("qty").value = 1;
+                    
+                    // Focus on quantity
+                    setTimeout(() => {
+                        document.getElementById("qty").focus();
+                        document.getElementById("qty").select();
+                    }, 50);
+                    
+                    // Show success message
+                    showTempMessage(`${product.name} সিলেক্ট করা হয়েছে`);
+                    
+                    // Clear search
+                    document.getElementById("searchSerial").value = "";
+                    hideSearchResults();
+                    break;
                 }
-                
-                // If not found, show error
-                alert("পণ্যটি ড্রপডাউনে পাওয়া যায়নি!");
-            });
-        }, 100);
-
-    } else {
-        alert("কোনো পণ্য পাওয়া যায়নি! Serial, Name অথবা ID চেক করুন।");
-        document.getElementById("searchSerial").value = "";
-        document.getElementById("searchSerial").focus();
-    }
+            }
+        });
+    }, 100);
 }
-
-// Alternative simpler search function
-function searchProductSimple(query){
-    if(!query || query.trim() === "") return;
-    query = query.toString().toLowerCase().trim();
-    
-    console.log("Simple search for:", query);
-    
-    // Find product
-    const product = allProducts.find(p => 
-        (p.serial && String(p.serial).toLowerCase().includes(query)) || 
-        (p.name && p.name.toLowerCase().includes(query)) ||
-        (p.key && p.key.toLowerCase().includes(query))
-    );
-
-    if(product){
-        console.log("Found:", product.name);
-        
-        // DIRECT APPROACH - Manually create option
-        const workSelect = document.getElementById("work");
-        
-        // Clear and add our product as option
-        workSelect.innerHTML = `<option value="${product.key}" data-price="${product.sellPrice}">${product.name} (${product.serial || '-'})</option>`;
-        
-        // Select it
-        workSelect.selectedIndex = 0;
-        
-        // Set category
-        document.getElementById("category").value = product.category;
-        
-        // Set price and quantity
-        document.getElementById("rate").value = product.sellPrice;
-        document.getElementById("qty").value = 1;
-        document.getElementById("searchSerial").value = "";
-        
-        // Focus
-        setTimeout(() => {
-            document.getElementById("qty").focus();
-            document.getElementById("qty").select();
-        }, 50);
-        
-    } else {
-        alert("কোনো পণ্য পাওয়া যায়নি!");
-        document.getElementById("searchSerial").focus();
-    }
-}
-
-// Use this updated version in your HTML
-// Change line 180 to: <input id="searchSerial" ... onkeydown="if(event.key === 'Enter'){ searchProductSimple(this.value); }">
 
 function addToCart(){
     const workSelect = document.getElementById("work");
@@ -661,7 +832,7 @@ function addToCart(){
     if(q <= 0) return alert("পরিমাণ অন্তত ১ হতে হবে");
     
     const stockItem = allProducts.find(p => p.key === pKey);
-    const pName = stockItem ? stockItem.name : pNameRaw; // Cleaner name
+    const pName = stockItem ? stockItem.name : pNameRaw;
 
     // Stock Validation
     if(stockItem && !stockItem.isService && stockItem.qty < q) { 
@@ -678,9 +849,8 @@ function addToCart(){
     });
     
     renderCart(); 
-    // Reset inputs
     document.getElementById("qty").value=1; 
-    document.getElementById("searchSerial").focus(); // Ready for next search
+    document.getElementById("searchSerial").focus();
 }
 
 function renderCart(){
@@ -736,13 +906,13 @@ function saveBulkEntry(showMemoFlag){
     const takenVal = parseFloat(document.getElementById("taken").value) || 0;
     
     const entryData = {
-        date: new Date().toLocaleDateString("en-GB"), // DD/MM/YYYY format
+        date: new Date().toLocaleDateString("en-GB"),
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        timestamp: firebase.database.ServerValue.TIMESTAMP, // Useful for sorting
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
         items: cart,
         total: totalVal,
         taken: takenVal,
-        loss: totalVal - takenVal, // Saved as 'loss' in DB but displayed as 'Due'
+        loss: totalVal - takenVal,
         user: currentUser,
         note: document.getElementById("note").value || "General Customer",
         phone: document.getElementById("phone").value || ""
@@ -752,11 +922,10 @@ function saveBulkEntry(showMemoFlag){
         deductStock(cart);
         
         if(showMemoFlag) {
-             // Pass the ID just generated
              entryData.key = snap.key;
              showMemo(entryData);
         } else {
-             alert("✅ সফলভাবে সেভ হয়েছে!");
+             showTempMessage("✅ সফলভাবে সেভ হয়েছে!");
         }
         
         // Clear UI
@@ -766,11 +935,42 @@ function saveBulkEntry(showMemoFlag){
         document.getElementById("phone").value = ""; 
         document.getElementById("taken").value = ""; 
         document.getElementById("due").value = "0";
+        
+        // Focus back to search
+        document.getElementById("searchSerial").focus();
     });
 }
 
-// --- MEMO & PRINTING ---
+// --- TEMPORARY MESSAGE FUNCTION ---
+function showTempMessage(message, type = "success") {
+    // Remove existing message
+    const existingMsg = document.querySelector('.temp-message');
+    if (existingMsg) {
+        existingMsg.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => existingMsg.remove(), 300);
+    }
+    
+    // Create new message
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "temp-message";
+    msgDiv.textContent = message;
+    msgDiv.style.background = type === "success" ? "#2ecc71" : 
+                              type === "error" ? "#e74c3c" : "#3498db";
+    
+    document.body.appendChild(msgDiv);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (msgDiv.parentNode) {
+            msgDiv.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => {
+                if (msgDiv.parentNode) msgDiv.remove();
+            }, 300);
+        }
+    }, 3000);
+}
 
+// --- MEMO & PRINTING ---
 function viewMemo(key) { 
     db.ref("entries/" + key).once("value", s => { 
         if(s.val()) {
@@ -804,11 +1004,9 @@ function showMemo(e){
             </tr>`;
         });
     } else {
-        // Legacy support for old data
         mItems.innerHTML += `<tr><td>${e.work}</td><td>-</td><td>${e.total}</td></tr>`;
     }
     
-    // Signatures based on User
     const signs = {
         owner: ["Toosher Ahmed", "01913-812765"], 
         admin: ["Arafat Sikder", "016749-44985"], 
@@ -827,8 +1025,7 @@ function closeModal(id) {
     document.getElementById("overlay").style.display="none"; 
 }
 
-// --- EDITING & DELETING (WITH STOCK RESTORE) ---
-
+// --- EDITING & DELETING ---
 function openEdit(key) {
     db.ref("entries/" + key).once("value", s => {
         const d = s.val();
@@ -855,27 +1052,23 @@ function updateEntry() {
         taken: k, 
         loss: t - k
     }).then(() => { 
-        alert("আপডেট হয়েছে!"); 
+        showTempMessage("✅ আপডেট হয়েছে!");
         closeModal("editModal"); 
     });
 }
 
-// --- CRITICAL: DELETE WITH STOCK RESTORE ---
 function delEntry(key){ 
     db.ref("entries/"+key).once("value", s => { 
         const entry = s.val();
         
-        // Security check
         if(entry.user !== currentUser && currentUser !== 'admin' && currentUser !== 'owner') {
              return alert("আপনি অন্যের ডাটা মুছতে পারবেন না!");
         }
         
-        if(confirm("সতর্কতা: এটি মুছে ফেললে স্টক আবার ফেরত (Restore) আসবে। আপনি কি নিশ্চিত?")) {
+        if(confirm("সতর্কতা: এটি মুছে ফেললে স্টক আবার ফেরত আসবে। আপনি কি নিশ্চিত?")) {
             
-            // 1. Restore Stock Loop
             if(entry.items && Array.isArray(entry.items)){
                 entry.items.forEach(item => {
-                    // Only restore if it was a physical product, not service
                     if(item.key && !item.isService){
                          const prod = allProducts.find(p => p.key === item.key);
                          if(prod){
@@ -887,16 +1080,14 @@ function delEntry(key){
                 });
             }
             
-            // 2. Delete the entry
-            db.ref("entries/"+key).remove(); 
+            db.ref("entries/"+key).remove();
+            showTempMessage("এন্ট্রি ডিলিট হয়েছে", "error");
         }
     }); 
 }
 
 // --- REPORTING & CHARTS ---
-
 function loadEntries(){ 
-    // Load last 100 entries automatically
     db.ref("entries").limitToLast(100).on("value", s => renderTable(s.val(), "tableBody")); 
 }
 
@@ -912,7 +1103,6 @@ function renderTable(data, tableId = "tableBody"){
     let totalSales=0, totalTaken=0, totalDue=0;
     let dailyData = {};
     
-    // Convert object to array and reverse (Newest first)
     const entriesArr = Object.keys(data).map(key => ({...data[key], key})).reverse();
     
     entriesArr.forEach(e => {
@@ -920,14 +1110,12 @@ function renderTable(data, tableId = "tableBody"){
         totalTaken += +e.taken || 0; 
         totalDue += +e.loss || 0;
         
-        // Format Items String
         const itemSummary = (e.items && Array.isArray(e.items)) 
             ? e.items.map(i => `<span style="background:#f1f1f1;padding:2px 5px;border-radius:4px;font-size:12px">${i.work} (${i.qty})</span>`).join(" ") 
             : e.work;
             
         const phone = e.phone || "-";
         
-        // Buttons
         const btnMemo = `<button class="btn-action btn-print" onclick="viewMemo('${e.key}')" title="মেমো">🖨️</button>`;
         const btnEdit = `<button class="btn-action btn-edit" onclick="openEdit('${e.key}')" title="এডিট">✏️</button>`;
         const btnDel = `<button class="btn-action btn-del" onclick="delEntry('${e.key}')" title="ডিলিট">❌</button>`;
@@ -944,11 +1132,9 @@ function renderTable(data, tableId = "tableBody"){
             <td class="noPrint" style="white-space:nowrap">${btnMemo}${btnEdit}${btnDel}</td>
         </tr>`;
         
-        // Chart Data Prep
         dailyData[e.date] = (dailyData[e.date]||0) + (+e.total||0);
     });
     
-    // Update Dashboard Stats (Only if loading main dashboard table)
     if(tableId === "tableBody") { 
         document.getElementById("cCount").innerText = entriesArr.length; 
         document.getElementById("cTotal").innerText = totalSales; 
@@ -973,7 +1159,7 @@ function renderUserStats(data) {
             if(e.date === today) {
                 hasData = true; 
                 const u = e.user.toLowerCase();
-                if(!stats[u]) stats[u] = {total:0, taken:0, due:0}; // Safety init
+                if(!stats[u]) stats[u] = {total:0, taken:0, due:0};
                 stats[u].total += (+e.total || 0); 
                 stats[u].taken += (+e.taken || 0); 
                 stats[u].due += (+e.loss || 0);
@@ -1003,13 +1189,12 @@ function renderUserStats(data) {
 }
 
 function updateChart(data){
-    // Sort dates
     const sortedDates = Object.keys(data).sort((a,b) => {
         const [d1,m1,y1] = a.split('/'); const [d2,m2,y2] = b.split('/');
         return new Date(`${y1}-${m1}-${d1}`) - new Date(`${y2}-${m2}-${d2}`);
     });
     
-    const labels = sortedDates.slice(-10); // Last 10 days
+    const labels = sortedDates.slice(-10);
     const values = labels.map(d => data[d]);
     
     if(salesChart) salesChart.destroy();
@@ -1036,7 +1221,6 @@ function updateChart(data){
 }
 
 // --- UTILITIES ---
-
 function showSection(id){ 
     document.querySelectorAll('.section').forEach(s=>s.style.display="none"); 
     document.getElementById(id).style.display="block"; 
@@ -1047,7 +1231,7 @@ function openSidebar(){ document.getElementById("sidebar").style.left="0"; docum
 
 function searchByDate(){ 
     if(!document.getElementById("sDate").value) return alert("তারিখ সিলেক্ট করুন");
-    const d = document.getElementById("sDate").value.split("-").reverse().join("/"); // YYYY-MM-DD to DD/MM/YYYY
+    const d = document.getElementById("sDate").value.split("-").reverse().join("/");
     
     db.ref("entries").orderByChild("date").equalTo(d).once("value", s => { 
         renderTable(s.val(), "reportTableBody"); 
@@ -1067,12 +1251,10 @@ function downloadExcel(){
         
         Object.keys(d).forEach(k => { 
             const e = d[k]; 
-            // Flatten items for CSV
             const items = (e.items && Array.isArray(e.items)) 
                 ? e.items.map(i=>`${i.work} (${i.qty}pc)`).join(" + ") 
                 : e.work;
             
-            // Handle commas in content
             const safeNote = e.note.replace(/,/g, " ");
             
             csv += `${e.date},${e.time},${safeNote},${e.phone||'-'},"${items}",${e.total},${e.taken},${e.loss},${e.user}\n`; 
@@ -1084,89 +1266,6 @@ function downloadExcel(){
         link.click();
     });
 }
-
-// --- MOBILE & PC UNIVERSAL SEARCH FIX ---
-window.addEventListener('load', function() {
-    const searchInput = document.getElementById("searchSerial");
-    if(searchInput) {
-        searchInput.addEventListener('keydown', function(event) {
-            if(event.key === 'Enter') {
-                event.preventDefault(); // ফোনের কীবোর্ড সাবমিট রোধ করবে
-                
-                const query = this.value.toString().toLowerCase().trim();
-                if(!query) return;
-
-                // ১. সিরিয়াল অনুযায়ী পণ্য খোঁজা
-                const product = allProducts.find(p => 
-                    p.serial && p.serial.toString().toLowerCase().trim() === query
-                );
-
-                if(product) {
-                    // ২. ক্যাটাগরি সেট করা
-                    const catSelect = document.getElementById("category");
-                    catSelect.value = product.category;
-
-                    // ৩. ফোনের জন্য কাজ/পণ্য ড্রপডাউনটি নতুন করে তৈরি করা
-                    const workSelect = document.getElementById("work");
-                    workSelect.innerHTML = ""; 
-                    
-                    const filtered = allProducts.filter(p => p.category === product.category);
-                    filtered.forEach(p => {
-                        const opt = document.createElement("option");
-                        opt.value = p.key;
-                        opt.text = `${p.name} (${p.serial || '-'})`;
-                        opt.setAttribute("data-price", p.sellPrice);
-                        if(p.key === product.key) opt.selected = true; 
-                        workSelect.appendChild(opt);
-                    });
-
-                    // ৪. ভ্যালু ও রেট বসানো
-                    workSelect.value = product.key;
-                    document.getElementById("rate").value = product.sellPrice;
-                    document.getElementById("qty").value = 1;
-                    this.value = ""; // সার্চ বক্স খালি করা
-
-                    // ৫. সরাসরি 'পরিমাণ' (Qty) বক্সে ফোকাস করা
-                    setTimeout(() => {
-                        const qtyBox = document.getElementById("qty");
-                        qtyBox.focus();
-                        if(typeof qtyBox.select === "function") qtyBox.select();
-                    }, 150);
-
-                } else {
-                    alert("সিরিয়াল '" + query + "' এর কোনো পণ্য নেই!");
-                    this.value = "";
-                    this.focus();
-                }
-            }
-        });
-    }
-});
 </script>
-
-<script>
-// === MOBILE + PC SEARCH FIX (FINAL) ===
-(function(){
-    const input = document.getElementById("searchSerial");
-    if(!input) return;
-
-    let lastVal = "";
-
-    input.addEventListener("input", function(){
-        const val = this.value.trim();
-        if(val === lastVal || val === "") return;
-        lastVal = val;
-        searchProductSimple(val);
-    });
-
-    input.addEventListener("keydown", function(e){
-        if(e.key === "Enter"){
-            e.preventDefault();
-            if(this.value.trim()) searchProductSimple(this.value.trim());
-        }
-    });
-})();
-</script>
-
 </body>
 </html>
