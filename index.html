@@ -64,7 +64,7 @@
         .btn-print:hover{background:#2980b9; color: white;}
         
         /* CART & MISC */
-        .cart-box {margin-top:20px; border:2px dashed #27ae60; padding:20px; border-radius:12px; background:#f9fff9}
+        .cart-box {margin-top:20px; border:2px dashed #27ae60; padding:20px;border-radius:12px; background:#f9fff9}
         .cart-item {display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; font-size:15px; align-items: center;}
         
         .modal{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:600px; max-width: 95%; padding:30px;z-index:1500;box-shadow:0 10px 40px rgba(0,0,0,0.2);border-radius:15px}
@@ -182,6 +182,45 @@
             border-left: 5px solid #27ae60;
         }
 
+        /* VALIDATION STYLES */
+        .validation-warning {
+            background: #fff8e1;
+            border-left: 5px solid #f39c12;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .validation-error {
+            background: #ffebee;
+            border-left: 5px solid #e74c3c;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .validation-success {
+            background: #e8f5e9;
+            border-left: 5px solid #2ecc71;
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .phone-warning {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .due-warning {
+            color: #e74c3c;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         /* A4 PRINT CSS - STRICT */
         @media print {
             @page { size: A4; margin: 0.8in; }
@@ -270,7 +309,7 @@
             </div>
         </div>
 
-        <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05)">
+        <div style="background:#fff;padding:20px;border-radius:12px;margin-bottom:25px;box-shadow:0 4px 6px rgba(0,0,0,0.05">
             <canvas id="salesChart" height="80"></canvas>
         </div>
         
@@ -284,7 +323,7 @@
     </div>
 
     <div id="newEntry" class="section">
-        <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.05)">
+        <div style="max-width:600px;margin:auto;background:#fff;padding:30px;border-radius:15px;box-shadow:0 5px 20px rgba(0,0,0,0.05">
             <h3 style="margin-top:0; color:#2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px;">নতুন ভাউচার তৈরি</h3>
             
             <div class="form-group" style="background:#e8f5e9; padding:15px; border:1px dashed #27ae60; border-radius:8px">
@@ -320,34 +359,49 @@
                 
                 <hr style="border:0; border-top:1px dashed #aaa; margin:15px 0">
                 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
-                    <div class="form-group">
-                        <label>গ্রাহকের নাম: <span style="color:red">*</span></label>
-                        <input id="note" placeholder="নাম লিখুন..." oninput="autoFillPhone()">
-                        <small style="color:#666;">গ্রাহকের মোবাইল দিলে পরে সহজে খুঁজে পাবেন</small>
+                <!-- গ্রাহক তথ্য -->
+                <div style="background:#f8f9fa; padding:15px; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
+                    <h4 style="margin-top:0; color:#2c3e50; font-size:16px;">গ্রাহক তথ্য</h4>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+                        <div class="form-group">
+                            <label>গ্রাহকের নাম: <span style="color:red">*</span></label>
+                            <input id="note" placeholder="নাম লিখুন..." oninput="checkCustomerName()">
+                            <small style="color:#666;" id="nameHelp">নতুন গ্রাহক হলে নাম লিখুন</small>
+                        </div>
+                        <div class="form-group">
+                            <label>মোবাইল (ঐচ্ছিক):</label>
+                            <input id="phone" placeholder="017XXXXXXXX" class="en" 
+                                   oninput="autoFillCustomerName(this.value)">
+                            <small style="color:#666;" id="phoneHelp">মোবাইল দিলে আগের নাম আসবে</small>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>মোবাইল (ঐচ্ছিক):</label>
-                        <input id="phone" placeholder="017XXXXXXXX" class="en">
-                        <small style="color:#666;">রশিদ হারালে এই নম্বর দিয়ে খুঁজে পাবেন</small>
-                    </div>
+                    <div id="customerValidation" style="margin-top:10px;"></div>
                 </div>
                 
+                <!-- পেমেন্ট তথ্য -->
                 <div style="background: #f0f0f0; padding: 15px; border-radius: 8px;">
+                    <h4 style="margin-top:0; color:#2c3e50; font-size:16px;">পেমেন্ট তথ্য</h4>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
                         <div class="form-group"><label>মোট বিল (Total):</label><input id="total" readonly class="en" value="0" style="background:#fff; font-weight:bold"></div>
-                        <div class="form-group"><label>নগদ জমা (Paid):</label><input id="taken" type="number" class="en" oninput="calcDue()"></div>
+                        <div class="form-group">
+                            <label>নগদ জমা (Paid):</label>
+                            <input id="taken" type="number" class="en" oninput="validatePayment()">
+                            <small style="color:#666;">টাকা জমা দিয়েছেন কিনা নিশ্চিত করুন</small>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label style="color:#e74c3c">বাকি (Due):</label>
                         <input id="due" readonly class="en" value="0" style="background:#fff; color:#e74c3c; font-weight:bold">
-                        <small style="color:#666;">বাকি থাকলে গ্রাহকের নাম ও মোবাইল সঠিকভাবে দিন</small>
+                        <div id="paymentValidation" style="margin-top:5px;"></div>
                     </div>
                 </div>
 
+                <!-- সতর্কতা বার্তা -->
+                <div id="finalWarning" style="display:none; margin-top:15px;"></div>
+
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:20px">
-                    <button onclick="saveBulkEntry(false)" style="background:#f39c12">💾 শুধু সেভ করুন</button>
-                    <button onclick="saveBulkEntry(true)" style="background:#2ecc71">🖨️ সেভ ও প্রিন্ট</button>
+                    <button onclick="validateAndSave(false)" style="background:#f39c12">💾 শুধু সেভ করুন</button>
+                    <button onclick="validateAndSave(true)" style="background:#2ecc71">🖨️ সেভ ও প্রিন্ট</button>
                 </div>
             </div>
         </div>
@@ -387,7 +441,7 @@
         </div>
     </div>
 
-    <!-- নতুন: গ্রাহক ব্যবস্থাপনা সেকশন -->
+    <!-- গ্রাহক ব্যবস্থাপনা সেকশন -->
     <div id="customers" class="section">
         <div style="max-width:1200px; margin:auto;">
             <h3 style="border-bottom:2px solid #3498db; padding-bottom:10px; color:#2c3e50; margin-top:0">👥 গ্রাহক ব্যবস্থাপনা</h3>
@@ -398,7 +452,7 @@
                 <div style="display:flex; gap:10px; align-items:flex-end;">
                     <div style="flex:1;">
                         <label>মোবাইল নম্বর বা নাম লিখুন:</label>
-                        <input type="text" id="searchCustomer" placeholder="যেমন: 017... অথবা রহিম..." style="width:100%;">
+                        <input type="text" id="searchCustomerInput" placeholder="যেমন: 017... অথবা রহিম..." style="width:100%;">
                     </div>
                     <button onclick="searchCustomer()" style="width:120px; height:46px; margin-top:20px;">খুঁজুন</button>
                 </div>
@@ -464,7 +518,7 @@
     </div>
 
     <div id="reports" class="section">
-        <div class="noPrint" style="max-width: 1000px; margin: auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
+        <div class="noPrint" style="max-width: 1000px; margin: auto; background:#fff; padding:30px; border-radius:15px; box-shadow:0 5px 15px rgba(0,0,0,0.05">
             <h3 style="text-align:center; margin-top:0">রিপোর্ট সেন্টার</h3>
             
             <div style="display:flex; gap:10px; margin-bottom: 20px; justify-content: center; background: #f9f9f9; padding: 20px; border-radius: 10px;">
@@ -609,6 +663,233 @@ let searchResultsDiv = null;
 let searchTimer = null;
 let selectedSearchIndex = -1;
 let currentCustomerData = null;
+let customerCache = {}; // গ্রাহক ক্যাশে
+let existingCustomers = {}; // বিদ্যমান গ্রাহক
+
+// --- SEARCH FUNCTIONALITY ---
+function setupSearchFunctionality() {
+    const searchInput = document.getElementById('searchSerial');
+    
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        const query = this.value.trim();
+        
+        if (!query) {
+            hideSearchResults();
+            return;
+        }
+        
+        searchTimer = setTimeout(() => {
+            performSearch(query);
+        }, 300);
+    });
+    
+    searchInput.addEventListener('keydown', function(e) {
+        const results = searchResultsDiv.querySelectorAll('.search-item');
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (selectedSearchIndex < results.length - 1) {
+                selectedSearchIndex++;
+                updateSearchSelection();
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (selectedSearchIndex > 0) {
+                selectedSearchIndex--;
+                updateSearchSelection();
+            }
+        } else if (e.key === 'Enter' && selectedSearchIndex >= 0) {
+            e.preventDefault();
+            const selectedItem = results[selectedSearchIndex];
+            if (selectedItem) {
+                const productKey = selectedItem.getAttribute('data-key');
+                selectProductFromSearch(productKey);
+            }
+        } else if (e.key === 'Escape') {
+            hideSearchResults();
+        }
+    });
+    
+    // ক্লিক করলে সার্চ রেজাল্ট হাইড করুন
+    document.addEventListener('click', function(e) {
+        if (!searchResultsDiv.contains(e.target) && e.target !== searchInput) {
+            hideSearchResults();
+        }
+    });
+}
+
+function performSearch(query) {
+    if (!query) {
+        hideSearchResults();
+        return;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    const results = [];
+    
+    allProducts.forEach(product => {
+        let score = 0;
+        let matchText = '';
+        
+        // সিরিয়াল দিয়ে ম্যাচ
+        if (product.serial && product.serial.toLowerCase().includes(lowerQuery)) {
+            score += 10;
+            matchText = product.serial;
+        }
+        
+        // নাম দিয়ে ম্যাচ
+        if (product.name && product.name.toLowerCase().includes(lowerQuery)) {
+            score += 5;
+            matchText = product.name;
+        }
+        
+        // ক্যাটাগরি দিয়ে ম্যাচ
+        if (product.category && product.category.toLowerCase().includes(lowerQuery)) {
+            score += 3;
+        }
+        
+        if (score > 0) {
+            results.push({
+                product: product,
+                score: score,
+                matchText: matchText
+            });
+        }
+    });
+    
+    // স্কোর অনুযায়ী সাজান
+    results.sort((a, b) => b.score - a.score);
+    
+    displaySearchResults(results, query);
+}
+
+function displaySearchResults(results, query) {
+    searchResultsDiv.innerHTML = '';
+    
+    if (results.length === 0) {
+        searchResultsDiv.innerHTML = '<div class="no-results">কোনো পণ্য পাওয়া যায়নি</div>';
+        searchResultsDiv.style.display = 'block';
+        return;
+    }
+    
+    const limitedResults = results.slice(0, 10);
+    
+    limitedResults.forEach(result => {
+        const product = result.product;
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'search-item';
+        itemDiv.setAttribute('data-key', product.key);
+        
+        const name = highlightMatch(product.name, query);
+        const serial = product.serial ? `<span style="color:#27ae60; font-weight:bold">${product.serial}</span>` : '';
+        const stockInfo = product.isService ? 
+            '<span class="service-badge">Service</span>' : 
+            `<span style="color:${product.qty < 5 ? '#e74c3c' : '#27ae60'}">স্টক: ${product.qty}</span>`;
+        
+        itemDiv.innerHTML = `
+            <div class="product-name">${serial} ${name}</div>
+            <div class="product-details">
+                <span>${product.category}</span>
+                <span>${stockInfo} | ৳${product.sellPrice}</span>
+            </div>
+        `;
+        
+        itemDiv.addEventListener('click', () => {
+            selectProductFromSearch(product.key);
+        });
+        
+        itemDiv.addEventListener('mouseenter', () => {
+            const allItems = searchResultsDiv.querySelectorAll('.search-item');
+            allItems.forEach(item => item.classList.remove('active'));
+            itemDiv.classList.add('active');
+            selectedSearchIndex = Array.from(allItems).indexOf(itemDiv);
+        });
+        
+        searchResultsDiv.appendChild(itemDiv);
+    });
+    
+    searchResultsDiv.style.display = 'block';
+    selectedSearchIndex = -1;
+}
+
+function highlightMatch(text, query) {
+    if (!query || !text) return text;
+    
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const index = lowerText.indexOf(lowerQuery);
+    
+    if (index === -1) return text;
+    
+    const before = text.substring(0, index);
+    const match = text.substring(index, index + query.length);
+    const after = text.substring(index + query.length);
+    
+    return `${before}<span class="highlight">${match}</span>${after}`;
+}
+
+function hideSearchResults() {
+    searchResultsDiv.style.display = 'none';
+    selectedSearchIndex = -1;
+}
+
+function updateSearchSelection() {
+    const results = searchResultsDiv.querySelectorAll('.search-item');
+    results.forEach(item => item.classList.remove('active'));
+    
+    if (selectedSearchIndex >= 0 && selectedSearchIndex < results.length) {
+        results[selectedSearchIndex].classList.add('active');
+        results[selectedSearchIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+function selectProductFromSearch(productKey) {
+    const product = allProducts.find(p => p.key === productKey);
+    if (!product) return;
+    
+    const catSelect = document.getElementById("category");
+    if (catSelect.value === "") {
+        if (confirm(`"${product.name}" পণ্যটি ${product.category} ক্যাটাগরিতে আছে।\n\nএই ক্যাটাগরি সিলেক্ট করতে চান?`)) {
+            catSelect.value = product.category;
+        } else {
+            hideSearchResults();
+            return;
+        }
+    } else if (catSelect.value !== product.category) {
+        if (!confirm(`সতর্কতা: আপনি "${catSelect.options[catSelect.selectedIndex].text}" ক্যাটাগরি সিলেক্ট করেছেন,\nকিন্তু পণ্যটি "${product.category}" ক্যাটাগরিতে আছে।\n\nক্যাটাগরি পরিবর্তন করতে চান?`)) {
+            hideSearchResults();
+            return;
+        }
+        catSelect.value = product.category;
+    }
+    
+    setTimeout(() => {
+        filterProducts().then(() => {
+            const workSelect = document.getElementById("work");
+            
+            for(let i = 0; i < workSelect.options.length; i++) {
+                if(workSelect.options[i].value === product.key) {
+                    workSelect.selectedIndex = i;
+                    
+                    document.getElementById("rate").value = product.sellPrice;
+                    document.getElementById("qty").value = 1;
+                    
+                    setTimeout(() => {
+                        document.getElementById("qty").focus();
+                        document.getElementById("qty").select();
+                    }, 50);
+                    
+                    showTempMessage(`${product.serial ? product.serial + ' - ' : ''}${product.name} সিলেক্ট করা হয়েছে`);
+                    
+                    document.getElementById("searchSerial").value = "";
+                    hideSearchResults();
+                    break;
+                }
+            }
+        });
+    }, 100);
+}
 
 // --- INITIALIZATION ---
 window.onload = function() {
@@ -621,7 +902,33 @@ window.onload = function() {
     // আজকের তারিখ সেট করুন পেমেন্ট মোডালে
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('payDate').value = today;
+    
+    // বিদ্যমান গ্রাহক লোড করুন
+    loadExistingCustomers();
 };
+
+// বিদ্যমান গ্রাহক লোড
+function loadExistingCustomers() {
+    db.ref("entries").once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+        
+        existingCustomers = {};
+        
+        Object.keys(data).forEach(key => {
+            const entry = data[key];
+            const phone = entry.phone;
+            const name = entry.note;
+            
+            if (phone && name && name !== "General Customer") {
+                existingCustomers[phone] = name;
+                customerCache[phone] = name;
+            }
+        });
+        
+        console.log("Loaded", Object.keys(existingCustomers).length, "existing customers");
+    });
+}
 
 // --- AUTHENTICATION ---
 function login(){
@@ -658,165 +965,194 @@ function logout() {
     location.reload(); 
 }
 
-// --- SEARCH FUNCTIONALITY ---
-function setupSearchFunctionality() {
-    const searchInput = document.getElementById("searchSerial");
+// --- CUSTOMER AUTO-FILL SYSTEM ---
+function autoFillCustomerName(phoneInput) {
+    const phone = phoneInput.trim();
+    const noteInput = document.getElementById("note");
+    const validationDiv = document.getElementById("customerValidation");
     
-    if (!searchInput) return;
-    
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimer);
-        const query = this.value.trim();
-        
-        if (query === "") {
-            hideSearchResults();
-            return;
-        }
-        
-        searchTimer = setTimeout(() => {
-            performLiveSearch(query);
-        }, 200);
-    });
-    
-    searchInput.addEventListener('keydown', function(e) {
-        const items = searchResultsDiv.querySelectorAll('.search-item');
-        
-        if (items.length === 0) return;
-        
-        switch(e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                selectedSearchIndex = (selectedSearchIndex + 1) % items.length;
-                updateSelectedItem(items);
-                break;
-                
-            case 'ArrowUp':
-                e.preventDefault();
-                selectedSearchIndex = selectedSearchIndex <= 0 ? items.length - 1 : selectedSearchIndex - 1;
-                updateSelectedItem(items);
-                break;
-                
-            case 'Enter':
-                e.preventDefault();
-                if (selectedSearchIndex >= 0 && selectedSearchIndex < items.length) {
-                    const item = items[selectedSearchIndex];
-                    selectProductFromSearch(item.getAttribute('data-key'));
-                    hideSearchResults();
-                } else if (items.length > 0) {
-                    const firstItem = items[0];
-                    selectProductFromSearch(firstItem.getAttribute('data-key'));
-                    hideSearchResults();
-                }
-                break;
-                
-            case 'Escape':
-                hideSearchResults();
-                this.value = "";
-                break;
-        }
-    });
-    
-    document.addEventListener('click', function(e) {
-        if (!searchInput.contains(e.target) && !searchResultsDiv.contains(e.target)) {
-            hideSearchResults();
-        }
-    });
-}
-
-function performLiveSearch(query) {
-    if (!query || query.trim() === "" || allProducts.length === 0) {
-        showNoResults("পণ্য লোড হচ্ছে...");
+    if (!phone || phone.length < 7) {
+        validationDiv.innerHTML = "";
         return;
     }
     
-    const q = query.toLowerCase().trim();
+    // ফোন নম্বর ফরম্যাট করুন (শুধু সংখ্যা রাখুন)
+    const cleanPhone = phone.replace(/\D/g, '');
     
-    const matches = allProducts.filter(product => {
-        if (product.serial && String(product.serial).toLowerCase().includes(q)) {
-            return true;
-        }
-        
-        if (product.name && product.name.toLowerCase().includes(q)) {
-            return true;
-        }
-        
-        return false;
-    });
-    
-    showSearchResults(matches, q);
-}
-
-function showSearchResults(matches, query) {
-    if (!searchResultsDiv) return;
-    
-    if (matches.length === 0) {
-        showNoResults(`"${query}" এর কোনো পণ্য পাওয়া যায়নি`);
+    // ক্যাশে চেক করুন
+    if (customerCache[cleanPhone]) {
+        noteInput.value = customerCache[cleanPhone];
+        showValidationMessage("✅ পুরানো গ্রাহক: " + customerCache[cleanPhone], "success");
         return;
     }
     
-    let html = '';
-    matches.slice(0, 8).forEach((product, index) => {
-        const serialPart = product.serial ? 
-            `<span style="font-weight:bold; color:#27ae60">${product.serial}</span> - ` : 
-            '';
-        const namePart = highlightText(product.name, query);
+    // Firebase থেকে খুঁজুন
+    db.ref("entries").once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
         
-        const stockInfo = product.isService ? 
-            '<span class="service-badge">সার্ভিস</span>' : 
-            `<small style="color:#666">স্টক: ${product.qty}</small>`;
+        let foundName = "";
+        let foundCount = 0;
         
-        html += `
-            <div class="search-item" data-key="${product.key}" 
-                 onclick="selectProductFromSearch('${product.key}')"
-                 onmouseover="this.classList.add('active')"
-                 onmouseout="this.classList.remove('active')">
-                <div class="product-name">
-                    ${serialPart}${namePart}
-                </div>
-                <div class="product-details">
-                    <span>${product.category}</span>
-                    <span>৳${product.sellPrice} ${stockInfo}</span>
-                </div>
-            </div>
-        `;
-    });
-    
-    searchResultsDiv.innerHTML = html;
-    searchResultsDiv.style.display = 'block';
-    selectedSearchIndex = -1;
-}
-
-function showNoResults(message) {
-    if (!searchResultsDiv) return;
-    
-    searchResultsDiv.innerHTML = `<div class="no-results">${message}</div>`;
-    searchResultsDiv.style.display = 'block';
-}
-
-function hideSearchResults() {
-    if (searchResultsDiv) {
-        searchResultsDiv.style.display = 'none';
-        searchResultsDiv.innerHTML = '';
-        selectedSearchIndex = -1;
-    }
-}
-
-function highlightText(text, query) {
-    if (!text || !query) return text;
-    
-    const regex = new RegExp(`(${query})`, 'gi');
-    return text.replace(regex, '<span class="highlight">$1</span>');
-}
-
-function updateSelectedItem(items) {
-    items.forEach((item, index) => {
-        if (index === selectedSearchIndex) {
-            item.classList.add('active');
-            item.scrollIntoView({ block: 'nearest' });
+        Object.keys(data).forEach(key => {
+            const entry = data[key];
+            if (entry.phone && entry.phone.includes(cleanPhone) && entry.note && entry.note !== "General Customer") {
+                foundName = entry.note;
+                foundCount++;
+            }
+        });
+        
+        if (foundName) {
+            customerCache[cleanPhone] = foundName;
+            noteInput.value = foundName;
+            showValidationMessage(`✅ পুরানো গ্রাহক (${foundCount} বার কেনাকাটা): ${foundName}`, "success");
         } else {
-            item.classList.remove('active');
+            // নতুন গ্রাহক
+            showValidationMessage("🆕 নতুন গ্রাহক, নাম লিখুন", "warning");
+            noteInput.focus();
         }
     });
+}
+
+function checkCustomerName() {
+    const name = document.getElementById("note").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const validationDiv = document.getElementById("customerValidation");
+    
+    if (!name) {
+        validationDiv.innerHTML = "";
+        return;
+    }
+    
+    if (phone && phone.length >= 7) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        customerCache[cleanPhone] = name;
+        showValidationMessage("✅ গ্রাহক তথ্য সেভ করা হয়েছে", "success");
+    } else {
+        showValidationMessage("📱 মোবাইল নম্বর দিলে পরে সহজে খুঁজে পাবেন", "warning");
+    }
+}
+
+function showValidationMessage(message, type) {
+    const validationDiv = document.getElementById("customerValidation");
+    validationDiv.innerHTML = `<div class="validation-${type}">${message}</div>`;
+}
+
+// --- PAYMENT VALIDATION ---
+function validatePayment() {
+    const total = parseFloat(document.getElementById("total").value) || 0;
+    const taken = parseFloat(document.getElementById("taken").value) || 0;
+    const due = total - taken;
+    const validationDiv = document.getElementById("paymentValidation");
+    const finalWarning = document.getElementById("finalWarning");
+    
+    document.getElementById("due").value = due;
+    
+    // পরিস্কার করুন
+    validationDiv.innerHTML = "";
+    finalWarning.innerHTML = "";
+    finalWarning.style.display = "none";
+    
+    if (due === 0) {
+        validationDiv.innerHTML = `<div class="validation-success">✅ পূর্ণ পরিশোধ হয়েছে</div>`;
+    } else if (due > 0) {
+        validationDiv.innerHTML = `<div class="validation-warning">⚠️ বাকি আছে: ৳${due}</div>`;
+    } else if (due < 0) {
+        validationDiv.innerHTML = `<div class="validation-error">❌ জমা বেশি হয়ে গেছে! বাকি: ৳${due}</div>`;
+    }
+    
+    // বিশেষ সতর্কতা
+    if (due > 0 && taken === 0) {
+        validationDiv.innerHTML = `<div class="validation-error due-warning">🚨 সতর্কতা: কোনো টাকা জমা দেওয়া হয়নি! বাকি: ৳${due}</div>`;
+    }
+}
+
+// --- FINAL VALIDATION BEFORE SAVE ---
+function validateAndSave(showMemoFlag) {
+    const total = parseFloat(document.getElementById("total").value) || 0;
+    const taken = parseFloat(document.getElementById("taken").value) || 0;
+    const due = total - taken;
+    const note = document.getElementById("note").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const finalWarning = document.getElementById("finalWarning");
+    
+    let warnings = [];
+    let errors = [];
+    
+    // নাম চেক
+    if (!note || note === "") {
+        errors.push("❌ গ্রাহকের নাম দিন");
+    }
+    
+    // পেমেন্ট চেক
+    if (taken === 0 && due > 0) {
+        errors.push("🚨 কোনো টাকা জমা দেওয়া হয়নি!");
+    }
+    
+    if (due < 0) {
+        errors.push("❌ জমা বেশি হয়ে গেছে!");
+    }
+    
+    // ফোন নম্বর ভ্যালিডেশন
+    if (phone) {
+        const cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone.length < 7) {
+            warnings.push("📱 মোবাইল নম্বরটি সঠিক নয় (কমপক্ষে ৭ ডিজিট)");
+        }
+        
+        // বিদ্যমান গ্রাহকের ফোন চেক
+        if (existingCustomers[cleanPhone] && existingCustomers[cleanPhone] !== note) {
+            warnings.push(`📞 এই নম্বরটি অন্য গ্রাহকের: ${existingCustomers[cleanPhone]}`);
+        }
+    }
+    
+    // বাকি থাকলে বিশেষ সতর্কতা
+    if (due > 0) {
+        if (!phone || phone === "") {
+            errors.push("🚨 বাকি থাকলে মোবাইল নম্বর দিন (রশিদ হারালে খুঁজে পাবেন)");
+        }
+        
+        warnings.push(`⚠️ বাকি আছে: ৳${due}`);
+    }
+    
+    // সতর্কতা বার্তা দেখান
+    if (errors.length > 0 || warnings.length > 0) {
+        let warningHTML = "";
+        
+        if (errors.length > 0) {
+            warningHTML += `<div class="validation-error" style="margin-bottom:10px;">
+                <strong>সমস্যা:</strong><br>${errors.join('<br>')}
+            </div>`;
+        }
+        
+        if (warnings.length > 0) {
+            warningHTML += `<div class="validation-warning">
+                <strong>সতর্কতা:</strong><br>${warnings.join('<br>')}
+            </div>`;
+        }
+        
+        finalWarning.innerHTML = warningHTML;
+        finalWarning.style.display = "block";
+        
+        // যদি কোনো error থাকে
+        if (errors.length > 0) {
+            // ইউজারকে জিজ্ঞাসা করুন
+            let errorMessage = "নিম্নলিখিত সমস্যা আছে:\n\n" + errors.join('\n') + "\n\n";
+            
+            if (warnings.length > 0) {
+                errorMessage += "সতর্কতা:\n" + warnings.join('\n') + "\n\n";
+            }
+            
+            errorMessage += "তবুও কি সেভ করতে চান?";
+            
+            if (!confirm(errorMessage)) {
+                return; // ইউজার না বললে সেভ করবে না
+            }
+        }
+    }
+    
+    // সবকিছু ঠিক থাকলে সেভ করুন
+    saveBulkEntry(showMemoFlag);
 }
 
 // --- PRODUCT & STOCK MANAGEMENT ---
@@ -961,58 +1297,6 @@ function autoFillPrice(){
     }
 }
 
-function selectProductFromSearch(productKey) {
-    const product = allProducts.find(p => p.key === productKey);
-    if (!product) return;
-    
-    const catSelect = document.getElementById("category");
-    if (catSelect.value === "") {
-        if (confirm(`"${product.name}" পণ্যটি ${product.category} ক্যাটাগরিতে আছে।\n\nএই ক্যাটাগরি সিলেক্ট করতে চান?`)) {
-            catSelect.value = product.category;
-        } else {
-            hideSearchResults();
-            return;
-        }
-    } else if (catSelect.value !== product.category) {
-        if (!confirm(`সতর্কতা: আপনি "${catSelect.options[catSelect.selectedIndex].text}" ক্যাটাগরি সিলেক্ট করেছেন,\nকিন্তু পণ্যটি "${product.category}" ক্যাটাগরিতে আছে।\n\nক্যাটাগরি পরিবর্তন করতে চান?`)) {
-            hideSearchResults();
-            return;
-        }
-        catSelect.value = product.category;
-    }
-    
-    setTimeout(() => {
-        filterProducts().then(() => {
-            const workSelect = document.getElementById("work");
-            
-            for(let i = 0; i < workSelect.options.length; i++) {
-                if(workSelect.options[i].value === product.key) {
-                    workSelect.selectedIndex = i;
-                    
-                    document.getElementById("rate").value = product.sellPrice;
-                    document.getElementById("qty").value = 1;
-                    
-                    setTimeout(() => {
-                        document.getElementById("qty").focus();
-                        document.getElementById("qty").select();
-                    }, 50);
-                    
-                    showTempMessage(`${product.serial ? product.serial + ' - ' : ''}${product.name} সিলেক্ট করা হয়েছে`);
-                    
-                    document.getElementById("searchSerial").value = "";
-                    hideSearchResults();
-                    break;
-                }
-            }
-        });
-    }, 100);
-}
-
-// নাম লিখলে অটো ফোন ফিল করার জন্য
-function autoFillPhone() {
-    // এই ফাংশন পরে উন্নত করা যাবে
-}
-
 function addToCart(){
     const catSelect = document.getElementById("category");
     if (catSelect.value === "") {
@@ -1126,10 +1410,13 @@ function saveBulkEntry(showMemoFlag){
     const note = document.getElementById("note").value.trim();
     const phone = document.getElementById("phone").value.trim();
     
-    if (dueVal > 0 && (!note || !phone)) {
-        if (!confirm("বাকি টাকা আছে! গ্রাহকের নাম ও মোবাইল সঠিকভাবে দিননি। তবুও কি সেভ করতে চান?")) {
-            return;
-        }
+    // ফোন নম্বর ক্লিন করুন
+    const cleanPhone = phone.replace(/\D/g, '');
+    
+    // গ্রাহক ক্যাশে আপডেট করুন
+    if (cleanPhone && note) {
+        customerCache[cleanPhone] = note;
+        existingCustomers[cleanPhone] = note;
     }
     
     const entryData = {
@@ -1142,7 +1429,7 @@ function saveBulkEntry(showMemoFlag){
         loss: dueVal,
         user: currentUser,
         note: note || "General Customer",
-        phone: phone || ""
+        phone: cleanPhone || ""
     };
     
     db.ref("entries").push(entryData).then((snap) => {
@@ -1155,12 +1442,17 @@ function saveBulkEntry(showMemoFlag){
              showTempMessage("✅ সফলভাবে সেভ হয়েছে!");
         }
         
+        // UI রিসেট করুন
         cart = []; 
         renderCart(); 
         document.getElementById("note").value = ""; 
         document.getElementById("phone").value = ""; 
         document.getElementById("taken").value = ""; 
         document.getElementById("due").value = "0";
+        document.getElementById("customerValidation").innerHTML = "";
+        document.getElementById("paymentValidation").innerHTML = "";
+        document.getElementById("finalWarning").innerHTML = "";
+        document.getElementById("finalWarning").style.display = "none";
         
         document.getElementById("searchSerial").focus();
         
@@ -1171,7 +1463,7 @@ function saveBulkEntry(showMemoFlag){
 
 // --- CUSTOMER MANAGEMENT SYSTEM ---
 function searchCustomer() {
-    const query = document.getElementById("searchCustomer").value.trim();
+    const query = document.getElementById("searchCustomerInput").value.trim();
     if (!query) {
         alert("গ্রাহকের মোবাইল নম্বর বা নাম লিখুন!");
         return;
@@ -1247,6 +1539,113 @@ function searchCustomer() {
     });
 }
 
+function showCustomerList(customers) {
+    // ছোট মোডালে গ্রাহক লিস্ট দেখান
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.style.width = '500px';
+    modal.style.zIndex = '2000';
+    
+    let html = '<h3 style="margin-top:0; color:#3498db;">একাধিক গ্রাহক পাওয়া গেছে</h3>';
+    html += '<p style="margin-bottom:15px;">নিচের তালিকা থেকে গ্রাহক সিলেক্ট করুন:</p>';
+    html += '<div style="max-height:300px; overflow-y:auto; margin-bottom:20px;">';
+    
+    customers.forEach((customer, index) => {
+        html += `
+            <div style="padding:12px; border-bottom:1px solid #eee; cursor:pointer; border-radius:5px; margin-bottom:5px; background:#f8f9fa;"
+                 onclick="selectCustomerFromList('${customer.phone}')"
+                 onmouseover="this.style.background='#e8f5e9'" 
+                 onmouseout="this.style.background='#f8f9fa'">
+                <div style="font-weight:bold; color:#2c3e50;">${customer.name}</div>
+                <div style="font-size:14px; color:#666;">
+                    <span>মোবাইল: ${customer.phone || 'নেই'}</span> | 
+                    <span>বাকি: ৳${customer.totalDue ? customer.totalDue.toFixed(2) : '0.00'}</span> | 
+                    <span>লেনদেন: ${customer.transactions ? customer.transactions.length : 0}টি</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    html += '<button onclick="closeCustomerListModal()" style="background:#e74c3c;">বন্ধ করুন</button>';
+    
+    modal.innerHTML = html;
+    document.body.appendChild(modal);
+    
+    // পজিশন সেট করুন
+    modal.style.position = 'fixed';
+    modal.style.top = '50%';
+    modal.style.left = '50%';
+    modal.style.transform = 'translate(-50%, -50%)';
+    modal.style.display = 'block';
+    
+    // ওভারলে দেখান
+    document.getElementById("overlay").style.display = "block";
+    
+    // মোডাল ক্লোজ ফাংশন
+    window.closeCustomerListModal = function() {
+        if (modal.parentNode) {
+            document.body.removeChild(modal);
+        }
+        document.getElementById("overlay").style.display = "none";
+    };
+}
+
+function selectCustomerFromList(phone) {
+    // মোডাল সরান
+    if (typeof closeCustomerListModal === 'function') {
+        closeCustomerListModal();
+    }
+    
+    // গ্রাহক খুঁজুন
+    db.ref("entries").once("value", snapshot => {
+        const data = snapshot.val();
+        if (!data) return;
+        
+        const customers = {};
+        let foundCustomer = null;
+        
+        Object.keys(data).forEach(key => {
+            const entry = data[key];
+            if (entry.phone === phone) {
+                if (!customers[phone]) {
+                    customers[phone] = {
+                        name: entry.note,
+                        phone: phone,
+                        totalSpent: 0,
+                        totalPaid: 0,
+                        totalDue: 0,
+                        lastDate: "",
+                        transactions: []
+                    };
+                }
+                
+                customers[phone].totalSpent += parseFloat(entry.total) || 0;
+                customers[phone].totalPaid += parseFloat(entry.taken) || 0;
+                customers[phone].totalDue += parseFloat(entry.loss) || 0;
+                if (!customers[phone].lastDate || entry.date > customers[phone].lastDate) {
+                    customers[phone].lastDate = entry.date;
+                }
+                customers[phone].transactions.push({
+                    key: key,
+                    date: entry.date,
+                    time: entry.time,
+                    total: entry.total,
+                    paid: entry.taken,
+                    due: entry.loss,
+                    items: entry.items,
+                    user: entry.user
+                });
+            }
+        });
+        
+        if (customers[phone]) {
+            currentCustomerData = customers[phone];
+            showCustomerDetails(currentCustomerData);
+        }
+    });
+}
+
 function showCustomerDetails(customer) {
     currentCustomerData = customer;
     
@@ -1271,27 +1670,27 @@ function showCustomerDetails(customer) {
             <div class="customer-stats">
                 <div class="stat-box">
                     <div style="font-size:14px; color:#666;">মোট কেনাকাটা</div>
-                    <div class="stat-value" style="color:#2c3e50;">৳${customer.totalSpent.toFixed(2)}</div>
+                    <div class="stat-value" style="color:#2c3e50;">৳${customer.totalSpent ? customer.totalSpent.toFixed(2) : '0.00'}</div>
                 </div>
                 <div class="stat-box">
                     <div style="font-size:14px; color:#666;">মোট জমা</div>
-                    <div class="stat-value" style="color:#27ae60;">৳${customer.totalPaid.toFixed(2)}</div>
+                    <div class="stat-value" style="color:#27ae60;">৳${customer.totalPaid ? customer.totalPaid.toFixed(2) : '0.00'}</div>
                 </div>
                 <div class="stat-box">
                     <div style="font-size:14px; color:#666;">বর্তমান বাকি</div>
-                    <div class="stat-value" style="color:${customer.totalDue > 0 ? '#e74c3c' : '#2ecc71'};">৳${customer.totalDue.toFixed(2)}</div>
+                    <div class="stat-value" style="color:${customer.totalDue > 0 ? '#e74c3c' : '#2ecc71'};">৳${customer.totalDue ? customer.totalDue.toFixed(2) : '0.00'}</div>
                 </div>
             </div>
             
             <div style="margin-top:15px; color:#666; font-size:14px;">
                 <span>শেষ কেনাকাটা: ${customer.lastDate || "কোনো রেকর্ড নেই"}</span>
-                <span style="float:right;">মোট লেনদেন: ${customer.transactions.length}টি</span>
+                <span style="float:right;">মোট লেনদেন: ${customer.transactions ? customer.transactions.length : 0}টি</span>
             </div>
         </div>
     `;
     
     // লেনদেনের তালিকা দেখান
-    displayCustomerTransactions(customer.transactions);
+    displayCustomerTransactions(customer.transactions || []);
 }
 
 function displayCustomerTransactions(transactions) {
@@ -1305,8 +1704,8 @@ function displayCustomerTransactions(transactions) {
     
     // তারিখ অনুসারে সাজান (নতুন থেকে পুরাতন)
     transactions.sort((a, b) => {
-        const dateA = a.date.split('/').reverse().join('-');
-        const dateB = b.date.split('/').reverse().join('-');
+        const dateA = a.date ? a.date.split('/').reverse().join('-') : '1970-01-01';
+        const dateB = b.date ? b.date.split('/').reverse().join('-') : '1970-01-01';
         return new Date(dateB) - new Date(dateA);
     });
     
@@ -1317,12 +1716,12 @@ function displayCustomerTransactions(transactions) {
         
         tbody.innerHTML += `
             <tr>
-                <td>${trans.date}<br><small>${trans.time}</small></td>
+                <td>${trans.date || ''}<br><small>${trans.time || ''}</small></td>
                 <td><small>${trans.key ? trans.key.slice(-6).toUpperCase() : ''}</small></td>
                 <td>${itemSummary}</td>
-                <td>৳${trans.total}</td>
-                <td style="color:#27ae60; font-weight:bold">৳${trans.paid}</td>
-                <td style="color:${trans.due > 0 ? '#e74c3c' : '#27ae60'}">৳${trans.due}</td>
+                <td>৳${trans.total || '0'}</td>
+                <td style="color:#27ae60; font-weight:bold">৳${trans.paid || '0'}</td>
+                <td style="color:${trans.due > 0 ? '#e74c3c' : '#27ae60'}">৳${trans.due || '0'}</td>
                 <td class="noPrint">
                     <button class="btn-action btn-print" onclick="viewMemo('${trans.key}')" title="রশিদ দেখুন">🖨️</button>
                 </td>
@@ -1379,19 +1778,19 @@ function displayAllCustomersTable(customers) {
     }
     
     // বাকি টাকার উপর ভিত্তি করে সাজান (বেশি বাকি প্রথমে)
-    customerList.sort((a, b) => b.totalDue - a.totalDue);
+    customerList.sort((a, b) => (b.totalDue || 0) - (a.totalDue || 0));
     
     customerList.forEach(customer => {
         tbody.innerHTML += `
             <tr style="${customer.totalDue > 0 ? 'background:#fff8f8' : ''}">
                 <td><strong>${customer.name}</strong></td>
                 <td>${customer.phone}</td>
-                <td>৳${customer.totalSpent.toFixed(2)}</td>
-                <td style="color:#27ae60">৳${customer.totalPaid.toFixed(2)}</td>
+                <td>৳${customer.totalSpent ? customer.totalSpent.toFixed(2) : '0.00'}</td>
+                <td style="color:#27ae60">৳${customer.totalPaid ? customer.totalPaid.toFixed(2) : '0.00'}</td>
                 <td style="color:${customer.totalDue > 0 ? '#e74c3c' : '#27ae60'}; font-weight:bold">
-                    ৳${customer.totalDue.toFixed(2)} ${customer.totalDue > 0 ? '⚠️' : '✅'}
+                    ৳${customer.totalDue ? customer.totalDue.toFixed(2) : '0.00'} ${customer.totalDue > 0 ? '⚠️' : '✅'}
                 </td>
-                <td>${customer.lastDate}</td>
+                <td>${customer.lastDate || 'N/A'}</td>
                 <td class="noPrint">
                     <button onclick="viewCustomerDetail('${customer.phone}')" style="padding:5px 10px; font-size:12px; background:#3498db; color:white; border:none; border-radius:4px; cursor:pointer;">
                         দেখুন
@@ -1403,19 +1802,19 @@ function displayAllCustomersTable(customers) {
 }
 
 function viewCustomerDetail(phone) {
-    document.getElementById("searchCustomer").value = phone;
+    document.getElementById("searchCustomerInput").value = phone;
     searchCustomer();
 }
 
 function clearCustomerSearch() {
     document.getElementById("customerDetails").style.display = "none";
     document.getElementById("customerHistorySection").style.display = "none";
-    document.getElementById("searchCustomer").value = "";
+    document.getElementById("searchCustomerInput").value = "";
     currentCustomerData = null;
 }
 
 function printCustomerReceipt() {
-    if (!currentCustomerData || currentCustomerData.transactions.length === 0) {
+    if (!currentCustomerData || !currentCustomerData.transactions || currentCustomerData.transactions.length === 0) {
         alert("গ্রাহকের কোনো লেনদেন নেই!");
         return;
     }
@@ -1434,7 +1833,7 @@ function addPayment() {
     // পেমেন্ট মোডাল সেট করুন
     document.getElementById("payCustomerName").value = currentCustomerData.name;
     document.getElementById("payCustomerPhone").value = currentCustomerData.phone;
-    document.getElementById("payCurrentDue").value = currentCustomerData.totalDue.toFixed(2);
+    document.getElementById("payCurrentDue").value = currentCustomerData.totalDue ? currentCustomerData.totalDue.toFixed(2) : '0.00';
     document.getElementById("payAmount").value = "";
     document.getElementById("payComment").value = "পূর্বের বাকি";
     
@@ -1533,13 +1932,13 @@ function viewMemo(key) {
 
 function showMemo(e){
     document.getElementById("mId").innerText = (e.key ? e.key.slice(-6).toUpperCase() : '---');
-    document.getElementById("mDate").innerText = e.date + " " + e.time;
-    document.getElementById("mUser").innerText = e.user;
-    document.getElementById("mNote").innerText = e.note;
+    document.getElementById("mDate").innerText = (e.date || '') + " " + (e.time || '');
+    document.getElementById("mUser").innerText = e.user || '';
+    document.getElementById("mNote").innerText = e.note || '';
     document.getElementById("mPhoneDisp").innerText = e.phone ? `(${e.phone})` : "";
-    document.getElementById("mTotal").innerText = e.total;
-    document.getElementById("mPaid").innerText = e.taken;
-    document.getElementById("mDueDisplay").innerText = e.loss;
+    document.getElementById("mTotal").innerText = e.total || '0';
+    document.getElementById("mPaid").innerText = e.taken || '0';
+    document.getElementById("mDueDisplay").innerText = e.loss || '0';
     
     const mItems = document.getElementById("mItems");
     mItems.innerHTML = "";
@@ -1548,13 +1947,13 @@ function showMemo(e){
         e.items.forEach(i => {
             mItems.innerHTML += `
             <tr>
-                <td style="border:1px solid #ddd; padding:8px">${i.work}</td>
-                <td style="text-align:center; border:1px solid #ddd; padding:8px">${i.qty}</td>
-                <td style="text-align:right; border:1px solid #ddd; padding:8px">${i.sub}</td>
+                <td style="border:1px solid #ddd; padding:8px">${i.work || ''}</td>
+                <td style="text-align:center; border:1px solid #ddd; padding:8px">${i.qty || '0'}</td>
+                <td style="text-align:right; border:1px solid #ddd; padding:8px">${i.sub || '0'}</td>
             </tr>`;
         });
     } else {
-        mItems.innerHTML += `<tr><td>${e.work}</td><td>-</td><td>${e.total}</td></tr>`;
+        mItems.innerHTML += `<tr><td>${e.work || ''}</td><td>-</td><td>${e.total || '0'}</td></tr>`;
     }
     
     const signs = {
@@ -1563,7 +1962,7 @@ function showMemo(e){
         roky: ["Roky", "01878-149052"]
     };
     
-    const s = signs[e.user] || [e.user.toUpperCase(), ""];
+    const s = signs[e.user] || [e.user ? e.user.toUpperCase() : '', ""];
     document.getElementById("signatureName").innerText = s[0];
     
     document.getElementById("memoModal").style.display="block";
@@ -1580,10 +1979,10 @@ function openEdit(key) {
     db.ref("entries/" + key).once("value", s => {
         const d = s.val();
         document.getElementById("editKey").value = key;
-        document.getElementById("editNote").value = d.note;
-        document.getElementById("editPhone").value = d.phone;
-        document.getElementById("editTotal").value = d.total;
-        document.getElementById("editTaken").value = d.taken;
+        document.getElementById("editNote").value = d.note || '';
+        document.getElementById("editPhone").value = d.phone || '';
+        document.getElementById("editTotal").value = d.total || 0;
+        document.getElementById("editTaken").value = d.taken || 0;
         
         document.getElementById("editModal").style.display = "block";
         document.getElementById("overlay").style.display = "block";
@@ -1658,9 +2057,13 @@ function renderTable(data, tableId = "tableBody"){
     const entriesArr = Object.keys(data).map(key => ({...data[key], key})).reverse();
     
     entriesArr.forEach(e => {
-        totalSales += +e.total || 0; 
-        totalTaken += +e.taken || 0; 
-        totalDue += +e.loss || 0;
+        const total = parseFloat(e.total) || 0;
+        const taken = parseFloat(e.taken) || 0;
+        const loss = parseFloat(e.loss) || 0;
+        
+        totalSales += total; 
+        totalTaken += taken; 
+        totalDue += loss;
         
         const itemSummary = (e.items && Array.isArray(e.items)) 
             ? e.items.map(i => `<span style="background:#f1f1f1;padding:2px 5px;border-radius:4px;font-size:12px">${i.work} (${i.qty})</span>`).join(" ") 
@@ -1674,24 +2077,26 @@ function renderTable(data, tableId = "tableBody"){
         
         tbody.innerHTML+=`
         <tr>
-            <td style="font-size:13px">${e.date}<br>${e.time}</td>
-            <td style="font-size:13px"><b>${e.note}</b><br>${itemSummary}</td>
+            <td style="font-size:13px">${e.date || ''}<br>${e.time || ''}</td>
+            <td style="font-size:13px"><b>${e.note || ''}</b><br>${itemSummary}</td>
             <td class="en">${phone}</td>
-            <td>${e.total}</td>
-            <td style="color:#27ae60;font-weight:bold">${e.taken}</td>
-            <td style="color:#e74c3c">${e.loss}</td>
-            <td style="text-transform:capitalize">${e.user}</td>
+            <td>${total}</td>
+            <td style="color:#27ae60;font-weight:bold">${taken}</td>
+            <td style="color:#e74c3c">${loss}</td>
+            <td style="text-transform:capitalize">${e.user || ''}</td>
             <td class="noPrint" style="white-space:nowrap">${btnMemo}${btnEdit}${btnDel}</td>
         </tr>`;
         
-        dailyData[e.date] = (dailyData[e.date]||0) + (+e.total||0);
+        if (e.date) {
+            dailyData[e.date] = (dailyData[e.date]||0) + total;
+        }
     });
     
     if(tableId === "tableBody") { 
         document.getElementById("cCount").innerText = entriesArr.length; 
-        document.getElementById("cTotal").innerText = totalSales; 
-        document.getElementById("cTaken").innerText = totalTaken; 
-        document.getElementById("cDue").innerText = totalDue; 
+        document.getElementById("cTotal").innerText = totalSales.toFixed(2); 
+        document.getElementById("cTaken").innerText = totalTaken.toFixed(2); 
+        document.getElementById("cDue").innerText = totalDue.toFixed(2); 
         
         updateChart(dailyData); 
         renderUserStats(data); 
@@ -1710,11 +2115,11 @@ function renderUserStats(data) {
             const e = data[key];
             if(e.date === today) {
                 hasData = true; 
-                const u = e.user.toLowerCase();
+                const u = e.user ? e.user.toLowerCase() : '';
                 if(!stats[u]) stats[u] = {total:0, taken:0, due:0};
-                stats[u].total += (+e.total || 0); 
-                stats[u].taken += (+e.taken || 0); 
-                stats[u].due += (+e.loss || 0);
+                stats[u].total += (parseFloat(e.total) || 0); 
+                stats[u].taken += (parseFloat(e.taken) || 0); 
+                stats[u].due += (parseFloat(e.loss) || 0);
             }
         });
     }
@@ -1732,9 +2137,9 @@ function renderUserStats(data) {
             tbody.innerHTML += `
             <tr>
                 <td style="text-transform:capitalize; font-weight:bold">${u}</td>
-                <td>${stats[u].total}</td>
-                <td style="color:#27ae60; font-weight:bold">${stats[u].taken}</td>
-                <td style="color:#e74c3c">${stats[u].due}</td>
+                <td>${stats[u].total.toFixed(2)}</td>
+                <td style="color:#27ae60; font-weight:bold">${stats[u].taken.toFixed(2)}</td>
+                <td style="color:#e74c3c">${stats[u].due.toFixed(2)}</td>
             </tr>`; 
         }
     });
@@ -1742,7 +2147,8 @@ function renderUserStats(data) {
 
 function updateChart(data){
     const sortedDates = Object.keys(data).sort((a,b) => {
-        const [d1,m1,y1] = a.split('/'); const [d2,m2,y2] = b.split('/');
+        const [d1,m1,y1] = a.split('/'); 
+        const [d2,m2,y2] = b.split('/');
         return new Date(`${y1}-${m1}-${d1}`) - new Date(`${y2}-${m2}-${d2}`);
     });
     
@@ -1782,8 +2188,14 @@ function showSection(id){
         loadAllCustomers();
     }
 }
-function closeSidebar(){ document.getElementById("sidebar").style.left="-300px"; document.getElementById("overlay").style.display="none"; }
-function openSidebar(){ document.getElementById("sidebar").style.left="0"; document.getElementById("overlay").style.display="block"; }
+function closeSidebar(){ 
+    document.getElementById("sidebar").style.left="-300px"; 
+    document.getElementById("overlay").style.display="none"; 
+}
+function openSidebar(){ 
+    document.getElementById("sidebar").style.left="0"; 
+    document.getElementById("overlay").style.display="block"; 
+}
 
 function searchByDate(){ 
     if(!document.getElementById("sDate").value) return alert("তারিখ সিলেক্ট করুন");
@@ -1811,9 +2223,9 @@ function downloadExcel(){
                 ? e.items.map(i=>`${i.work} (${i.qty}pc)`).join(" + ") 
                 : e.work;
             
-            const safeNote = e.note.replace(/,/g, " ");
+            const safeNote = e.note ? e.note.replace(/,/g, " ") : '';
             
-            csv += `${e.date},${e.time},${safeNote},${e.phone||'-'},"${items}",${e.total},${e.taken},${e.loss},${e.user}\n`; 
+            csv += `${e.date || ''},${e.time || ''},${safeNote},${e.phone||'-'},"${items}",${e.total || 0},${e.taken || 0},${e.loss || 0},${e.user || ''}\n`; 
         });
         
         const link = document.createElement("a"); 
