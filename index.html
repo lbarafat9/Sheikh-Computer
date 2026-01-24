@@ -222,11 +222,11 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
     #container { padding-top: 80px; }
 }
 
-/* --- PRINT SETTINGS (FIXED 1 PAGE A4) --- */
+/* --- PRINT SETTINGS (UPDATED TO A5) --- */
 @media print {
     @page { 
-        size: A4 portrait; 
-        margin: 0; /* Remove browser margins */
+        size: A5 portrait; /* CHANGED: A4 -> A5 */
+        margin: 0; 
     }
     
     html, body {
@@ -234,7 +234,7 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
         height: 100%;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: hidden !important; /* Force single page */
+        overflow: hidden !important; 
         background: #fff !important;
     }
 
@@ -255,7 +255,7 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
         max-width: 100% !important; 
         height: auto !important;
         margin: 0 !important; 
-        padding: 15mm !important; /* Internal padding for A4 */
+        padding: 10mm !important; /* Adjusted padding for A5 */
         transform: none !important; 
         box-shadow: none !important; 
         border: none !important; 
@@ -493,7 +493,8 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
                 
                 <div style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
-                        <div class="form-group"><label>মোট বিল (Total):</label><input id="total" readonly class="en" value="0" style="background:#f8fafc; font-weight:bold; font-size: 18px; color: var(--text-main);"></div>
+                        <!-- UPDATED: Removed readonly, added oninput="calcDue()" for manual discount -->
+                        <div class="form-group"><label>মোট বিল (Total):</label><input id="total" class="en" value="0" oninput="calcDue()" style="background:#fff; font-weight:bold; font-size: 18px; color: var(--text-main);"></div>
                         <div class="form-group"><label>নগদ জমা (Paid):</label><input id="taken" type="number" min="0" class="en" oninput="calcDue()" style="font-size: 18px;"></div>
                     </div>
                     <div class="form-group">
@@ -2738,6 +2739,13 @@ function loadAllCustomers() {
         }
     }); 
 }
+
+// --- REFRESH WARNING (ADDED) ---
+window.onbeforeunload = function() {
+    if (cart.length > 0) {
+        return "কার্টে পণ্য আছে। পেজ রিলোড দিলে ডাটা মুছে যাবে।";
+    }
+};
 </script>
 </body>
 </html>
