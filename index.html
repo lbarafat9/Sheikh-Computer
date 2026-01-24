@@ -222,24 +222,29 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
     #container { padding-top: 80px; }
 }
 
-/* --- PRINT SETTINGS (A4 & FIT) --- */
+/* --- PRINT SETTINGS (FIXED 1 PAGE A4) --- */
 @media print {
     @page { 
         size: A4 portrait; 
-        margin: 10mm; 
+        margin: 0; /* Remove browser margins */
     }
-    body { 
-        background: #fff; 
-        color: #000; 
+    
+    html, body {
         width: 100%;
         height: 100%;
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important; /* Force single page */
+        background: #fff !important;
     }
+
+    /* Hide everything else */
     body * { visibility: hidden; }
     
     /* Show only the Memo Modal */
-    #memoModal, #memoModal * { visibility: visible !important; }
+    #memoModal, #memoModal * { 
+        visibility: visible !important; 
+    }
     
     #memoModal { 
         display: block !important; 
@@ -248,22 +253,20 @@ tr:hover { background-color: rgba(241, 245, 249, 0.5); }
         top: 0; 
         width: 100% !important; 
         max-width: 100% !important; 
+        height: auto !important;
         margin: 0 !important; 
-        padding: 0 !important; 
+        padding: 15mm !important; /* Internal padding for A4 */
         transform: none !important; 
         box-shadow: none !important; 
         border: none !important; 
         background: transparent !important; 
-        overflow: visible !important;
     }
     
     /* Ensure table fits */
     #memoModal table {
         width: 100% !important;
         border-collapse: collapse;
-        page-break-inside: auto;
     }
-    #memoModal tr { page-break-inside: avoid; page-break-after: auto; }
     
     .noPrint { display: none !important; }
 }
