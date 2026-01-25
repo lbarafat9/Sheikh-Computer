@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -11,7 +10,7 @@
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
 <style>
-/* --- PREMIUM THEME (3D GRADIENT EDITION) --- */
+/* --- PREMIUM THEME (ORIGINAL 3D GRADIENT EDITION) --- */
 :root {
     --primary: #4f46e5;
     --primary-dark: #3730a3;
@@ -263,9 +262,28 @@ tr:hover { background-color: #f8fafc; }
 .p-item { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; cursor: pointer; color: #333; transition: 0.2s; font-weight: 500; }
 .p-item:hover { background: #f8fafc; color: var(--primary); padding-left: 25px; }
 
-/* --- GLOBAL STOCK ALERT --- */
+/* --- GLOBAL STOCK ALERT (DANGEROUS MODE) --- */
 #globalStockAlert { position: fixed; bottom: 30px; right: 30px; z-index: 1300; background: #ef4444; color: #fff; padding: 14px 25px; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4); display: none; align-items: center; gap: 10px; font-weight: bold; animation: pulse 2s infinite; }
+#globalStockAlert.critical { background: #b91c1c; animation: pulseFast 0.8s infinite; border: 2px solid #fff; }
 @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+@keyframes pulseFast { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+/* --- CHAT & LOG STYLES (UPDATED) --- */
+#chatBtn { position: fixed; bottom: 90px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1290; transition: 0.3s; }
+#chatBtn:hover { transform: scale(1.1); }
+#chatBadge { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
+#chatBox { position: fixed; bottom: 150px; right: 30px; width: 320px; height: 450px; background: #fff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 1300; border: 1px solid #e2e8f0; overflow: hidden; }
+.chat-header { padding: 15px; background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+.chat-body { flex: 1; overflow-y: auto; padding: 15px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+.chat-footer { padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 5px; }
+.msg { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 13px; line-height: 1.4; position: relative; }
+.msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
+.msg.other { align-self: flex-start; background: #e2e8f0; color: #333; border-bottom-left-radius: 2px; }
+.msg-meta { font-size: 9px; opacity: 0.7; display: block; margin-top: 3px; text-align: right; }
+
+/* --- DANGEROUS STOCK STYLES --- */
+.row-zero { background-color: #fee2e2 !important; color: #b91c1c !important; font-weight: bold; }
+.badge-out { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -284,6 +302,7 @@ tr:hover { background-color: #f8fafc; }
 <!-- PROFILE MENU -->
 <div id="profileMenu">
     <div class="p-item" onclick="openProfileModal()">👤 আমার প্রোফাইল</div>
+    <div class="p-item" id="logBtn" onclick="openLogModal()" style="display:none">📋 অ্যাক্টিভিটি লগ</div>
     <div class="p-item" onclick="openSettingsModal()">⚙️ সেটিংস</div>
     <div class="p-item" onclick="exportDataCSV()">📄 ডাটা এক্সপোর্ট (CSV)</div>
     <div class="p-item" onclick="backupFullData()">💾 ডাটা ব্যাকআপ (Full)</div>
@@ -295,13 +314,35 @@ tr:hover { background-color: #f8fafc; }
     ⚠️ <span id="alertText">Stock Alert</span>
 </div>
 
-<div id="overlay" onclick="closeSidebar(); closeProfile(); closeModal('shortageModal'); closeModal('quickStockModal'); closeModal('userProfileModal'); closeModal('appSettingsModal'); closeModal('dueCollectionModal'); closeModal('returnModal'); closeModal('holdOrderModal')"></div>
+<!-- CHAT BUTTON & BOX (UPDATED LAYOUT) -->
+<div id="chatBtn" onclick="toggleChat()">💬 <div id="chatBadge"></div></div>
+<div id="chatBox">
+    <div class="chat-header">
+        <span>Team Notice Board</span>
+        <span onclick="toggleChat()" style="cursor:pointer">✕</span>
+    </div>
+    <div class="chat-body" id="msgList"></div>
+    <div class="chat-footer">
+        <div style="display:flex; align-items:center; gap:5px; margin-bottom:2px">
+            <span style="font-size:11px; color:#666; font-weight:bold">To:</span>
+            <select id="msgTarget" style="padding:3px; font-size:11px; border:1px solid #ddd; border-radius:4px; background:#f9fafb; outline:none; cursor:pointer">
+                <!-- Options loaded via JS -->
+            </select>
+        </div>
+        <div style="display:flex; gap:5px; width:100%">
+            <input id="msgInput" placeholder="Type message..." style="padding:10px; border:1px solid #ddd; border-radius:6px; flex:1; outline:none; font-size:13px">
+            <button onclick="sendMsg()" style="padding:0 15px; margin:0; border-radius:6px; font-size:16px; width:auto">➤</button>
+        </div>
+    </div>
+</div>
+
+<div id="overlay" onclick="closeSidebar(); closeProfile(); closeModal('shortageModal'); closeModal('quickStockModal'); closeModal('userProfileModal'); closeModal('appSettingsModal'); closeModal('dueCollectionModal'); closeModal('returnModal'); closeModal('holdOrderModal'); closeModal('logModal')"></div>
 
 <!-- LOGIN SCREEN -->
 <div id="loginDiv">
     <div class="login-card">
         <h2 class="login-title">শেখ ফটোকপি <span>PRO</span></h2>
-        <p class="login-subtitle">v4.0.1 (Stable) | ২৫-০১-২০২৬</p>
+        <p class="login-subtitle">v5.0 (Team Edition) | ২৫-০১-২০২৬</p>
         <label class="login-label">👤 ইউজারনেম</label>
         <input id="uName" class="login-input" placeholder="ইউজারনেম">
         <label class="login-label">🔒 পাসওয়ার্ড</label>
@@ -335,7 +376,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v4.0.1 (Stable)</div>
+                <div class="footer-val en">v5.0 (Team Edition)</div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -418,13 +459,13 @@ tr:hover { background-color: #f8fafc; }
                 <div class="form-group">
                     <label>২. ক্যাটাগরি:</label>
                     <select id="categorySelect" onchange="loadProductsByCategory()" style="background:#f0fdf4; border-color:#10b981; font-weight:600;">
-                        <option value="">-- আগে বিভাগ দিন --</option>
+                        <option value="">আগে বিভাগ সিলেক্ট করুন</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>৩. পণ্য/কাজ:</label>
                     <select id="productSelect" onchange="productSelectedFromDropdown()">
-                        <option value="">-- আগে ক্যাটাগরি দিন --</option>
+                        <option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>
                     </select>
                     <input type="hidden" id="selectedProductKey">
                 </div>
@@ -869,6 +910,20 @@ tr:hover { background-color: #f8fafc; }
         <p style="font-size:12px; color:#ef4444; margin-top:5px">ℹ️ পাসওয়ার্ড পরিবর্তন করতে এডমিনের সাথে যোগাযোগ করুন।</p>
     </div>
     <button onclick="closeModal('userProfileModal')" style="background:#94a3b8">বন্ধ করুন</button>
+</div>
+
+<!-- ACTIVITY LOG MODAL (ADDED) -->
+<div id="logModal" class="modal">
+    <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center">
+        <h3 style="margin:0; color:var(--primary);">📋 অ্যাক্টিভিটি লগ (Admin Only)</h3>
+        <button onclick="closeModal('logModal')" style="background:none; color:#ef4444; font-size:28px; padding:0; width:auto; box-shadow:none;">×</button>
+    </div>
+    <div class="table-box" style="max-height:400px; overflow-y:auto">
+        <table class="en">
+            <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+            <tbody id="logBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <!-- ADVANCED SETTINGS MODAL (UPDATED WITH USER MANAGEMENT) -->
@@ -1340,6 +1395,11 @@ function setupUser(u) {
         const roleName = role === 'admin' ? 'অ্যাডমিন' : (role === 'owner' ? 'মালিক' : 'সেনাপতি');
         setHTML("userShow", `স্বাগতম, <b style="text-transform:uppercase; color:#fff">${u}</b> (${roleName})`);
         setText("modalProfileRole", roleName);
+        
+        // Show Log Button only for Admin/Owner
+        if(u === 'admin' || u === 'owner') {
+            document.getElementById("logBtn").style.display = "block";
+        }
     });
 
     setText("pName", u.toUpperCase()); 
@@ -1350,6 +1410,7 @@ function setupUser(u) {
     loadEntries(); 
     loadAllCustomers();
     loadExpenses();
+    setupChat(); // Initialize Chat
     showSection('dashboard');
     setupLiveSearch();
 }
@@ -1390,6 +1451,94 @@ function openProfileModal() {
     setText("upTotal", total.toLocaleString());
     document.getElementById("userProfileModal").style.display = "block";
     document.getElementById("overlay").style.display = "block";
+}
+
+// --- ACTIVITY LOG (NEW) ---
+function logActivity(action, details) {
+    const log = {
+        time: new Date().toLocaleString(),
+        user: currentUser,
+        action: action,
+        details: details
+    };
+    db.ref("logs").push(log);
+}
+
+function openLogModal() {
+    closeProfile();
+    const tbody = document.getElementById("logBody");
+    tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
+    db.ref("logs").limitToLast(50).once("value", s => {
+        tbody.innerHTML = "";
+        const logs = [];
+        s.forEach(c => logs.push(c.val()));
+        logs.reverse().forEach(l => {
+            tbody.innerHTML += `<tr><td><small>${l.time}</small></td><td>${l.user}</td><td style="color:var(--primary); font-weight:bold">${l.action}</td><td>${l.details}</td></tr>`;
+        });
+    });
+    document.getElementById("logModal").style.display = "block";
+    document.getElementById("overlay").style.display = "block";
+}
+
+// --- CHAT SYSTEM (NEW) ---
+function setupChat() {
+    db.ref("messages").limitToLast(20).on("value", s => {
+        const div = document.getElementById("msgList");
+        div.innerHTML = "";
+        let unread = false;
+        s.forEach(c => {
+            const m = c.val();
+            // Filter: Show if public (all), or sent by me, or sent to me
+            if(m.target === 'all' || m.sender === currentUser || m.target === currentUser) {
+                const isMe = m.sender === currentUser;
+                div.innerHTML += `
+                <div class="msg ${isMe ? 'me' : 'other'}">
+                    ${!isMe ? `<b style="font-size:11px; color:#666">${m.sender.toUpperCase()} ${m.target!=='all'?'(Private)':''}</b><br>` : ''}
+                    ${m.text}
+                    <span class="msg-meta">${m.time}</span>
+                </div>`;
+                if(!isMe) unread = true;
+            }
+        });
+        div.scrollTop = div.scrollHeight;
+        if(unread && document.getElementById("chatBox").style.display === "none") {
+            document.getElementById("chatBadge").style.display = "block";
+        }
+    });
+    updateChatTargets();
+}
+
+function updateChatTargets() {
+    const targets = ['admin', 'owner', 'roky'];
+    let html = '<option value="all">All (সবাই)</option>';
+    targets.forEach(t => {
+        if(t !== currentUser) html += `<option value="${t}">${t.toUpperCase()}</option>`;
+    });
+    document.getElementById('msgTarget').innerHTML = html;
+}
+
+function sendMsg() {
+    const txt = document.getElementById("msgInput").value.trim();
+    const target = document.getElementById("msgTarget").value;
+    if(!txt) return;
+    
+    db.ref("messages").push({
+        sender: currentUser,
+        target: target,
+        text: txt,
+        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+    });
+    document.getElementById("msgInput").value = "";
+}
+
+function toggleChat() {
+    const box = document.getElementById("chatBox");
+    if(box.style.display === "flex") {
+        box.style.display = "none";
+    } else {
+        box.style.display = "flex";
+        document.getElementById("chatBadge").style.display = "none";
+    }
 }
 
 // --- ADVANCED SETTINGS LOGIC ---
@@ -1625,10 +1774,10 @@ function updateCategories() {
     const section = document.getElementById("sectionSelect").value;
     const catSelect = document.getElementById("categorySelect");
     const prodSelect = document.getElementById("productSelect");
-    catSelect.innerHTML = '<option value="">ক্যাটাগরি সিলেক্ট করুন...</option>';
-    prodSelect.innerHTML = '<option value="">-- আগে বিভাগ দিন --</option>';
+    catSelect.innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
+    prodSelect.innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     if(!section) {
-        catSelect.innerHTML = '<option value="">-- আগে বিভাগ দিন --</option>';
+        catSelect.innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
         return;
     }
     const filtered = allProducts.filter(p => p.mainType === section);
@@ -1644,7 +1793,7 @@ function loadProductsByCategory() {
     const prodSelect = document.getElementById("productSelect");
     prodSelect.innerHTML = '<option value="">পণ্য সিলেক্ট করুন...</option>';
     if (!selectedCat) {
-        prodSelect.innerHTML = '<option value="">-- আগে ক্যাটাগরি দিন --</option>';
+        prodSelect.innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
         return;
     }
     const filteredProducts = allProducts.filter(p => p.category === selectedCat && p.mainType === selectedSection);
@@ -1680,15 +1829,21 @@ function setupLiveSearch() {
                 const alertLevel = p.alertLevel || 5; 
                 const isLowStock = !p.isService && p.qty <= alertLevel;
                 const typeIcon = p.mainType === 'Computer' ? '💻' : (p.mainType === 'Photocopy' ? '📄' : '🛍️');
+                
+                let statusBadge = '';
+                if(!p.isService) {
+                    if(p.qty <= 0) statusBadge = '<span class="badge-out">❌ STOCK OUT</span>';
+                    else if(p.qty <= (p.alertLevel||5)) statusBadge = '<span style="color:orange; font-weight:bold; font-size:11px">⚠️ Low Stock</span>';
+                }
+
                 html += `
                 <div class="search-item" onclick="selectProductFromSearch('${p.key}')">
                     <div>
-                        <div style="font-weight:bold; color:var(--text-main)">${typeIcon} ${p.name}</div>
+                        <div style="font-weight:bold; color:var(--text-main)">${typeIcon} ${p.name} ${statusBadge}</div>
                         <div style="display:flex; gap:10px; margin-top:5px;">
                             <span class="serial" style="color:#64748b; font-size:12px">${p.serial || 'No Serial'}</span>
                             <span class="category" style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px">${p.category}</span>
                             ${!p.isService ? `<span class="stock" style="font-size:12px">স্টক: ${p.qty}</span>` : '<span class="category" style="background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-size:12px">Service</span>'}
-                            ${isLowStock ? '<span style="color:#ef4444; font-size:11px; font-weight:bold">⚠️ লো স্টক</span>' : ''}
                         </div>
                     </div>
                     <div style="text-align:right">
@@ -1760,14 +1915,22 @@ function loadAllProducts(){
 }
 
 function checkGlobalStockStatus() {
-    const shortages = allProducts.filter(p => !p.isService && p.qty <= (p.alertLevel || 5));
+    const zeroStock = allProducts.filter(p => !p.isService && p.qty <= 0);
+    const lowStock = allProducts.filter(p => !p.isService && p.qty > 0 && p.qty <= (p.alertLevel || 5));
+    
     const alertBtn = document.getElementById("globalStockAlert");
     const alertText = document.getElementById("alertText");
-    if (shortages.length > 0) {
-        if(alertBtn) alertBtn.style.display = "flex";
-        if(alertText) alertText.innerText = `${shortages.length} Items Low Stock`;
+    
+    if (zeroStock.length > 0) {
+        alertBtn.style.display = "flex";
+        alertBtn.className = "critical"; // Red Pulse
+        alertText.innerText = `❌ ${zeroStock.length} EMPTY | ⚠️ ${lowStock.length} LOW`;
+    } else if (lowStock.length > 0) {
+        alertBtn.style.display = "flex";
+        alertBtn.className = ""; // Normal Pulse
+        alertText.innerText = `⚠️ ${lowStock.length} Low Stock`;
     } else {
-        if(alertBtn) alertBtn.style.display = "none";
+        alertBtn.style.display = "none";
     }
 }
 
@@ -1776,10 +1939,11 @@ function showShortageModal() {
     const tbody = document.getElementById("shortageModalBody");
     tbody.innerHTML = "";
     shortages.forEach(p => {
+        const isZero = p.qty <= 0;
         tbody.innerHTML += `
-        <tr>
+        <tr class="${isZero ? 'row-zero' : ''}">
             <td>${p.name} <br><small style="color:#666">${p.category}</small></td>
-            <td style="color:#ef4444; font-weight:bold">${p.qty}</td>
+            <td style="color:${isZero ? '#b91c1c' : '#ef4444'}; font-weight:bold">${p.qty}</td>
             <td>${p.alertLevel || 5}</td>
         </tr>`;
     });
@@ -1865,6 +2029,7 @@ function addNewProduct(){
         document.getElementById("stSell").value = "";
         document.getElementById("stAlert").value = "";
         document.getElementById("stSerial").value = targetSerial + 1;
+        logActivity("Add Product", `Added ${name} (${mainType})`);
     });
 }
 
@@ -1930,6 +2095,7 @@ function saveEditProduct() {
     }).then(() => {
         showToast("আপডেট হয়েছে!", "success");
         closeModal("editProductModal");
+        logActivity("Edit Product", `Updated ${name}`);
     });
 }
 
@@ -1937,9 +2103,11 @@ function deleteProductFromEdit() {
     const key = document.getElementById("editProdKey").value;
     if(currentUser === 'owner' || currentUser === 'admin'){ 
         if(confirm("সতর্কতা: আইটেমটি ডিলিট করতে চান?")) {
+            const p = allProducts.find(x => x.key === key);
             db.ref("products/"+key).remove();
             closeModal("editProductModal");
             showToast("ডিলিট করা হয়েছে", "warning");
+            logActivity("Delete Product", `Deleted ${p ? p.name : 'Product'}`);
         }
     } else { 
         showToast("শুধুমাত্র মালিক বা এডমিন ডিলিট করতে পারবে।", "error"); 
@@ -1989,7 +2157,12 @@ function addToCart(){
             if(currentCartQty > 0) {
                 showToast(`❌ কার্টে ইতিমধ্যে ${currentCartQty}টি আছে। স্টকে আছে ${product.qty}টি।`, "error");
             } else {
-                openQuickStockModal(product.key, product.name, product.qty);
+                // Specific Error for 0 Stock
+                if(product.qty <= 0) {
+                    showToast("❌ পণ্যটি স্টকে নেই! (Stock is 0)", "error");
+                } else {
+                    openQuickStockModal(product.key, product.name, product.qty);
+                }
             }
             return; 
         }
@@ -2017,8 +2190,8 @@ function addToCart(){
     renderCart(); 
     document.getElementById("selectedProductKey").value = "";
     document.getElementById("sectionSelect").value = "";
-    document.getElementById("categorySelect").innerHTML = '<option value="">-- আগে বিভাগ দিন --</option>';
-    document.getElementById("productSelect").innerHTML = '<option value="">-- আগে ক্যাটাগরি দিন --</option>';
+    document.getElementById("categorySelect").innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
+    document.getElementById("productSelect").innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     document.getElementById("rate").value = "";
     document.getElementById("qty").value = 1;
     document.getElementById("stockLiveMsg").style.display = "none";
@@ -2579,6 +2752,7 @@ function deleteFromEdit() {
             });
             db.ref("entries/"+key).remove();
             closeModal("editEntryModal");
+            logActivity("Delete Entry", `Deleted Memo ${entry.memoId || key.slice(-4)}`);
             showToast("এন্ট্রি ডিলিট হয়েছে", "warning");
         });
     }
