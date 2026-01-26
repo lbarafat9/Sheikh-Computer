@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Photocopy PRO</title>
+<title>Sheikh Computer PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- EXCEL & CSV LIBRARY (SheetJS) -->
@@ -34,6 +34,7 @@ body.light-theme {
 body.light-theme #sidebar { border-right: 1px solid #cbd5e1; box-shadow: 2px 0 10px rgba(0,0,0,0.05); }
 body.light-theme #sidebar a { color: #475569; }
 body.light-theme #sidebar a:hover { background: #f8fafc; color: var(--primary); }
+body.light-theme #sidebar a.active { background: #e0f2fe; color: var(--primary); border-left-color: var(--primary); }
 body.light-theme #userShow { color: #334155; border-bottom: 1px solid #e2e8f0; }
 body.light-theme .sidebar-footer { background: #f8fafc; border-top: 1px solid #e2e8f0; }
 body.light-theme .footer-label { color: #64748b; }
@@ -74,37 +75,97 @@ body {
 /* --- HEADER (Mobile Only) --- */
 header {
     background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-    color: #fff; padding: 15px; text-align: center; font-size: 20px; font-weight: 700;
+    color: #fff; padding: 0 60px;
+    text-align: center; font-size: 18px; font-weight: 700;
     display: none; position: fixed; top: 0; width: 100%; z-index: 1000;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+    height: 60px;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
 /* --- LOGIN SCREEN --- */
 #loginDiv {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(160deg, #2dd4bf 0%, #3b82f6 100%);
+    background: linear-gradient(180deg, #34d399 0%, #3b82f6 100%);
     display: flex; align-items: center; justify-content: center;
     z-index: 2000;
 }
 .login-card {
     background: #fff;
-    width: 90%; max-width: 400px;
-    padding: 40px 30px;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    width: 85%; max-width: 360px; 
+    padding: 35px 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     text-align: center;
+    font-family: 'Hind Siliguri', sans-serif;
 }
-.login-title { font-size: 26px; font-weight: 700; color: #10b981; margin-bottom: 5px; }
-.login-title span { color: #3b82f6; }
-.login-subtitle { font-size: 13px; color: #9ca3af; margin-bottom: 30px; font-family: 'Poppins', sans-serif; }
-.login-label { display: block; text-align: left; font-weight: 600; color: #374151; margin-bottom: 8px; font-size: 14px; }
-.login-input { width: 100%; padding: 12px 15px; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 15px; margin-bottom: 20px; background: #fff; color: #333; transition: 0.2s; }
-.login-input:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
-.login-btn { width: 100%; padding: 12px; background: #10b981; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-.login-btn:hover { background: #059669; }
-.login-footer { margin-top: 25px; font-size: 11px; color: #9ca3af; line-height: 1.5; }
+.login-title { 
+    font-size: 28px; 
+    font-weight: 700; 
+    color: #10b981; 
+    margin-bottom: 5px; 
+}
+.login-title span { 
+    color: #3b82f6; 
+}
+.login-subtitle { 
+    font-size: 12px; 
+    color: #9ca3af; 
+    margin-bottom: 25px; 
+    font-family: 'Poppins', sans-serif;
+}
+.login-form-group {
+    text-align: left;
+    margin-bottom: 15px;
+}
+.login-label { 
+    display: block; 
+    font-weight: 700; 
+    color: #374151; 
+    margin-bottom: 8px; 
+    font-size: 14px; 
+    display: flex; align-items: center; gap: 5px;
+}
+.login-input { 
+    width: 100%; 
+    padding: 12px 15px; 
+    border: 1px solid #e5e7eb; 
+    border-radius: 8px; 
+    font-size: 14px; 
+    background: #fff; 
+    color: #333; 
+    outline: none;
+    transition: 0.2s;
+}
+.login-input:focus { 
+    border-color: #10b981; 
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+.login-btn { 
+    width: 100%; 
+    padding: 12px; 
+    background: #22c55e; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    font-size: 16px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    margin-top: 10px; 
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: 0.2s;
+}
+.login-btn:hover { background: #16a34a; }
+.login-footer { 
+    margin-top: 20px; 
+    font-size: 11px; 
+    color: #9ca3af; 
+    line-height: 1.5;
+}
 
-/* --- LAYOUT (PC OPTIMIZED) --- */
+/* --- LAYOUT --- */
 #container { 
     display: none; 
     margin-left: 280px; 
@@ -116,7 +177,17 @@ header {
 }
 
 /* --- SIDEBAR --- */
-#menuBtn { position: fixed; top: 15px; left: 15px; font-size: 24px; color: #fff; cursor: pointer; display: none; z-index: 1100; background: var(--primary); padding: 5px 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+#menuBtn { 
+    display: none; 
+    align-items: center; justify-content: center; 
+    position: fixed; top: 13px; left: 15px;
+    height: 34px; width: 40px; 
+    background: var(--primary); color: #fff; border-radius: 8px; 
+    z-index: 1100; font-size: 24px; 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); 
+    padding-top: 0; line-height: 34px; cursor: pointer;
+}
+
 #sidebar {
     position: fixed; top: 0; left: 0; width: 280px; height: 100%;
     background: var(--sidebar-bg); backdrop-filter: blur(15px);
@@ -140,6 +211,7 @@ header {
     font-size: 15px;
 }
 #sidebar a:hover { background: rgba(255,255,255,0.05); color: #fff; border-left-color: var(--accent); padding-left: 30px; }
+#sidebar a.active { background: rgba(255,255,255,0.1); color: #fff; border-left-color: var(--accent); padding-left: 30px; font-weight: 700; }
 
 /* --- SIDEBAR FOOTER --- */
 .sidebar-footer {
@@ -196,7 +268,7 @@ button {
 }
 button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3); }
 
-/* --- TABLES (PC OPTIMIZED) --- */
+/* --- TABLES --- */
 .table-box { 
     overflow-x: auto; 
     background: #fff; 
@@ -234,8 +306,8 @@ tr:hover { background-color: #f8fafc; }
 @media (max-width: 1024px) {
     #container { margin-left: 0; width: 100%; padding: 15px; padding-top: 80px; }
     #sidebar { left: -300px; }
-    header { display: flex; align-items: center; justify-content: center; height: 60px; padding: 0 60px; font-size: 16px; font-weight: 700; position: fixed; top: 0; width: 100%; z-index: 1000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    #menuBtn { display: flex; align-items: center; justify-content: center; position: fixed; top: 13px; left: 15px; height: 34px; width: 40px; background: var(--primary); color: #fff; border-radius: 8px; z-index: 1100; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); padding-top: 3px; line-height: normal; }
+    header { display: flex; } 
+    #menuBtn { display: flex; }
     #profileBtn { display: flex; align-items: center; position: fixed; top: 13px; right: 15px; height: 34px; padding: 0 15px; font-size: 13px; z-index: 1100; border-radius: 30px; }
     #pIcon { font-size: 14px; margin-right: 5px; }
     #profileMenu { top: 60px; right: 15px; width: 200px; }
@@ -262,24 +334,58 @@ tr:hover { background-color: #f8fafc; }
 .p-item { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; cursor: pointer; color: #333; transition: 0.2s; font-weight: 500; }
 .p-item:hover { background: #f8fafc; color: var(--primary); padding-left: 25px; }
 
-/* --- GLOBAL STOCK ALERT (DANGEROUS MODE) --- */
+/* --- GLOBAL STOCK ALERT --- */
 #globalStockAlert { position: fixed; bottom: 30px; right: 30px; z-index: 1300; background: #ef4444; color: #fff; padding: 14px 25px; border-radius: 50px; cursor: pointer; box-shadow: 0 5px 20px rgba(239, 68, 68, 0.4); display: none; align-items: center; gap: 10px; font-weight: bold; animation: pulse 2s infinite; }
 #globalStockAlert.critical { background: #b91c1c; animation: pulseFast 0.8s infinite; border: 2px solid #fff; }
 @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
 @keyframes pulseFast { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-/* --- CHAT & LOG STYLES (UPDATED) --- */
+/* --- CHAT SYSTEM --- */
 #chatBtn { position: fixed; bottom: 90px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3); z-index: 1290; transition: 0.3s; }
 #chatBtn:hover { transform: scale(1.1); }
 #chatBadge { position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; background: #ef4444; border-radius: 50%; border: 2px solid #fff; display: none; }
-#chatBox { position: fixed; bottom: 150px; right: 30px; width: 320px; height: 450px; background: #fff; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 1300; border: 1px solid #e2e8f0; overflow: hidden; }
-.chat-header { padding: 15px; background: var(--primary); color: #fff; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
-.chat-body { flex: 1; overflow-y: auto; padding: 15px; background: #f8fafc; display: flex; flex-direction: column; gap: 10px; }
+
+#chatBox { position: fixed; bottom: 150px; right: 30px; width: 340px; height: 500px; background: #fff; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); display: none; flex-direction: column; z-index: 1300; border: 1px solid #e2e8f0; overflow: hidden; font-family: 'Poppins', sans-serif; }
+.chat-header { padding: 15px; background: linear-gradient(to right, var(--primary), var(--primary-dark)); color: #fff; display: flex; justify-content: space-between; align-items: center; font-weight: bold; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.chat-body { flex: 1; overflow-y: auto; padding: 15px; background: #f1f5f9; display: flex; flex-direction: column; gap: 8px; }
+.chat-date { text-align: center; font-size: 10px; color: #94a3b8; margin: 15px 0 5px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+/* Message Row Container */
+.msg-row { display: flex; align-items: flex-end; gap: 5px; margin-bottom: 2px; position: relative; }
+.msg-row.me { flex-direction: row-reverse; }
+.msg-row.other { flex-direction: row; }
+
+/* Message Bubble */
+.msg { max-width: 75%; padding: 8px 12px; border-radius: 18px; font-size: 13px; line-height: 1.4; position: relative; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.msg.me { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; padding-right: 25px; }
+.msg.other { background: #fff; color: #333; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; padding-right: 25px; }
+
+/* Meta Info */
+.msg-meta { font-size: 9px; opacity: 0.7; display: block; margin-top: 4px; text-align: right; }
+.sender-name { font-size: 10px; color: #64748b; margin-bottom: 2px; display: block; font-weight: bold; }
+
+/* Three Dot Menu Button */
+.msg-opt-btn { 
+    position: absolute; top: 5px; right: 5px;
+    cursor: pointer; font-size: 14px; color: inherit; opacity: 0.6; transition: 0.2s; 
+    line-height: 1;
+}
+.msg-opt-btn:hover { opacity: 1; font-weight: bold; transform: scale(1.1); }
+
+/* Dropdown Menu */
+.msg-menu { 
+    position: absolute; 
+    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; 
+    box-shadow: 0 5px 20px rgba(0,0,0,0.25); 
+    z-index: 1500; display: none; overflow: hidden; width: 100px; 
+    top: 25px; right: 10px; 
+}
+.msg-menu-item { padding: 10px 12px; font-size: 12px; color: #333; cursor: pointer; transition: 0.2s; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; }
+.msg-menu-item:last-child { border-bottom: none; }
+.msg-menu-item:hover { background: #f8fafc; color: var(--primary); }
+.msg-menu-item.del:hover { background: #fee2e2; color: #ef4444; }
+
 .chat-footer { padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 5px; }
-.msg { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 13px; line-height: 1.4; position: relative; }
-.msg.me { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 2px; }
-.msg.other { align-self: flex-start; background: #e2e8f0; color: #333; border-bottom-left-radius: 2px; }
-.msg-meta { font-size: 9px; opacity: 0.7; display: block; margin-top: 3px; text-align: right; }
 
 /* --- DANGEROUS STOCK STYLES --- */
 .row-zero { background-color: #fee2e2 !important; color: #b91c1c !important; font-weight: bold; }
@@ -291,7 +397,7 @@ tr:hover { background-color: #f8fafc; }
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
-<header id="header">Sheikh Photocopy PRO</header>
+<header id="header">Sheikh Computer PRO</header>
 <div id="menuBtn" onclick="openSidebar()">☰</div>
 
 <!-- PROFILE BUTTON -->
@@ -314,7 +420,7 @@ tr:hover { background-color: #f8fafc; }
     ⚠️ <span id="alertText">Stock Alert</span>
 </div>
 
-<!-- CHAT BUTTON & BOX (UPDATED LAYOUT) -->
+<!-- CHAT BUTTON & BOX -->
 <div id="chatBtn" onclick="toggleChat()">💬 <div id="chatBadge"></div></div>
 <div id="chatBox">
     <div class="chat-header">
@@ -330,8 +436,8 @@ tr:hover { background-color: #f8fafc; }
             </select>
         </div>
         <div style="display:flex; gap:5px; width:100%">
-            <input id="msgInput" placeholder="Type message..." style="padding:10px; border:1px solid #ddd; border-radius:6px; flex:1; outline:none; font-size:13px">
-            <button onclick="sendMsg()" style="padding:0 15px; margin:0; border-radius:6px; font-size:16px; width:auto">➤</button>
+            <input id="msgInput" placeholder="Type message..." onkeydown="if(event.key==='Enter') sendMsg()" style="padding:10px; border:1px solid #ddd; border-radius:20px; flex:1; outline:none; font-size:13px; padding-left:15px;">
+            <button onclick="sendMsg()" style="padding:0 15px; margin:0; border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; font-size:16px;" id="sendBtnIcon">➤</button>
         </div>
     </div>
 </div>
@@ -341,12 +447,16 @@ tr:hover { background-color: #f8fafc; }
 <!-- LOGIN SCREEN -->
 <div id="loginDiv">
     <div class="login-card">
-        <h2 class="login-title">শেখ ফটোকপি <span>PRO</span></h2>
-        <p class="login-subtitle">v5.0 (Team Edition) | ২৫-০১-২০২৬</p>
-        <label class="login-label">👤 ইউজারনেম</label>
-        <input id="uName" class="login-input" placeholder="ইউজারনেম">
-        <label class="login-label">🔒 পাসওয়ার্ড</label>
-        <input id="uPass" type="password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+        <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
+        <p class="login-subtitle">v5.1 (Optimized) | ২৬-০১-২০২৬</p>
+        <div class="login-form-group">
+            <label class="login-label">👤 ইউজারনেম</label>
+            <input id="uName" class="login-input" placeholder="ইউজারনেম">
+        </div>
+        <div class="login-form-group">
+            <label class="login-label">🔒 পাসওয়ার্ড</label>
+            <input id="uPass" type="password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+        </div>
         <button onclick="login()" class="login-btn">➜ লগইন করুন</button>
         <p class="login-footer" style="cursor:pointer; color:#3b82f6" onclick="alert('পাসওয়ার্ড ভুলে গেলে অ্যাডমিনের সাথে যোগাযোগ করুন।')">পাসওয়ার্ড ভুলে গেছেন?</p>
         <p class="login-footer">ℹ️ সকল ইউজারের একই এক্সেস | ডেভেলপার: আরাফাত সিকদার</p>
@@ -355,17 +465,17 @@ tr:hover { background-color: #f8fafc; }
 
 <div id="container">
     <div id="sidebar">
-        <div class="sidebar-header">Sheikh Photocopy</div>
+        <div class="sidebar-header">Sheikh Computer</div>
         <div style="text-align:right;padding:10px 20px;font-size:24px;cursor:pointer;color:#ef4444; display:none" onclick="closeSidebar()" id="closeBtn">✕</div>
         <div id="userShow"></div>
-        <a onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড</a>
-        <a onclick="showSection('newEntry')">📝 নতুন এন্ট্রি / সেলস</a>
-        <a onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
-        <a onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
-        <a onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
-        <a onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
-        <a onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
-        <a onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
+        <a id="nav-dashboard" onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড</a>
+        <a id="nav-newEntry" onclick="showSection('newEntry')">📝 নতুন এন্ট্রি / সেলস</a>
+        <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
+        <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
+        <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
+        <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
+        <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
+        <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
         <a onclick="logout()" style="color:#ef4444; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1);">🚪 লগআউট</a>
         
         <!-- SIDEBAR FOOTER -->
@@ -376,7 +486,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v5.0 (Team Edition)</div>
+                <div class="footer-val en">v5.1 (Optimized)</div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -387,22 +497,26 @@ tr:hover { background-color: #f8fafc; }
 
     <!-- DASHBOARD -->
     <div id="dashboard" class="section">
+        <div style="text-align:center; margin-bottom:20px;">
+            <button onclick="loadDashboardStats()" style="background:var(--text-main); width:auto; padding:10px 20px;">👁️ আজকের হিসাব দেখুন</button>
+        </div>
+
         <div class="stats en">
             <div class="card" style="border-bottom-color:#3b82f6">
-                <span>মোট এন্ট্রি</span>
-                <b id="cCount" style="color:#3b82f6">0</b>
+                <span>আজকের এন্ট্রি</span>
+                <b id="cCount" style="color:#3b82f6">---</b>
             </div>
             <div class="card" style="border-bottom-color:#10b981">
-                <span>সর্বমোট সেল (৳)</span>
-                <b id="cTotal" style="color:#10b981">0</b>
+                <span>আজকের সেল (৳)</span>
+                <b id="cTotal" style="color:#10b981">---</b>
             </div>
             <div class="card" style="border-bottom-color:#f59e0b">
-                <span>নগদ ক্যাশ (৳)</span>
-                <b id="cTaken" style="color:#f59e0b">0</b>
+                <span>আজকের ক্যাশ (৳)</span>
+                <b id="cTaken" style="color:#f59e0b">---</b>
             </div>
             <div class="card" style="border-bottom-color:#ef4444">
-                <span>মোট বাকি (৳)</span>
-                <b id="cDue" style="color:#ef4444">0</b>
+                <span>আজকের বাকি (৳)</span>
+                <b id="cDue" style="color:#ef4444">---</b>
             </div>
         </div>
 
@@ -430,7 +544,7 @@ tr:hover { background-color: #f8fafc; }
         </div>
         
         <div class="table-box">
-            <h4 style="padding:20px; margin:0; background: transparent; border-bottom: 1px solid #f1f5f9; color:var(--text-main)">সাম্প্রতিক কার্যক্রম (শেষ ৫০টি)</h4>
+            <h4 style="padding:20px; margin:0; background: transparent; border-bottom: 1px solid #f1f5f9; color:var(--text-main)">সাম্প্রতিক কার্যক্রম (সর্বশেষ ১০০টি)</h4>
             <table class="en">
                 <thead><tr><th>Memo</th><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
                 <tbody id="tableBody"></tbody>
@@ -453,19 +567,19 @@ tr:hover { background-color: #f8fafc; }
                 <div class="form-group">
                     <label>১. বিভাগ (Section):</label>
                     <select id="sectionSelect" onchange="updateCategories()" style="background:#fffbeb; border-color:#fcd34d; font-weight:bold;">
-                        <option value="">সিলেক্ট করুন...</option>
+                        <option value="" disabled selected>সিলেক্ট করুন...</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>২. ক্যাটাগরি:</label>
                     <select id="categorySelect" onchange="loadProductsByCategory()" style="background:#f0fdf4; border-color:#10b981; font-weight:600;">
-                        <option value="">আগে বিভাগ সিলেক্ট করুন</option>
+                        <option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>৩. পণ্য/কাজ:</label>
                     <select id="productSelect" onchange="productSelectedFromDropdown()">
-                        <option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>
+                        <option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>
                     </select>
                     <input type="hidden" id="selectedProductKey">
                 </div>
@@ -498,7 +612,7 @@ tr:hover { background-color: #f8fafc; }
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
                     <div class="form-group">
                         <label>কাস্টমারের নাম (খালি থাকলে 'General Customer'):</label>
-                        <input id="note" placeholder="নাম লিখুন (ঐচ্ছিক)...">
+                        <input id="note" placeholder="কাস্টমারের নাম (ঐচ্ছিক)...">
                     </div>
                     <div class="form-group">
                         <label>মোবাইল (১১ ডিজিট):</label>
@@ -645,7 +759,35 @@ tr:hover { background-color: #f8fafc; }
     <div id="analytics" class="section">
         <div class="card-glass">
             <h3 style="margin-top:0; border-bottom:1px solid #f1f5f9; padding-bottom:15px; color: var(--text-main)">📈 প্রফিট ও লস অ্যানালিটিক্স</h3>
+            
+            <!-- OPTIMIZED: LOAD BUTTON FOR LIFETIME ANALYTICS -->
+            <div style="text-align:center; margin-bottom:25px; background:#f8fafc; padding:20px; border-radius:12px; border:1px solid #e2e8f0">
+                <p style="color:#64748b; margin-bottom:15px">অ্যাপ ফাস্ট রাখার জন্য ডিফল্টভাবে সব ডাটা লোড করা হয় না। প্রফিট দেখতে নিচের বাটনে ক্লিক করুন।</p>
+                <div style="display:flex; gap:15px; justify-content:center">
+                    <button onclick="toggleFullHistory(true)" style="background:var(--primary); width:auto; padding:12px 25px; font-size:16px; box-shadow:0 4px 15px rgba(79, 70, 229, 0.3);">🔄 Load Full History</button>
+                    <button onclick="toggleFullHistory(false)" style="background:#ef4444; width:auto; padding:12px 25px; font-size:16px;">❌ Unload History</button>
+                </div>
+                <p id="historyStatus" style="margin-top:10px; font-weight:bold; color:#10b981; display:none">✅ Full History Loaded!</p>
+            </div>
+
+            <!-- LIFETIME STATS CARDS -->
+            <div class="stats en" style="margin-bottom:30px;">
+                <div class="card" style="background:#f8fafc; border-bottom: 4px solid #6366f1;">
+                    <span>সর্বমোট সেল (লাইফটাইম)</span>
+                    <b id="lifeSale" style="color:#4f46e5">---</b>
+                </div>
+                <div class="card" style="background:#f8fafc; border-bottom: 4px solid #ef4444;">
+                    <span>সর্বমোট বাকি (লাইফটাইম)</span>
+                    <b id="lifeDue" style="color:#ef4444">---</b>
+                </div>
+                <div class="card" style="background:#f8fafc; border-bottom: 4px solid #10b981;">
+                    <span>সর্বমোট ক্যাশ (লাইফটাইম)</span>
+                    <b id="lifeCash" style="color:#10b981">---</b>
+                </div>
+            </div>
+
             <div style="display:flex; gap:15px; justify-content:center; align-items:center; margin-bottom:25px; background:#f8fafc; padding:20px; border-radius:12px;">
+                <span style="font-weight:bold; color:#666">মাসিক ফিল্টার:</span>
                 <select id="anMonth" class="en" style="width:160px">
                     <option value="0">All Months</option>
                     <option value="1">January</option><option value="2">February</option><option value="3">March</option>
@@ -656,29 +798,29 @@ tr:hover { background-color: #f8fafc; }
                 <select id="anYear" class="en" style="width:110px">
                     <option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option>
                 </select>
-                <button onclick="generateAnalytics()" style="margin:0; width:auto; padding:12px 25px; background: var(--text-main);">হিসাব দেখুন</button>
+                <button onclick="generateAnalytics()" style="margin:0; width:auto; padding:12px 25px; background: var(--text-main);">ফিল্টার করুন</button>
             </div>
 
             <div class="stats en" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
                 <div class="card" style="border-bottom: 4px solid #3b82f6;">
-                    <span>TOTAL SALES</span>
-                    <b id="anaSale">0</b>
+                    <span>ফিল্টার করা সেল</span>
+                    <b id="anaSale">---</b>
                 </div>
                 <div class="card" style="border-bottom: 4px solid #94a3b8;">
-                    <span>PRODUCT COST</span>
-                    <b id="anaCost" style="color:#64748b">0</b>
+                    <span>পণ্যের কেনা খরচ</span>
+                    <b id="anaCost" style="color:#64748b">---</b>
                 </div>
                 <div class="card" style="border-bottom: 4px solid #f59e0b;">
-                    <span>GROSS PROFIT</span>
-                    <b id="anaGross" style="color:#d97706">0</b>
+                    <span>গ্রস প্রফিট (লাভ)</span>
+                    <b id="anaGross" style="color:#d97706">---</b>
                 </div>
                 <div class="card" style="border-bottom: 4px solid #ef4444;">
-                    <span>TOTAL EXPENSE</span>
-                    <b id="anaExpense" style="color:#b91c1c">0</b>
+                    <span>মোট খরচ</span>
+                    <b id="anaExpense" style="color:#b91c1c">---</b>
                 </div>
                 <div class="card" style="border-bottom: 4px solid #10b981; background:#f0fdf4; transform: scale(1.02);">
-                    <span id="netProfitTitle">NET PROFIT</span>
-                    <b id="anaNet" style="font-size: 28px;">0</b>
+                    <span id="netProfitTitle">নিট প্রফিট (আসল লাভ)</span>
+                    <b id="anaNet" style="font-size: 28px;">---</b>
                 </div>
             </div>
 
@@ -812,7 +954,7 @@ tr:hover { background-color: #f8fafc; }
     <input type="hidden" id="qsKey">
     <div class="form-group">
         <label>নতুন স্টক যোগ করুন (Add Qty):</label>
-        <input id="qsAddQty" type="number" class="en" placeholder="Example: 10, 20..." style="font-size:18px; font-weight:bold">
+        <input id="qsAddQty" type="number" class="en" placeholder="Example: 10, 20..." style="font-size:18px; font-weight:bold" onkeydown="if(event.key==='Enter') saveQuickStock()">
     </div>
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px">
         <button onclick="closeModal('quickStockModal')" style="background:#94a3b8">বাতিল</button>
@@ -912,7 +1054,7 @@ tr:hover { background-color: #f8fafc; }
     <button onclick="closeModal('userProfileModal')" style="background:#94a3b8">বন্ধ করুন</button>
 </div>
 
-<!-- ACTIVITY LOG MODAL (ADDED) -->
+<!-- ACTIVITY LOG MODAL -->
 <div id="logModal" class="modal">
     <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center">
         <h3 style="margin:0; color:var(--primary);">📋 অ্যাক্টিভিটি লগ (Admin Only)</h3>
@@ -926,7 +1068,7 @@ tr:hover { background-color: #f8fafc; }
     </div>
 </div>
 
-<!-- ADVANCED SETTINGS MODAL (UPDATED WITH USER MANAGEMENT) -->
+<!-- ADVANCED SETTINGS MODAL -->
 <div id="appSettingsModal" class="modal" style="width:600px">
     <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px; display:flex; justify-content:space-between; align-items:center">
         <h3 style="margin:0; color:var(--text-main);">⚙️ সেটিংস ও কনফিগারেশন</h3>
@@ -947,7 +1089,7 @@ tr:hover { background-color: #f8fafc; }
         <h4 style="margin-bottom:15px; color:var(--text-light)">দোকানের তথ্য (প্রিন্টে দেখাবে)</h4>
         <div class="form-group">
             <label>দোকানের নাম:</label>
-            <input id="shopNameInput" placeholder="Sheikh Photocopy & Stationery">
+            <input id="shopNameInput" placeholder="Sheikh Computer & Stationery">
         </div>
         <div class="form-group">
             <label>ঠিকানা:</label>
@@ -956,7 +1098,7 @@ tr:hover { background-color: #f8fafc; }
         <button onclick="saveShopInfo()" style="width:100%; background:var(--primary)">সেভ করুন</button>
     </div>
 
-    <!-- Tab Content: Users (NEW) -->
+    <!-- Tab Content: Users -->
     <div id="tabUsers" class="settings-tab" style="display:none">
         <h4 style="margin-bottom:15px; color:var(--text-light)">🔐 পাসওয়ার্ড পরিবর্তন</h4>
         <div class="form-group">
@@ -1092,7 +1234,7 @@ tr:hover { background-color: #f8fafc; }
 <!-- MEMO MODAL (PRINT ONLY) -->
 <div id="memoModal" class="modal">
     <div style="text-align:center">
-        <h2 style="margin:0; color:#10b981; font-weight: 800; font-size: 24px;" id="printShopName">শেখ ফটোকপি এন্ড স্টেশনারি</h2>
+        <h2 style="margin:0; color:#10b981; font-weight: 800; font-size: 24px;" id="printShopName">শেখ কম্পিউটার এন্ড স্টেশনারি</h2>
         <p class="address" style="margin:5px 0 0 0; color:#555; font-size: 13px;" id="printShopAddress">কাশিয়ানী উপজেলা পরিষদের সামনে, কাশিয়ানী, গোপালগঞ্জ।</p>
     </div>
     <div class="memo-meta en" style="margin-top:20px; font-size: 13px;">
@@ -1206,7 +1348,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// --- HELPER: SAFE TEXT SETTER (PREVENTS CRASHES) ---
+// --- HELPER: SAFE TEXT SETTER ---
 function setText(id, val) {
     const el = document.getElementById(id);
     if (el) el.innerText = val;
@@ -1217,7 +1359,7 @@ function setHTML(id, val) {
     if (el) el.innerHTML = val;
 }
 
-// --- SOUND EFFECTS (Optimized) ---
+// --- SOUND EFFECTS ---
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(type) {
@@ -1271,6 +1413,11 @@ let customerStats = [];
 let selectedReturnEntry = null; 
 let appSections = ["General", "Computer", "Photocopy"]; 
 let appExpCats = ["Shop Rent", "Electricity", "Transport", "Food", "Other"]; 
+
+// --- LOADING OPTIMIZATION VARIABLES ---
+let fullHistoryListener = null;
+let recentHistoryListener = null;
+let isFullHistoryLoaded = false;
 
 // --- PAGINATION VARIABLES ---
 let currentReportPage = 1;
@@ -1344,17 +1491,15 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// --- AUTHENTICATION (UPDATED) ---
+// --- AUTHENTICATION ---
 function checkFirstTimeSetup() {
     db.ref("users").once("value", snap => {
         if(!snap.exists()) {
-            // Create default users
             db.ref("users").set({
                 admin: { pass: "123", role: "admin" },
                 owner: { pass: "456", role: "owner" },
                 roky: { pass: "789", role: "staff" }
             });
-            console.log("Default users created.");
         }
     });
 }
@@ -1385,18 +1530,16 @@ function setupUser(u) {
     currentUser = u; 
     document.getElementById("loginDiv").style.display = "none"; 
     document.getElementById("container").style.display = "block";
-    document.getElementById("header").style.display = "block"; 
-    document.getElementById("menuBtn").style.display = "block";
+    document.getElementById("header").style.display = "flex"; 
+    document.getElementById("menuBtn").style.display = "flex";
     document.getElementById("profileBtn").style.display = "flex"; 
     
-    // Get Role
     db.ref("users/" + u + "/role").once("value", snap => {
         const role = snap.val() || "staff";
         const roleName = role === 'admin' ? 'অ্যাডমিন' : (role === 'owner' ? 'মালিক' : 'সেনাপতি');
         setHTML("userShow", `স্বাগতম, <b style="text-transform:uppercase; color:#fff">${u}</b> (${roleName})`);
         setText("modalProfileRole", roleName);
         
-        // Show Log Button only for Admin/Owner
         if(u === 'admin' || u === 'owner') {
             document.getElementById("logBtn").style.display = "block";
         }
@@ -1407,10 +1550,10 @@ function setupUser(u) {
     setText("modalProfileInit", u.charAt(0).toUpperCase());
     
     loadAllProducts(); 
-    loadEntries(); 
+    loadEntries(); // Loads only recent 100
     loadAllCustomers();
     loadExpenses();
-    setupChat(); // Initialize Chat
+    setupChat(); 
     showSection('dashboard');
     setupLiveSearch();
 }
@@ -1453,7 +1596,7 @@ function openProfileModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- ACTIVITY LOG (NEW) ---
+// --- ACTIVITY LOG ---
 function logActivity(action, details) {
     const log = {
         time: new Date().toLocaleString(),
@@ -1480,32 +1623,105 @@ function openLogModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- CHAT SYSTEM (NEW) ---
+// --- CHAT SYSTEM ---
+let editingMsgKey = null;
+
 function setupChat() {
-    db.ref("messages").limitToLast(20).on("value", s => {
+    db.ref("messages").limitToLast(50).on("value", s => {
         const div = document.getElementById("msgList");
         div.innerHTML = "";
+        
+        let lastDate = "";
         let unread = false;
+        
         s.forEach(c => {
             const m = c.val();
-            // Filter: Show if public (all), or sent by me, or sent to me
+            const key = c.key;
+            
             if(m.target === 'all' || m.sender === currentUser || m.target === currentUser) {
+                const hiddenKey = "hidden_msg_" + key;
+                if(localStorage.getItem(hiddenKey)) return;
+
                 const isMe = m.sender === currentUser;
+                const isAdmin = (currentUser === 'admin'); 
+                
+                const msgDate = m.fullDate || "Today"; 
+                if(msgDate !== lastDate) {
+                    let displayDate = msgDate;
+                    const today = new Date().toLocaleDateString("en-GB");
+                    const y = new Date(); y.setDate(y.getDate() - 1);
+                    const yesterday = y.toLocaleDateString("en-GB");
+
+                    if(msgDate === today) displayDate = "Today";
+                    else if(msgDate === yesterday) displayDate = "Yesterday";
+
+                    div.innerHTML += `<div class="chat-date">${displayDate}</div>`;
+                    lastDate = msgDate;
+                }
+
                 div.innerHTML += `
-                <div class="msg ${isMe ? 'me' : 'other'}">
-                    ${!isMe ? `<b style="font-size:11px; color:#666">${m.sender.toUpperCase()} ${m.target!=='all'?'(Private)':''}</b><br>` : ''}
-                    ${m.text}
-                    <span class="msg-meta">${m.time}</span>
+                <div class="msg-row ${isMe ? 'me' : 'other'}" onmouseleave="hideMsgMenu('${key}')">
+                    ${isMe ? `
+                        <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')">⋮</div>
+                        <div id="menu_${key}" class="msg-menu">
+                            <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
+                            <div class="msg-menu-item del" onclick="deleteMsg('${key}', true)">🗑️ Delete</div>
+                        </div>
+                    ` : ''}
+                    <div class="msg ${isMe ? 'me' : 'other'}">
+                        ${!isMe ? `<span class="sender-name">${m.sender.toUpperCase()}</span>` : ''}
+                        ${m.text}
+                        <span class="msg-meta">${m.time} ${m.edited ? '(edited)' : ''}</span>
+                        ${!isMe && isAdmin ? `
+                            <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')" style="color:#999">⋮</div>
+                            <div id="menu_${key}" class="msg-menu" style="right:5px; top:25px;">
+                                <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
+                                <div class="msg-menu-item del" onclick="deleteMsg('${key}', true)">🗑️ Delete</div>
+                            </div>
+                        ` : ''}
+                    </div>
                 </div>`;
+                
                 if(!isMe) unread = true;
             }
         });
+        
         div.scrollTop = div.scrollHeight;
         if(unread && document.getElementById("chatBox").style.display === "none") {
             document.getElementById("chatBadge").style.display = "block";
         }
     });
     updateChatTargets();
+}
+
+function sendMsg() {
+    const txtInput = document.getElementById("msgInput");
+    const txt = txtInput.value.trim();
+    const target = document.getElementById("msgTarget").value;
+    
+    if(!txt) return;
+
+    if(editingMsgKey) {
+        db.ref("messages/" + editingMsgKey).update({
+            text: txt,
+            edited: true
+        }).then(() => {
+            editingMsgKey = null;
+            txtInput.value = "";
+            txtInput.placeholder = "Type message...";
+            document.getElementById("sendBtnIcon").innerText = "➤"; 
+        });
+    } else {
+        const now = new Date();
+        db.ref("messages").push({
+            sender: currentUser,
+            target: target,
+            text: txt,
+            time: now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+            fullDate: now.toLocaleDateString("en-GB") 
+        });
+        txtInput.value = "";
+    }
 }
 
 function updateChatTargets() {
@@ -1515,20 +1731,6 @@ function updateChatTargets() {
         if(t !== currentUser) html += `<option value="${t}">${t.toUpperCase()}</option>`;
     });
     document.getElementById('msgTarget').innerHTML = html;
-}
-
-function sendMsg() {
-    const txt = document.getElementById("msgInput").value.trim();
-    const target = document.getElementById("msgTarget").value;
-    if(!txt) return;
-    
-    db.ref("messages").push({
-        sender: currentUser,
-        target: target,
-        text: txt,
-        time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
-    });
-    document.getElementById("msgInput").value = "";
 }
 
 function toggleChat() {
@@ -1541,6 +1743,38 @@ function toggleChat() {
     }
 }
 
+function toggleMsgMenu(key) {
+    const menu = document.getElementById("menu_" + key);
+    document.querySelectorAll('.msg-menu').forEach(m => {
+        if(m.id !== "menu_" + key) m.style.display = 'none';
+    });
+    if(menu.style.display === "block") {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+    }
+}
+
+function hideMsgMenu(key) {
+    const menu = document.getElementById("menu_" + key);
+    if(menu) menu.style.display = 'none';
+}
+
+function deleteMsg(key, isGlobal) {
+    if(confirm("মেসেজটি ডিলিট করতে চান?")) {
+        db.ref("messages/" + key).remove();
+    }
+}
+
+function editMsg(key, oldText) {
+    const input = document.getElementById("msgInput");
+    input.value = oldText;
+    input.focus();
+    editingMsgKey = key;
+    input.placeholder = "Editing message...";
+    document.getElementById("sendBtnIcon").innerText = "✓";
+}
+
 // --- ADVANCED SETTINGS LOGIC ---
 function openSettingsModal() {
     closeProfile();
@@ -1548,20 +1782,18 @@ function openSettingsModal() {
     document.getElementById("overlay").style.display = "block";
     switchTab('tabGeneral');
     
-    // Load Shop Info
     db.ref("settings/shopInfo").once("value", snap => {
         const info = snap.val() || {};
-        document.getElementById("shopNameInput").value = info.name || "Sheikh Photocopy & Stationery";
+        document.getElementById("shopNameInput").value = info.name || "Sheikh Computer & Stationery";
         document.getElementById("shopAddressInput").value = info.address || "Kashiani, Gopalganj";
     });
 
-    // Load Memo Counter
     db.ref("settings/memoCounter").once("value", snap => {
         document.getElementById("memoCounterInput").value = snap.val() || 1000;
     });
     
     renderSettingsLists();
-    loadUserManagement(); // NEW: Load users
+    loadUserManagement(); 
 }
 
 function switchTab(tabId) {
@@ -1569,7 +1801,6 @@ function switchTab(tabId) {
     document.getElementById(tabId).style.display = 'block';
 }
 
-// --- USER MANAGEMENT LOGIC (NEW) ---
 function changeOwnPassword() {
     const newPass = document.getElementById("newPassInput").value.trim();
     if(!newPass) return showToast("নতুন পাসওয়ার্ড দিন", "error");
@@ -1585,7 +1816,6 @@ function loadUserManagement() {
         document.getElementById("adminUserPanel").style.display = "none";
         return;
     }
-    
     document.getElementById("adminUserPanel").style.display = "block";
     const tbody = document.getElementById("userListBody");
     
@@ -1594,10 +1824,7 @@ function loadUserManagement() {
         snap.forEach(child => {
             const u = child.key;
             const data = child.val();
-            
-            // Don't show admin's own password to avoid accidental change, or show it if needed
             const passDisplay = (u === 'admin') ? '******' : data.pass;
-            
             tbody.innerHTML += `
             <tr>
                 <td style="text-transform:uppercase; font-weight:bold">${u}</td>
@@ -1639,7 +1866,7 @@ function saveMemoCounter() {
 function loadShopSettings() {
     db.ref("settings/shopInfo").on("value", snap => {
         const info = snap.val() || {};
-        const name = info.name || "Sheikh Photocopy & Stationery";
+        const name = info.name || "Sheikh Computer & Stationery";
         const addr = info.address || "Kashiani, Gopalganj";
         setText("printShopName", name);
         setText("printShopAddress", addr);
@@ -1648,7 +1875,6 @@ function loadShopSettings() {
     });
 }
 
-// --- DYNAMIC SECTIONS & EXPENSE CATS ---
 function loadDynamicSettings() {
     db.ref("settings/sections").on("value", snap => {
         if(snap.exists()) appSections = snap.val();
@@ -1664,14 +1890,17 @@ function loadDynamicSettings() {
 function updateSectionDropdowns() {
     const sel = document.getElementById("sectionSelect");
     const stSel = document.getElementById("stMainType");
-    let html = '<option value="">সিলেক্ট করুন...</option>';
+    let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
+    let count = 0;
     appSections.forEach(s => {
         html += `<option value="${s}">${s}</option>`;
+        count++;
     });
+    if(count === 0) html = '<option value="" disabled>কোনো সেকশন পাওয়া যায়নি</option>';
+    
     sel.innerHTML = html;
     stSel.innerHTML = html;
     
-    // Update Dashboard Section Summary
     const container = document.getElementById("sectionSummaryContainer");
     container.innerHTML = "";
     appSections.forEach(s => {
@@ -1774,32 +2003,49 @@ function updateCategories() {
     const section = document.getElementById("sectionSelect").value;
     const catSelect = document.getElementById("categorySelect");
     const prodSelect = document.getElementById("productSelect");
-    catSelect.innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
-    prodSelect.innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
-    if(!section) {
-        catSelect.innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
-        return;
-    }
+    
+    catSelect.innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+    prodSelect.innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
+    
+    if(!section) return;
+
     const filtered = allProducts.filter(p => p.mainType === section);
     const uniqueCategories = [...new Set(filtered.map(p => p.category))].filter(Boolean).sort();
+    
+    let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
+    let count = 0;
     uniqueCategories.forEach(c => {
-        catSelect.innerHTML += `<option value="${c}">${c}</option>`;
+        html += `<option value="${c}">${c}</option>`;
+        count++;
     });
+    
+    if(count === 0) html = '<option value="" disabled>কোনো ক্যাটাগরি পাওয়া যায়নি</option>';
+    catSelect.innerHTML = html;
 }
 
 function loadProductsByCategory() {
     const selectedCat = document.getElementById("categorySelect").value;
     const selectedSection = document.getElementById("sectionSelect").value;
     const prodSelect = document.getElementById("productSelect");
-    prodSelect.innerHTML = '<option value="">পণ্য সিলেক্ট করুন...</option>';
+    
+    prodSelect.innerHTML = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+    
     if (!selectedCat) {
-        prodSelect.innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
+        prodSelect.innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
         return;
     }
+    
     const filteredProducts = allProducts.filter(p => p.category === selectedCat && p.mainType === selectedSection);
+    
+    let html = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+    let count = 0;
     filteredProducts.forEach(p => {
-        prodSelect.innerHTML += `<option value="${p.key}">${p.name} (স্টক: ${p.isService ? 'Service' : p.qty})</option>`;
+        html += `<option value="${p.key}">${p.name} (স্টক: ${p.isService ? 'Service' : p.qty})</option>`;
+        count++;
     });
+    
+    if(count === 0) html = '<option value="" disabled>কোনো পণ্য পাওয়া যায়নি</option>';
+    prodSelect.innerHTML = html;
 }
 
 function productSelectedFromDropdown() {
@@ -1923,11 +2169,11 @@ function checkGlobalStockStatus() {
     
     if (zeroStock.length > 0) {
         alertBtn.style.display = "flex";
-        alertBtn.className = "critical"; // Red Pulse
+        alertBtn.className = "critical"; 
         alertText.innerText = `❌ ${zeroStock.length} EMPTY | ⚠️ ${lowStock.length} LOW`;
     } else if (lowStock.length > 0) {
         alertBtn.style.display = "flex";
-        alertBtn.className = ""; // Normal Pulse
+        alertBtn.className = ""; 
         alertText.innerText = `⚠️ ${lowStock.length} Low Stock`;
     } else {
         alertBtn.style.display = "none";
@@ -1951,7 +2197,6 @@ function showShortageModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- QUICK STOCK ADD LOGIC ---
 function openQuickStockModal(key, name, currentQty) {
     document.getElementById("qsKey").value = key;
     document.getElementById("qsName").innerText = name;
@@ -1966,10 +2211,11 @@ function saveQuickStock() {
     const key = document.getElementById("qsKey").value;
     const addQty = parseFloat(document.getElementById("qsAddQty").value);
     if(!addQty || addQty <= 0) return showToast("সঠিক পরিমাণ দিন!", "error");
-    const product = allProducts.find(p => p.key === key);
-    if(!product) return;
-    const newTotal = parseFloat(product.qty) + addQty;
-    db.ref("products/" + key).update({ qty: newTotal }).then(() => {
+    
+    // Use Transaction for Safety
+    db.ref("products/" + key + "/qty").transaction((currentQty) => {
+        return (currentQty || 0) + addQty;
+    }).then(() => {
         showToast("স্টক আপডেট হয়েছে! এখন বিক্রি করতে পারেন।", "success");
         closeModal("quickStockModal");
         checkStockLive();
@@ -2057,7 +2303,6 @@ function updateStockTable() {
     });
 }
 
-// --- PRODUCT EDIT LOGIC ---
 function openProductEdit(key) {
     const p = allProducts.find(x => x.key === key);
     if(!p) return;
@@ -2154,16 +2399,8 @@ function addToCart(){
         const totalReq = currentCartQty + q;
         if(product.qty <= 0 || totalReq > product.qty) {
             playSound('error');
-            if(currentCartQty > 0) {
-                showToast(`❌ কার্টে ইতিমধ্যে ${currentCartQty}টি আছে। স্টকে আছে ${product.qty}টি।`, "error");
-            } else {
-                // Specific Error for 0 Stock
-                if(product.qty <= 0) {
-                    showToast("❌ পণ্যটি স্টকে নেই! (Stock is 0)", "error");
-                } else {
-                    openQuickStockModal(product.key, product.name, product.qty);
-                }
-            }
+            showToast(`⚠️ স্টক নেই! প্রয়োজন: ${totalReq}, আছে: ${product.qty}। স্টক যুক্ত করুন।`, "warning");
+            openQuickStockModal(product.key, product.name, product.qty); 
             return; 
         }
         if((product.qty - totalReq) <= (product.alertLevel || 5)) {
@@ -2190,8 +2427,8 @@ function addToCart(){
     renderCart(); 
     document.getElementById("selectedProductKey").value = "";
     document.getElementById("sectionSelect").value = "";
-    document.getElementById("categorySelect").innerHTML = '<option value="">আগে বিভাগ সিলেক্ট করুন</option>';
-    document.getElementById("productSelect").innerHTML = '<option value="">আগে ক্যাটাগরি সিলেক্ট করুন</option>';
+    document.getElementById("categorySelect").innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+    document.getElementById("productSelect").innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     document.getElementById("rate").value = "";
     document.getElementById("qty").value = 1;
     document.getElementById("stockLiveMsg").style.display = "none";
@@ -2240,13 +2477,13 @@ function calcDue(){
         dueLabel.style.color = "#10b981";
         dueInput.style.color = "#10b981";
         dueInput.style.background = "#f0fdf4";
-        dueInput.value = Math.abs(diff);
+        dueInput.value = Math.abs(diff).toFixed(2);
     } else {
         dueLabel.innerText = "বাকি (Due):";
         dueLabel.style.color = "#ef4444";
         dueInput.style.color = "#ef4444";
         dueInput.style.background = "#fef2f2";
-        dueInput.value = diff;
+        dueInput.value = diff.toFixed(2);
     }
 }
 
@@ -2285,13 +2522,16 @@ function deductStock(cartItems) {
     cartItems.forEach(cItem => {
         const product = allProducts.find(p => p.key === cItem.key);
         if(product && !product.isService) {
-            const newQty = parseFloat(product.qty) - parseFloat(cItem.qty);
-            db.ref("products/" + cItem.key).update({ qty: newQty });
+            // Use Transaction to prevent race conditions
+            db.ref("products/" + cItem.key + "/qty").transaction((currentQty) => {
+                if (currentQty === null) return 0; // Handle if product deleted
+                return currentQty - parseFloat(cItem.qty);
+            });
         }
     });
 }
 
-// --- NEW: HOLD & RECALL LOGIC ---
+// --- HOLD & RECALL LOGIC ---
 function holdOrder() {
     if(cart.length === 0) return showToast("কার্ট খালি!", "error");
     const note = document.getElementById("note").value || "Unknown";
@@ -2391,6 +2631,10 @@ function saveBulkEntry(showMemoFlag){
         const isoDate = now.toISOString().split('T')[0];
         let actualDue = totalVal - takenVal;
         if(actualDue < 0) actualDue = 0;
+        
+        // Fix Floating Point
+        actualDue = parseFloat(actualDue.toFixed(2));
+
         const entryData = {
             date: now.toLocaleDateString("en-GB"), 
             isoDate: isoDate, 
@@ -2483,9 +2727,6 @@ function loadExpenses() {
             </tr>`;
         });
         setText("totalExpenseDisplay", totalExp);
-        if(document.getElementById("analytics").style.display === "block") {
-            generateAnalytics();
-        }
     });
 }
 
@@ -2496,8 +2737,31 @@ function deleteExpense(key) {
     }
 }
 
-// --- ANALYTICS ---
+// --- ANALYTICS (OPTIMIZED) ---
 function generateAnalytics() {
+    if(!isFullHistoryLoaded) {
+        showToast("⚠️ সঠিক হিসাবের জন্য আগে 'Load Full History' বাটনে ক্লিক করুন!", "warning");
+        return;
+    }
+
+    showToast("অ্যানালিটিক্স জেনারেট হচ্ছে...", "success");
+
+    // --- PART 1: LIFETIME STATS ---
+    let lifeSale = 0;
+    let lifeDue = 0;
+    let lifeCash = 0;
+
+    allEntries.forEach(e => {
+        lifeSale += parseFloat(e.total) || 0;
+        lifeCash += parseFloat(e.taken) || 0;
+        lifeDue += parseFloat(e.loss) || 0;
+    });
+
+    setText("lifeSale", lifeSale.toLocaleString());
+    setText("lifeDue", lifeDue.toLocaleString());
+    setText("lifeCash", lifeCash.toLocaleString());
+
+    // --- PART 2: MONTHLY FILTERED STATS ---
     const month = parseInt(document.getElementById("anMonth").value);
     const year = parseInt(document.getElementById("anYear").value);
     let totalSale = 0;
@@ -2654,7 +2918,6 @@ function showMemo(e){
     document.getElementById("overlay").style.display="block";
 }
 
-// --- NEW VIEW DETAILS LOGIC ---
 function viewMemo(key){
     const entry = allEntries.find(e => e.key === key);
     if(!entry) return showToast("তথ্য পাওয়া যায়নি!", "error");
@@ -2747,7 +3010,10 @@ function deleteFromEdit() {
             if(entry.items) entry.items.forEach(i => {
                 if(!i.isService) {
                      const p = allProducts.find(x => x.key === i.key);
-                     if(p) db.ref("products/"+i.key).update({qty: (parseFloat(p.qty)||0) + parseFloat(i.qty)});
+                     if(p) {
+                         // Restore Stock using Transaction
+                         db.ref("products/"+i.key+"/qty").transaction(current => (current||0) + parseFloat(i.qty));
+                     }
                 }
             });
             db.ref("entries/"+key).remove();
@@ -2758,9 +3024,12 @@ function deleteFromEdit() {
     }
 }
 
-// --- REPORTING CORE ---
+// --- REPORTING CORE (OPTIMIZED) ---
 function loadEntries(){ 
-    db.ref("entries").on("value", s => {
+    // Load only last 100 entries for fast startup
+    recentHistoryListener = db.ref("entries").limitToLast(100).on("value", s => {
+        if(isFullHistoryLoaded) return; // Don't overwrite if full history is active
+        
         const val = s.val();
         allEntries = [];
         if(val) {
@@ -2769,14 +3038,67 @@ function loadEntries(){
                  allEntries.push(e);
              });
         }
-        const recent = allEntries.slice(-50).reverse();
+        // Sort for display
+        const recent = allEntries.slice().reverse();
         renderTable(recent, "tableBody");
-        generateAnalytics();
         updateUserSummary();
         updateSectionSummary();
         renderChart();
         loadCustomerManager(); 
     }); 
+}
+
+function toggleFullHistory(load) {
+    const statusEl = document.getElementById("historyStatus");
+    
+    if(load) {
+        if(isFullHistoryLoaded) return showToast("ইতিমধ্যে সব ডাটা লোড করা আছে!", "success");
+        
+        showToast("সব ডাটা লোড হচ্ছে... অপেক্ষা করুন", "warning");
+        
+        // Detach recent listener to avoid conflict
+        if(recentHistoryListener) db.ref("entries").off("value", recentHistoryListener);
+        
+        fullHistoryListener = db.ref("entries").on("value", s => {
+            const val = s.val();
+            allEntries = [];
+            if(val) {
+                 Object.keys(val).forEach(k => {
+                     let e = val[k]; e.key = k;
+                     allEntries.push(e);
+                 });
+            }
+            isFullHistoryLoaded = true;
+            statusEl.style.display = "block";
+            showToast("✅ সব ডাটা লোড সম্পন্ন!", "success");
+            
+            // Refresh all views with full data
+            renderTable(allEntries.slice().reverse().slice(0, 100), "tableBody"); // Show recent 100 in dashboard
+            updateUserSummary();
+            updateSectionSummary();
+            renderChart();
+            loadCustomerManager();
+            generateAnalytics(); // Auto generate analytics now
+        });
+    } else {
+        // Unload
+        if(!isFullHistoryLoaded) return;
+        
+        if(fullHistoryListener) db.ref("entries").off("value", fullHistoryListener);
+        isFullHistoryLoaded = false;
+        statusEl.style.display = "none";
+        allEntries = []; // Clear memory
+        
+        showToast("মেমোরি ক্লিয়ার করা হয়েছে!", "success");
+        loadEntries(); // Reload only recent 100
+        
+        // Reset Analytics Display
+        setText("lifeSale", "---");
+        setText("lifeDue", "---");
+        setText("lifeCash", "---");
+        setText("anaSale", "---");
+        setText("anaNet", "---");
+    }
 }
 
 function updateSectionSummary() {
@@ -2803,6 +3125,12 @@ function updateSectionSummary() {
 }
 
 function loadReportData() {
+    if(!isFullHistoryLoaded) {
+        if(confirm("পুরো রিপোর্ট দেখার জন্য সব ডাটা লোড করতে হবে। লোড করবেন?")) {
+            toggleFullHistory(true);
+        }
+        return;
+    }
     currentReportPage = 1;
     renderReportWithPagination();
 }
@@ -2831,11 +3159,8 @@ function renderTable(data, tableId){
     const tbody = document.getElementById(tableId);
     tbody.innerHTML=""; 
     if(!data || data.length === 0) { tbody.innerHTML = "<tr><td colspan='9' style='text-align:center'>কোনো ডাটা নেই</td></tr>"; return; }
-    let totalSales=0, totalTaken=0, totalDue=0;
+    
     data.forEach(e => {
-        totalSales += +e.total || 0; 
-        totalTaken += +e.taken || 0; 
-        totalDue += +e.loss || 0;
         const itemSummary = (e.items && Array.isArray(e.items)) 
             ? e.items.map(i => `<span style="background:#f1f1f1;padding:2px 5px;border-radius:4px;font-size:12px">${i.work}</span>`).join(" ") 
             : e.work;
@@ -2856,15 +3181,13 @@ function renderTable(data, tableId){
             <td class="noPrint" style="white-space:nowrap">${btnView}${btnEdit}${btnPrint}</td>
         </tr>`;
     });
-    if(tableId === "tableBody") { 
-        setText("cCount", allEntries.length); 
-        setText("cTotal", totalSales); 
-        setText("cTaken", totalTaken); 
-        setText("cDue", totalDue); 
-    }
 }
 
 function searchByDateRange() {
+    if(!isFullHistoryLoaded) {
+        alert("তারিখ অনুযায়ী খুঁজতে হলে আগে 'Load Full History' বাটনে ক্লিক করুন।");
+        return;
+    }
     const fromDate = document.getElementById("rFromDate").value;
     const toDate = document.getElementById("rToDate").value;
     if(!fromDate || !toDate) return showToast("দুটি তারিখই সিলেক্ট করুন", "error");
@@ -3235,11 +3558,8 @@ function processSmartReturn() {
                     isService: item.isService
                 });
                 if(!item.isService && item.key) {
-                    const product = allProducts.find(p => p.key === item.key);
-                    if(product) {
-                        const newStock = parseFloat(product.qty) + rQty;
-                        db.ref("products/" + item.key).update({ qty: newStock });
-                    }
+                    // Restore Stock using Transaction
+                    db.ref("products/" + item.key + "/qty").transaction(current => (current||0) + rQty);
                 }
                 totalRefund += (rQty * item.rate);
             }
@@ -3307,7 +3627,7 @@ function backupFullData() {
     const fullBackup = {
         meta: {
             app: "Sheikh Photocopy PRO",
-            version: "4.0.1",
+            version: "5.1",
             backupDate: new Date().toLocaleString(),
             exportedBy: currentUser
         },
@@ -3396,8 +3716,14 @@ function downloadExcel(type) {
 function showSection(id){ 
     document.querySelectorAll('.section').forEach(s=>s.style.display="none"); 
     document.getElementById(id).style.display="block"; 
-    closeSidebar(); 
-    if(id === 'analytics') generateAnalytics();
+    
+    document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
+    const navId = 'nav-' + id;
+    const activeLink = document.getElementById(navId);
+    if(activeLink) activeLink.classList.add('active');
+
+    if(window.innerWidth <= 1024) closeSidebar(); 
+    
     if(id === 'customerManager') loadCustomerManager();
 }
 function closeSidebar(){ document.getElementById("sidebar").style.left="-300px"; document.getElementById("overlay").style.display="none"; }
@@ -3415,13 +3741,50 @@ function loadAllCustomers() {
         allCustomers = []; 
         s.forEach(c => {
             let cust = c.val();
-            cust.key = c.key; // Save DB key
+            cust.key = c.key; 
             allCustomers.push(cust);
         }); 
         if(document.getElementById("customerManager").style.display === "block") {
             loadCustomerManager();
         }
     }); 
+}
+
+function loadDashboardStats() {
+    if(!allEntries || allEntries.length === 0) {
+        showToast("ডাটা লোড হচ্ছে, একটু অপেক্ষা করুন...", "warning");
+        return;
+    }
+
+    showToast("আজকের হিসাব ক্যালকুলেট করা হচ্ছে...", "success");
+
+    const today = new Date().toLocaleDateString("en-GB");
+    let totalSales = 0;
+    let totalTaken = 0;
+    let totalDue = 0;
+    let count = 0;
+
+    allEntries.forEach(e => {
+        if(e.date === today) {
+            totalSales += parseFloat(e.total) || 0;
+            totalTaken += parseFloat(e.taken) || 0;
+            totalDue += parseFloat(e.loss) || 0;
+            count++;
+        }
+    });
+
+    setText("cCount", count);
+    setText("cTotal", totalSales.toLocaleString());
+    setText("cTaken", totalTaken.toLocaleString());
+    setText("cDue", totalDue.toLocaleString());
+
+    setTimeout(() => {
+        setText("cCount", "---");
+        setText("cTotal", "---");
+        setText("cTaken", "---");
+        setText("cDue", "---");
+        showToast("হিসাব হাইড করা হয়েছে (Security)", "warning");
+    }, 10000); 
 }
 
 window.onbeforeunload = function() {
