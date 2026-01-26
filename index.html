@@ -453,7 +453,7 @@ tr:hover { background-color: #f8fafc; }
 <div id="loginDiv">
     <div class="login-card">
         <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
-        <p class="login-subtitle">v5.2 (Optimized) | ২৬-০১-২০২৬</p>
+        <p class="login-subtitle">v5.3 (Optimized) | ২৬-০১-২০২৬</p>
         <div class="login-form-group">
             <label class="login-label">👤 ইউজারনেম</label>
             <input id="uName" class="login-input" placeholder="ইউজারনেম">
@@ -492,7 +492,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v5.2 (Optimized)</div>
+                <div class="footer-val en">v5.3 (Optimized)</div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -1377,6 +1377,11 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// --- OFFLINE PERSISTENCE (NEW) ---
+db.setPersistenceEnabled(true).catch(function(err) {
+    console.error("Persistence failed", err);
+});
+
 // --- KEYBOARD SHORTCUTS (NEW) ---
 window.addEventListener('keydown', function(e) {
     // F1: Dashboard
@@ -1387,7 +1392,7 @@ window.addEventListener('keydown', function(e) {
     if (e.key === 'F4') {
         e.preventDefault();
         showSection('newEntry');
-        document.getElementById('searchSerial').focus();
+        setTimeout(() => document.getElementById('searchSerial').focus(), 100);
     }
     // Alt + C: Cash Deposit
     if (e.altKey && e.key.toLowerCase() === 'c') { e.preventDefault(); openMyCashModal(); }
@@ -1693,7 +1698,7 @@ function saveCashDeposit() {
     db.ref("cash_deposits").push(depositData).then(() => {
         showToast("ক্যাশ জমার তথ্য সেভ হয়েছে!", "success");
         logActivity("Cash Deposit", `${currentUser} deposited ৳${amount} to ${target}`);
-        closeModal('myCashModal');
+        closeAllModals();
 
         db.ref("messages").push({
             sender: "SYSTEM",
@@ -3736,7 +3741,7 @@ function backupFullData() {
     const fullBackup = {
         meta: {
             app: "Sheikh Photocopy PRO",
-            version: "5.2",
+            version: "5.3",
             backupDate: new Date().toLocaleString(),
             exportedBy: currentUser
         },
