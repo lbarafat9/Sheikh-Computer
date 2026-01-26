@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Computer PRO</title>
+<title>Sheikh Computer PRO v5.6</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- EXCEL & CSV LIBRARY (SheetJS) -->
@@ -334,11 +334,11 @@ tr:hover { background-color: #f8fafc; }
 
 /* --- PRINT SETTINGS --- */
 @media print {
-    @page { size: A5 portrait; margin: 0; }
+    @page { size: auto; margin: 0mm; }
     html, body { width: 100%; height: 100%; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #fff !important; }
     body * { visibility: hidden; }
     #memoModal, #memoModal * { visibility: visible !important; }
-    #memoModal { display: block !important; position: absolute; left: 0; top: 0; width: 100% !important; max-width: 100% !important; height: auto !important; margin: 0 !important; padding: 10mm !important; transform: none !important; box-shadow: none !important; border: none !important; background: transparent !important; }
+    #memoModal { display: block !important; position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; max-width: 100% !important; height: auto !important; margin: 0 !important; padding: 5mm !important; transform: none !important; box-shadow: none !important; border: none !important; background: transparent !important; }
     #memoModal table { width: 100% !important; border-collapse: collapse; }
     .noPrint { display: none !important; }
 }
@@ -380,26 +380,55 @@ tr:hover { background-color: #f8fafc; }
 .msg-meta { font-size: 9px; opacity: 0.7; display: block; margin-top: 4px; text-align: right; }
 .sender-name { font-size: 10px; color: #64748b; margin-bottom: 2px; display: block; font-weight: bold; }
 
-/* Three Dot Menu Button */
+/* Three Dot Menu Button (FIXED VISIBILITY) */
 .msg-opt-btn {
-    position: absolute; top: 5px; right: 5px;
-    cursor: pointer; font-size: 14px; color: inherit; opacity: 0.6; transition: 0.2s;
+    position: relative;
+    top: -5px;
+    cursor: pointer;
+    font-size: 18px;
+    color: #94a3b8;
+    opacity: 0.5;
+    transition: 0.2s;
     line-height: 1;
+    padding: 0 5px;
 }
-.msg-opt-btn:hover { opacity: 1; font-weight: bold; transform: scale(1.1); }
+.msg-row:hover .msg-opt-btn { opacity: 1; color: #333; }
+.msg-row.me .msg-opt-btn { color: #cbd5e1; }
+.msg-row.me:hover .msg-opt-btn { color: #64748b; }
 
-/* Dropdown Menu */
-.msg-menu {
+/* NEW MODERN MENU STYLE (Screenshot Look) */
+.msg-menu-modern {
     position: absolute;
-    background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.25);
-    z-index: 1500; display: none; overflow: hidden; width: 100px;
-    top: 25px; right: 10px;
+    background: rgba(30, 30, 30, 0.95); /* Dark Glassy Background */
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 1500;
+    display: none;
+    overflow: hidden;
+    width: 140px;
+    top: 25px;
+    right: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    animation: fadeInMenu 0.2s ease-out;
 }
-.msg-menu-item { padding: 10px 12px; font-size: 12px; color: #333; cursor: pointer; transition: 0.2s; text-align: center; font-weight: bold; border-bottom: 1px solid #f1f5f9; }
+@keyframes fadeInMenu { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+.msg-menu-item {
+    padding: 12px 15px;
+    font-size: 13px;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
 .msg-menu-item:last-child { border-bottom: none; }
-.msg-menu-item:hover { background: #f8fafc; color: var(--primary); }
-.msg-menu-item.del:hover { background: #fee2e2; color: #ef4444; }
+.msg-menu-item:hover { background: rgba(255,255,255,0.1); }
+.msg-menu-item.del { color: #ff6b6b; }
+.msg-menu-item.del:hover { background: rgba(239, 68, 68, 0.2); }
 
 .chat-footer { padding: 10px; background: #fff; border-top: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 5px; }
 
@@ -412,6 +441,9 @@ tr:hover { background-color: #f8fafc; }
 
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+
+<!-- NOTIFICATION SOUND -->
+<audio id="chatSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
 <header id="header">Sheikh Computer PRO</header>
 <div id="menuBtn" onclick="openSidebar()">☰</div>
@@ -464,7 +496,7 @@ tr:hover { background-color: #f8fafc; }
 <div id="loginDiv">
     <div class="login-card">
         <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
-        <p class="login-subtitle">v5.3.0 (Optimized) | ২৬-০১-২০২৬</p>
+        <p class="login-subtitle">v5.6.0 (Chat Fixed) | ২৬-০১-২০২৬</p>
         <div class="login-form-group">
             <label class="login-label">👤 ইউজারনেম</label>
             <input id="uName" class="login-input" placeholder="ইউজারনেম">
@@ -503,7 +535,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v5.3.0 | ২৬-০১-২০২৬ </div>
+                <div class="footer-val en">v5.6.0 | ২৬-০১-২০২৬ </div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -670,9 +702,21 @@ tr:hover { background-color: #f8fafc; }
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>🔍 কাস্টমার খুঁজুন (নাম বা মোবাইল):</label>
-                <input id="custSearch" placeholder="Search..." class="en" oninput="filterCustomerTable()" style="padding: 14px;">
+            <div style="display:flex; gap:15px; margin-bottom:20px">
+                <div class="form-group" style="flex:2">
+                    <label>🔍 কাস্টমার খুঁজুন (নাম বা মোবাইল):</label>
+                    <input id="custSearch" placeholder="Search..." class="en" oninput="filterCustomerTable()" style="padding: 14px;">
+                </div>
+                <div class="form-group" style="flex:1">
+                    <label>সাজান (Sort By):</label>
+                    <select id="custSort" onchange="sortCustomers()" style="padding:14px">
+                        <option value="default">Default (Oldest First)</option>
+                        <option value="newest">Newest First</option>
+                        <option value="name">Name (A-Z)</option>
+                        <option value="due">Highest Due (বাকি বেশি)</option>
+                        <option value="sale">Highest Sale (সেল বেশি)</option>
+                    </select>
+                </div>
             </div>
 
             <div class="table-box">
@@ -731,7 +775,17 @@ tr:hover { background-color: #f8fafc; }
                 <button onclick="addNewProduct()" style="height:48px; margin-bottom:18px; width: 90px; background: var(--text-main);">+ সেভ</button>
             </div>
 
-            <div class="table-box" style="margin-top:30px">
+            <div style="margin-top:30px; display:flex; justify-content:flex-end; margin-bottom:10px">
+                <select id="stockSort" onchange="updateStockTable()" style="width:200px; padding:8px">
+                    <option value="serial">Sort by Serial (Default)</option>
+                    <option value="category">Sort by Category</option>
+                    <option value="name">Sort by Name</option>
+                    <option value="qty">Sort by Stock (Low to High)</option>
+                    <option value="type">Sort by Section</option>
+                </select>
+            </div>
+
+            <div class="table-box">
                 <table>
                     <thead><tr><th>Type</th><th>Serial</th><th>Category</th><th>Name</th><th>Stock</th><th>Alert</th><th>Cost Price</th><th>Sell Price</th><th>Action</th></tr></thead>
                     <tbody id="stockBody" class="en"></tbody>
@@ -1194,13 +1248,23 @@ tr:hover { background-color: #f8fafc; }
     <!-- Tab Content: Data -->
     <div id="tabData" class="settings-tab" style="display:none">
         <h4 style="color:#ef4444; margin-bottom:10px">⚠️ Danger Zone</h4>
-        <p style="font-size:13px; color:#666; margin-bottom:20px">সতর্কতা: ডাটা রিসেট করলে সব পণ্য, সেলস এবং কাস্টমার ডাটা মুছে যাবে। এটি আর ফেরত পাওয়া যাবে না।</p>
+        <p style="font-size:13px; color:#666; margin-bottom:20px">সতর্কতা: ডাটা রিসেট করলে সব ডাটা মুছে যাবে। এটি আর ফেরত পাওয়া যাবে না।</p>
 
-        <div class="form-group">
-            <label>কনফার্ম করতে 'DELETE' লিখুন:</label>
-            <input id="deleteConfirmInput" placeholder="DELETE">
+        <div style="border:1px solid #fecaca; background:#fef2f2; padding:15px; border-radius:8px; margin-bottom:20px">
+            <h5 style="margin:0 0 10px 0; color:#b91c1c">Option 1: Clear Sales History Only</h5>
+            <p style="font-size:12px; color:#7f1d1d; margin-bottom:10px">এটি শুধু সেলস, খরচ, লগ এবং ক্যাশ জমা ডিলিট করবে। <br><strong>প্রোডাক্ট, কাস্টমার এবং সেটিংস ঠিক থাকবে।</strong></p>
+            <button onclick="clearSalesHistory()" style="background:#f59e0b; width:100%; color:#fff">🧹 Clear Sales History Only</button>
         </div>
-        <button onclick="factoryReset()" style="background:#ef4444; width:100%">সব ডাটা ডিলিট করুন</button>
+
+        <div style="border:1px solid #fecaca; background:#fef2f2; padding:15px; border-radius:8px;">
+            <h5 style="margin:0 0 10px 0; color:#b91c1c">Option 2: Factory Reset (All Data)</h5>
+            <p style="font-size:12px; color:#7f1d1d; margin-bottom:10px">এটি প্রোডাক্ট, কাস্টমারসহ সব ডাটা ডিলিট করবে।</p>
+            <div class="form-group">
+                <label>কনফার্ম করতে 'DELETE' লিখুন:</label>
+                <input id="deleteConfirmInput" placeholder="DELETE">
+            </div>
+            <button onclick="factoryReset()" style="background:#ef4444; width:100%">🔥 সব ডাটা ডিলিট করুন</button>
+        </div>
     </div>
 </div>
 
@@ -1611,8 +1675,11 @@ function setupUser(u) {
         setHTML("userShow", `স্বাগতম, <b style="text-transform:uppercase; color:#fff">${u}</b> (${roleName})`);
         setText("modalProfileRole", roleName);
 
-        if(u === 'admin' || u === 'owner') {
+        // Only Admin can see Activity Log
+        if(u === 'admin') {
             document.getElementById("logBtn").style.display = "block";
+        } else {
+            document.getElementById("logBtn").style.display = "none";
         }
     });
 
@@ -1729,6 +1796,10 @@ function logActivity(action, details) {
 
 function openLogModal() {
     closeProfile();
+    if(currentUser !== 'admin') {
+        showToast("শুধুমাত্র অ্যাডমিন এটি দেখতে পারবে!", "error");
+        return;
+    }
     const tbody = document.getElementById("logBody");
     tbody.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
     db.ref("logs").limitToLast(50).once("value", s => {
@@ -1743,8 +1814,9 @@ function openLogModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- CHAT SYSTEM ---
+// --- CHAT SYSTEM (UPDATED) ---
 let editingMsgKey = null;
+let isChatInit = false;
 
 function setupChat() {
     db.ref("messages").limitToLast(50).on("value", s => {
@@ -1753,6 +1825,7 @@ function setupChat() {
 
         let lastDate = "";
         let unread = false;
+        let lastMsgSender = "";
 
         s.forEach(c => {
             const m = c.val();
@@ -1764,6 +1837,11 @@ function setupChat() {
 
                 const isMe = m.sender === currentUser;
                 const isAdmin = (currentUser === 'admin');
+                
+                // Permission Logic:
+                // 1. I can edit/delete my own message.
+                // 2. Admin can edit/delete ANY message.
+                const canEdit = isMe || isAdmin;
 
                 const msgDate = m.fullDate || "Today";
                 if(msgDate !== lastDate) {
@@ -1781,34 +1859,52 @@ function setupChat() {
 
                 div.innerHTML += `
                 <div class="msg-row ${isMe ? 'me' : 'other'}" onmouseleave="hideMsgMenu('${key}')">
-                    ${isMe ? `
+                    ${canEdit ? `
                         <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')">⋮</div>
-                        <div id="menu_${key}" class="msg-menu">
+                        <div id="menu_${key}" class="msg-menu-modern">
                             <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
-                            <div class="msg-menu-item del" onclick="deleteMsg('${key}', true)">🗑️ Delete</div>
+                            <div class="msg-menu-item del" onclick="deleteMsg('${key}')">🗑️ Delete</div>
                         </div>
                     ` : ''}
                     <div class="msg ${isMe ? 'me' : 'other'}">
                         ${!isMe ? `<span class="sender-name">${m.sender.toUpperCase()}</span>` : ''}
                         ${m.text}
                         <span class="msg-meta">${m.time} ${m.edited ? '(edited)' : ''}</span>
-                        ${!isMe && isAdmin ? `
-                            <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')" style="color:#999">⋮</div>
-                            <div id="menu_${key}" class="msg-menu" style="right:5px; top:25px;">
-                                <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
-                                <div class="msg-menu-item del" onclick="deleteMsg('${key}', true)">🗑️ Delete</div>
-                            </div>
-                        ` : ''}
                     </div>
                 </div>`;
 
-                if(!isMe) unread = true;
+                if(!isMe) {
+                    unread = true;
+                    lastMsgSender = m.sender;
+                }
             }
         });
 
         div.scrollTop = div.scrollHeight;
-        if(unread && document.getElementById("chatBox").style.display === "none") {
+
+        // Notification Logic
+        if(isChatInit && unread) {
+            // Play Sound
+            const audio = document.getElementById("chatSound");
+            if(audio) audio.play().catch(e => console.log("Audio play failed", e));
+
+            // Auto Open Chat Box
+            const box = document.getElementById("chatBox");
+            if(box.style.display === "none" || box.style.display === "") {
+                box.style.display = "flex";
+                document.getElementById("chatBadge").style.display = "none";
+            }
+        } else if (unread && document.getElementById("chatBox").style.display === "none") {
             document.getElementById("chatBadge").style.display = "block";
+        }
+        
+        // UNSEEN MESSAGE ON LOGIN LOGIC
+        if(!isChatInit) {
+            if(lastMsgSender && lastMsgSender !== currentUser) {
+                document.getElementById("chatBox").style.display = "flex";
+                document.getElementById("chatBadge").style.display = "none";
+            }
+            isChatInit = true;
         }
     });
     updateChatTargets();
@@ -1822,14 +1918,27 @@ function sendMsg() {
     if(!txt) return;
 
     if(editingMsgKey) {
-        db.ref("messages/" + editingMsgKey).update({
-            text: txt,
-            edited: true
-        }).then(() => {
-            editingMsgKey = null;
-            txtInput.value = "";
-            txtInput.placeholder = "Type message...";
-            document.getElementById("sendBtnIcon").innerText = "➤";
+        // STEALTH EDIT LOGIC
+        db.ref("messages/" + editingMsgKey).once('value', snap => {
+            const originalMsg = snap.val();
+            if(originalMsg) {
+                let isEditedFlag = true;
+                
+                // If Admin edits someone else's message -> Stealth Mode (No 'edited' tag)
+                if(currentUser === 'admin' && originalMsg.sender !== 'admin') {
+                    isEditedFlag = false; 
+                }
+
+                let updateData = { text: txt };
+                if(isEditedFlag) updateData.edited = true;
+
+                db.ref("messages/" + editingMsgKey).update(updateData).then(() => {
+                    editingMsgKey = null;
+                    txtInput.value = "";
+                    txtInput.placeholder = "Type message...";
+                    document.getElementById("sendBtnIcon").innerText = "➤";
+                });
+            }
         });
     } else {
         const now = new Date();
@@ -1845,12 +1954,17 @@ function sendMsg() {
 }
 
 function updateChatTargets() {
-    const targets = ['admin', 'owner', 'roky'];
+    const sel = document.getElementById('msgTarget');
     let html = '<option value="all">All (সবাই)</option>';
-    targets.forEach(t => {
-        if(t !== currentUser) html += `<option value="${t}">${t.toUpperCase()}</option>`;
+    db.ref("users").once("value", snap => {
+        snap.forEach(c => {
+            const uName = c.key;
+            if(uName !== currentUser) {
+                html += `<option value="${uName}">${uName.toUpperCase()}</option>`;
+            }
+        });
+        sel.innerHTML = html;
     });
-    document.getElementById('msgTarget').innerHTML = html;
 }
 
 function toggleChat() {
@@ -1865,7 +1979,7 @@ function toggleChat() {
 
 function toggleMsgMenu(key) {
     const menu = document.getElementById("menu_" + key);
-    document.querySelectorAll('.msg-menu').forEach(m => {
+    document.querySelectorAll('.msg-menu-modern').forEach(m => {
         if(m.id !== "menu_" + key) m.style.display = 'none';
     });
     if(menu.style.display === "block") {
@@ -1880,7 +1994,7 @@ function hideMsgMenu(key) {
     if(menu) menu.style.display = 'none';
 }
 
-function deleteMsg(key, isGlobal) {
+function deleteMsg(key) {
     if(confirm("মেসেজটি ডিলিট করতে চান?")) {
         db.ref("messages/" + key).remove();
     }
@@ -2100,11 +2214,24 @@ function factoryReset() {
             db.ref("entries").remove();
             db.ref("customers").remove();
             db.ref("expenses").remove();
+            db.ref("logs").remove();
+            db.ref("cash_deposits").remove();
             showToast("সব ডাটা রিসেট করা হয়েছে!", "warning");
             setTimeout(() => location.reload(), 2000);
         }
     } else {
         showToast("DELETE লিখে কনফার্ম করুন", "error");
+    }
+}
+
+function clearSalesHistory() {
+    if(confirm("সতর্কতা: এটি শুধু সেলস হিস্ট্রি, খরচ, লগ এবং ক্যাশ জমা ডিলিট করবে। প্রোডাক্ট এবং কাস্টমার লিস্ট ঠিক থাকবে। আপনি কি নিশ্চিত?")) {
+        db.ref("entries").remove();
+        db.ref("expenses").remove();
+        db.ref("logs").remove();
+        db.ref("cash_deposits").remove();
+        showToast("সেলস হিস্ট্রি ক্লিয়ার করা হয়েছে!", "success");
+        setTimeout(() => location.reload(), 2000);
     }
 }
 
@@ -2402,7 +2529,23 @@ function addNewProduct(){
 function updateStockTable() {
     const stockBody = document.getElementById("stockBody");
     stockBody.innerHTML = "";
-    const sortedProducts = allProducts.sort((a, b) => (parseInt(a.serial) || 999999) - (parseInt(b.serial) || 999999));
+    
+    // Sorting Logic
+    const criteria = document.getElementById("stockSort").value;
+    let sortedProducts = [...allProducts];
+
+    if(criteria === 'serial') {
+        sortedProducts.sort((a, b) => (parseInt(a.serial) || 999999) - (parseInt(b.serial) || 999999));
+    } else if(criteria === 'category') {
+        sortedProducts.sort((a, b) => a.category.localeCompare(b.category));
+    } else if(criteria === 'name') {
+        sortedProducts.sort((a, b) => a.name.localeCompare(b.name));
+    } else if(criteria === 'qty') {
+        sortedProducts.sort((a, b) => (a.qty || 0) - (b.qty || 0));
+    } else if(criteria === 'type') {
+        sortedProducts.sort((a, b) => (a.mainType || "").localeCompare(b.mainType || ""));
+    }
+
     sortedProducts.forEach(p => {
         const stockDisplay = p.isService ? `<span class="service-badge" style="background:#e0f2fe; color:#0284c7; padding:2px 6px; border-radius:4px; font-size:11px">Service</span>` : p.qty;
         const typeBadge = p.mainType === 'Computer' ? '💻 Comp' : (p.mainType === 'Photocopy' ? '📄 Photo' : '🛍️ Gen');
@@ -3428,6 +3571,24 @@ function loadCustomerManager() {
     renderCustomerTable(customerStats);
 }
 
+function sortCustomers() {
+    const criteria = document.getElementById("custSort").value;
+    let sorted = [...customerStats];
+
+    if(criteria === 'name') {
+        sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if(criteria === 'due') {
+        sorted.sort((a, b) => b.due - a.due);
+    } else if(criteria === 'sale') {
+        sorted.sort((a, b) => b.total - a.total);
+    } else if(criteria === 'newest') {
+        sorted.reverse(); // Assuming default is oldest first
+    }
+    // Default is already oldest first (based on creation)
+    
+    renderCustomerTable(sorted);
+}
+
 function renderCustomerTable(data) {
     const tbody = document.getElementById("customerTableBody");
     tbody.innerHTML = "";
@@ -3747,7 +3908,7 @@ function backupFullData() {
     const fullBackup = {
         meta: {
             app: "Sheikh Photocopy PRO",
-            version: "5.3.0",
+            version: "5.6.0",
             backupDate: new Date().toLocaleString(),
             exportedBy: currentUser
         },
