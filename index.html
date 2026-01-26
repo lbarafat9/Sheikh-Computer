@@ -176,7 +176,7 @@ header {
     transition: 0.3s;
 }
 
-/* --- SIDEBAR (SCROLL FIXED) --- */
+/* --- SIDEBAR (SCROLL FIXED FOR PC) --- */
 #menuBtn {
     display: none;
     align-items: center; justify-content: center;
@@ -195,11 +195,22 @@ header {
     transition: .3s; z-index: 1200; padding-top: 0;
     display: flex; flex-direction: column;
     box-shadow: 5px 0 25px rgba(0,0,0,0.1);
-    overflow-y: auto; /* PC SCROLL ENABLED */
+    overflow-y: auto;
 }
-/* Sidebar Scrollbar Styling */
-#sidebar::-webkit-scrollbar { width: 5px; }
-#sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+
+/* --- SIDEBAR SCROLLBAR UPDATED --- */
+#sidebar::-webkit-scrollbar { width: 10px; }
+#sidebar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+#sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+#sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+    cursor: pointer;
+}
 
 .sidebar-header {
     padding: 30px 20px; background: linear-gradient(to right, var(--primary), var(--accent));
@@ -453,7 +464,7 @@ tr:hover { background-color: #f8fafc; }
 <div id="loginDiv">
     <div class="login-card">
         <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
-        <p class="login-subtitle">v5.3 (Optimized) | ২৬-০১-২০২৬</p>
+        <p class="login-subtitle">v5.3.0 (Optimized) | ২৬-০১-২০২৬</p>
         <div class="login-form-group">
             <label class="login-label">👤 ইউজারনেম</label>
             <input id="uName" class="login-input" placeholder="ইউজারনেম">
@@ -492,7 +503,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v5.3 (Optimized)</div>
+                <div class="footer-val en">v5.3.0 | ২৬-০১-২০২৬ </div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -502,9 +513,9 @@ tr:hover { background-color: #f8fafc; }
     </div>
 
     <!-- DASHBOARD -->
-    <div id="dashboard" class="section">
-        <div style="text-align:center; margin-bottom:20px;">
-            <button onclick="loadDashboardStats()" style="background:var(--text-main); width:auto; padding:10px 20px;">👁️ আজকের হিসাব দেখুন</button>
+    <div id="dashboard" class="section" style="padding-top: 20px;">
+        <div style="text-align:center; margin-bottom:40px;">
+            <button onclick="loadDashboardStats()" style="background:var(--primary); width:auto; padding:12px 30px; font-size: 16px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">👁️ আজকের হিসাব দেখুন</button>
         </div>
 
         <div class="stats en">
@@ -1378,25 +1389,20 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 // --- OFFLINE PERSISTENCE (NEW) ---
-db.setPersistenceEnabled(true).catch(function(err) {
-    console.error("Persistence failed", err);
-});
+try {
+    db.setPersistenceEnabled(true);
+} catch(e) { console.log("Persistence Error: ", e); }
 
 // --- KEYBOARD SHORTCUTS (NEW) ---
 window.addEventListener('keydown', function(e) {
-    // F1: Dashboard
     if (e.key === 'F1') { e.preventDefault(); showSection('dashboard'); }
-    // F2: New Entry
     if (e.key === 'F2') { e.preventDefault(); showSection('newEntry'); }
-    // F4: Focus Search (Only if in New Entry)
     if (e.key === 'F4') {
         e.preventDefault();
         showSection('newEntry');
         setTimeout(() => document.getElementById('searchSerial').focus(), 100);
     }
-    // Alt + C: Cash Deposit
     if (e.altKey && e.key.toLowerCase() === 'c') { e.preventDefault(); openMyCashModal(); }
-    // Escape: Close All
     if (e.key === 'Escape') {
         closeSidebar();
         closeProfile();
@@ -3741,7 +3747,7 @@ function backupFullData() {
     const fullBackup = {
         meta: {
             app: "Sheikh Photocopy PRO",
-            version: "5.3",
+            version: "5.3.0",
             backupDate: new Date().toLocaleString(),
             exportedBy: currentUser
         },
@@ -3836,7 +3842,8 @@ function showSection(id){
     const activeLink = document.getElementById(navId);
     if(activeLink) activeLink.classList.add('active');
 
-    if(window.innerWidth <= 1024) closeSidebar();
+    // --- AUTOMATIC SIDEBAR CLOSE ---
+    closeSidebar();
 
     if(id === 'customerManager') loadCustomerManager();
 }
