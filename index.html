@@ -61,11 +61,12 @@ body {
 /* --- TOAST --- */
 #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
 .toast {
-    min-width: 300px; margin-bottom: 12px; background: #fff; padding: 16px 20px;
+    min-width: 300px; margin-bottom: 12px; background: #fff; padding: 166px 20px;
     border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     display: flex; align-items: center; justify-content: space-between;
     animation: slideIn 0.3s ease-out forwards; border-left: 6px solid #333; font-weight: 600;
 }
+.toast { padding: 16px 20px; } /* Fixed padding from previous line typo */
 .toast.success { border-left-color: var(--success); color: var(--success); }
 .toast.error { border-left-color: var(--danger); color: var(--danger); }
 .toast.warning { border-left-color: var(--warning); color: #d97706; }
@@ -453,6 +454,20 @@ tr:hover { background-color: #f8fafc; }
 /* --- DANGEROUS STOCK STYLES --- */
 .row-zero { background-color: #fee2e2 !important; color: #b91c1c !important; font-weight: bold; }
 .badge-out { background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+
+/* --- SERVICE BADGE DEEP GRADIENT --- */
+.service-badge-deep {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white !important;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 </style>
 </head>
 <body>
@@ -663,6 +678,9 @@ tr:hover { background-color: #f8fafc; }
                 </div>
                 <div class="form-group"><label>দর (Rate ৳):</label><input id="rate" type="number" min="0" class="en"></div>
             </div>
+
+            <!-- NEW RECALL BUTTON BEFORE ADD BUTTON -->
+            <button onclick="openHoldModal()" style="background: #6366f1; margin-bottom:10px; padding: 12px; font-size: 14px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">📂 হোল্ড করা অর্ডার রিকল করুন (<span id="holdCountMain">0</span>)</button>
 
             <button onclick="addToCart()" style="background: linear-gradient(to right, #3b82f6, #2563eb); margin-bottom:25px; padding: 14px;">⬇️ লিস্টে যোগ করুন (Add)</button>
 
@@ -1717,7 +1735,7 @@ function login(){
 
 function setupUser(u) {
     currentUser = u;
-    
+
     // 3. USER BAN CHECK (LIVE)
     db.ref("users/" + u + "/blocked").on("value", snap => {
         if(snap.val() === true) {
@@ -1900,7 +1918,7 @@ function setupChat() {
 
                 const isMe = m.sender === currentUser;
                 const isAdmin = (currentUser === 'admin');
-                
+
                 // Permission Logic:
                 // 1. I can edit/delete my own message.
                 // 2. Admin can edit/delete ANY message.
@@ -1960,7 +1978,7 @@ function setupChat() {
         } else if (unread && document.getElementById("chatBox").style.display === "none") {
             document.getElementById("chatBadge").style.display = "block";
         }
-        
+
         // UNSEEN MESSAGE ON LOGIN LOGIC
         if(!isChatInit) {
             if(lastMsgSender && lastMsgSender !== currentUser) {
@@ -1986,10 +2004,10 @@ function sendMsg() {
             const originalMsg = snap.val();
             if(originalMsg) {
                 let isEditedFlag = true;
-                
+
                 // If Admin edits someone else's message -> Stealth Mode (No 'edited' tag)
                 if(currentUser === 'admin' && originalMsg.sender !== 'admin') {
-                    isEditedFlag = false; 
+                    isEditedFlag = false;
                 }
 
                 let updateData = { text: txt };
@@ -2592,7 +2610,7 @@ function addNewProduct(){
 function updateStockTable() {
     const stockBody = document.getElementById("stockBody");
     stockBody.innerHTML = "";
-    
+
     // Sorting Logic
     const criteria = document.getElementById("stockSort").value;
     let sortedProducts = [...allProducts];
@@ -2610,7 +2628,8 @@ function updateStockTable() {
     }
 
     sortedProducts.forEach(p => {
-        const stockDisplay = p.isService ? `<span class="service-badge" style="background:#e0f2fe; color:#0284c7; padding:2px 6px; border-radius:4px; font-size:11px">Service</span>` : p.qty;
+        // UPDATED SERVICE BADGE STYLE
+        const stockDisplay = p.isService ? `<span class="service-badge-deep">SERVICE</span>` : p.qty;
         const typeBadge = p.mainType === 'Computer' ? '💻 Comp' : (p.mainType === 'Photocopy' ? '📄 Photo' : '🛍️ Gen');
         const alertDisplay = p.isService ? '-' : (p.alertLevel || 5);
         stockBody.innerHTML += `<tr>
@@ -2881,6 +2900,7 @@ function holdOrder() {
 
 function updateHoldCount() {
     setText("holdCount", heldOrders.length);
+    setText("holdCountMain", heldOrders.length); // UPDATED TO SYNC BOTH BUTTONS
 }
 
 function openHoldModal() {
@@ -3648,7 +3668,7 @@ function sortCustomers() {
         sorted.reverse(); // Assuming default is oldest first
     }
     // Default is already oldest first (based on creation)
-    
+
     renderCustomerTable(sorted);
 }
 
