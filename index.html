@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Computer PRO v5.6</title>
+<title>Sheikh Computer PRO v6.0 (Admin Connected)</title>
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- EXCEL & CSV LIBRARY (SheetJS) -->
@@ -71,6 +71,24 @@ body {
 .toast.warning { border-left-color: var(--warning); color: #d97706; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeOut { to { transform: translateX(100%); opacity: 0; } }
+
+/* --- ADMIN NOTICE BAR --- */
+#adminTicker {
+    background: #f59e0b;
+    color: #000;
+    text-align: center;
+    padding: 8px;
+    font-weight: bold;
+    font-size: 14px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 9000;
+    display: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease-out;
+}
+@keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 
 /* --- HEADER (Mobile Only) --- */
 header {
@@ -442,6 +460,9 @@ tr:hover { background-color: #f8fafc; }
 <!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
 
+<!-- ADMIN NOTICE -->
+<div id="adminTicker"></div>
+
 <!-- NOTIFICATION SOUND -->
 <audio id="chatSound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
@@ -496,7 +517,7 @@ tr:hover { background-color: #f8fafc; }
 <div id="loginDiv">
     <div class="login-card">
         <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
-        <p class="login-subtitle">v5.6.0 (Chat Fixed) | ২৬-০১-২০২৬</p>
+        <p class="login-subtitle">v6.0 (Admin Linked) | ২৬-০১-২০২৬</p>
         <div class="login-form-group">
             <label class="login-label">👤 ইউজারনেম</label>
             <input id="uName" class="login-input" placeholder="ইউজারনেম">
@@ -535,7 +556,7 @@ tr:hover { background-color: #f8fafc; }
             </div>
             <div class="footer-item">
                 <span class="footer-label">সংস্করণ</span>
-                <div class="footer-val en">v5.6.0 | ২৬-০১-২০২৬ </div>
+                <div class="footer-val en">v6.0 | ২৬-০১-২০২৬ </div>
             </div>
             <div class="footer-item">
                 <span class="footer-label">ডেভেলপার: আরাফাত সিকদার</span>
@@ -1457,6 +1478,35 @@ try {
     db.setPersistenceEnabled(true);
 } catch(e) { console.log("Persistence Error: ", e); }
 
+// --- ADMIN CONTROL LISTENERS (NEW FOR v6.0) ---
+
+// 1. SYSTEM LOCK LISTENER
+db.ref("settings/appLock").on("value", snap => {
+    if(snap.val() === true) {
+        document.body.innerHTML = `
+        <div style="height:100vh; display:flex; justify-content:center; align-items:center; flex-direction:column; background:#0f172a; color:#ef4444; text-align:center; font-family:'Hind Siliguri', sans-serif">
+            <div style="font-size:60px; margin-bottom:20px">⚠️</div>
+            <h1 style="margin:0; font-size:36px">SYSTEM LOCKED BY ADMIN</h1>
+            <p style="color:#94a3b8">মেইনটেইন্যান্স চলছে। অ্যাডমিনের সাথে যোগাযোগ করুন।</p>
+        </div>`;
+    } else {
+        // Reload if it was locked
+        if(document.body.innerText.includes("SYSTEM LOCKED")) location.reload();
+    }
+});
+
+// 2. ADMIN NOTICE LISTENER
+db.ref("settings/notice").on("value", snap => {
+    const msg = snap.val();
+    const ticker = document.getElementById("adminTicker");
+    if(msg && msg.length > 0) {
+        ticker.innerText = "📢 ADMIN NOTICE: " + msg;
+        ticker.style.display = "block";
+    } else {
+        ticker.style.display = "none";
+    }
+});
+
 // --- KEYBOARD SHORTCUTS (NEW) ---
 window.addEventListener('keydown', function(e) {
     if (e.key === 'F1') { e.preventDefault(); showSection('dashboard'); }
@@ -1648,6 +1698,10 @@ function login(){
     db.ref("users/" + u).once("value", snap => {
         if(snap.exists()) {
             const userData = snap.val();
+            if(userData.blocked) {
+                showToast("🚫 এই অ্যাকাউন্টটি অ্যাডমিন ব্লক করেছে!", "error");
+                return;
+            }
             if(userData.pass === p) {
                 localStorage.setItem("loggedInUser", u);
                 showToast(`স্বাগতম, ${u.toUpperCase()}!`, "success");
@@ -1663,6 +1717,15 @@ function login(){
 
 function setupUser(u) {
     currentUser = u;
+    
+    // 3. USER BAN CHECK (LIVE)
+    db.ref("users/" + u + "/blocked").on("value", snap => {
+        if(snap.val() === true) {
+            alert("🚫 আপনার অ্যাকাউন্টটি অ্যাডমিন ব্লক করেছে!");
+            logout();
+        }
+    });
+
     document.getElementById("loginDiv").style.display = "none";
     document.getElementById("container").style.display = "block";
     document.getElementById("header").style.display = "flex";
