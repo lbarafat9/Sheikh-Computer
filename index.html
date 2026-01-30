@@ -564,15 +564,20 @@ tr:hover { background-color: #f8fafc; }
         <div class="sidebar-header">Sheikh Computer</div>
         <div style="text-align:right;padding:10px 20px;font-size:24px;cursor:pointer;color:#ef4444; display:none" onclick="closeSidebar()" id="closeBtn">✕</div>
         <div id="userShow"></div>
-        <a id="nav-dashboard" onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড (F1)</a>
-        <a id="nav-newEntry" onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (F2)</a>
-        <a id="nav-cashDeposit" onclick="openMyCashModal()" style="color: #10b981; font-weight: bold; border-left: 4px solid #10b981;">💰 ক্যাশ জমা (Alt+C)</a>
-        <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
-        <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
-        <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
-        <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
-        <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
-        <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
+        
+        <!-- DYNAMIC MENU CONTAINER -->
+        <div id="dynamicMenuContainer">
+            <a id="nav-dashboard" onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড (F1)</a>
+            <a id="nav-newEntry" onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (F2)</a>
+            <a id="nav-cashDeposit" onclick="openMyCashModal()" style="color: #10b981; font-weight: bold; border-left: 4px solid #10b981;">💰 ক্যাশ জমা (Alt+C)</a>
+            <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
+            <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
+            <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
+            <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
+            <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
+            <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
+        </div>
+        
         <a onclick="logout()" style="color:#ef4444; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1);">🚪 লগআউট</a>
 
         <!-- SIDEBAR FOOTER -->
@@ -1669,6 +1674,8 @@ let sysConfig = {
     ui: { memoLabel: "MEMO / BILL", currency: "৳", footer: "Thank you!" },
     logic: { vatEnable: false }
 };
+let translations = {};
+let lastPopupTime = 0;
 
 // --- ADMIN CONTROL LISTENERS (GOD MODE) ---
 function loadGodModeListeners() {
@@ -1679,18 +1686,23 @@ function loadGodModeListeners() {
             sysConfig = { ...sysConfig, ...val };
             updateModuleVisibility();
             updateUIFromConfig();
+            // Apply permission-based UI changes
+            document.getElementById('rate').readOnly = !sysConfig.perms.priceEdit;
         }
     });
 
     // 2. App Lock Listener
     db.ref("settings/appLock").on("value", snap => {
         if(snap.val() === true) {
-            document.body.innerHTML = `
-            <div style="height:100vh; display:flex; justify-content:center; align-items:center; flex-direction:column; background:#0f172a; color:#ef4444; text-align:center; font-family:'Hind Siliguri', sans-serif">
-                <div style="font-size:60px; margin-bottom:20px">⚠️</div>
-                <h1 style="margin:0; font-size:36px">SYSTEM LOCKED BY ADMIN</h1>
-                <p style="color:#94a3b8">মেইনটেইন্যান্স চলছে। অ্যাডমিনের সাথে যোগাযোগ করুন।</p>
-            </div>`;
+            db.ref("settings/maintMsg").once("value", msgSnap => {
+                const msg = msgSnap.val() || "মেইনটেইন্যান্স চলছে। অ্যাডমিনের সাথে যোগাযোগ করুন।";
+                document.body.innerHTML = `
+                <div style="height:100vh; display:flex; justify-content:center; align-items:center; flex-direction:column; background:#0f172a; color:#ef4444; text-align:center; font-family:'Hind Siliguri', sans-serif">
+                    <div style="font-size:60px; margin-bottom:20px">⚠️</div>
+                    <h1 style="margin:0; font-size:36px">SYSTEM LOCKED BY ADMIN</h1>
+                    <p style="color:#94a3b8">${msg}</p>
+                </div>`;
+            });
         } else {
             if(document.body.innerText.includes("SYSTEM LOCKED")) location.reload();
         }
@@ -1727,19 +1739,36 @@ function loadGodModeListeners() {
     db.ref("settings/css").on("value", snap => {
         document.getElementById("adminDynamicStyle").innerHTML = snap.val() || "";
     });
+    
+    // 6. Force Popup Listener
+    db.ref("settings/popup").on("value", snap => {
+        const popup = snap.val();
+        if(popup && popup.msg && popup.time > lastPopupTime) {
+            alert("📢 ADMIN ALERT:\n\n" + popup.msg);
+            lastPopupTime = popup.time;
+        }
+    });
+
+    // 7. Dynamic Menu Listener
+    db.ref("settings/menu").on("value", snap => {
+        renderDynamicMenu(snap.val());
+    });
+
+    // 8. Language/Translation Listener
+    db.ref("settings/translations").on("value", snap => {
+        translations = snap.val() || {};
+        applyTranslations();
+    });
 }
 
 function updateModuleVisibility() {
-    // Chat
     document.getElementById("chatBtn").style.display = sysConfig.modules.chat ? "flex" : "none";
-    
-    // Manual Sale
-    const manToggle = document.getElementById("manualModeContainer");
-    if(manToggle) manToggle.style.display = sysConfig.modules.manual ? "flex" : "none";
-    
-    // Sidebar Items
+    document.getElementById("manualModeContainer").style.display = sysConfig.modules.manual ? "flex" : "none";
     document.getElementById("nav-return").style.display = sysConfig.modules.return ? "block" : "none";
     document.getElementById("nav-expenseManager").style.display = sysConfig.modules.expense ? "block" : "none";
+    // Due/Credit module control
+    const dueButtons = [document.querySelector('[onclick="openDueCollectionModal()"]')];
+    dueButtons.forEach(btn => { if(btn) btn.style.display = sysConfig.modules.due ? 'block' : 'none'; });
 }
 
 function updateUIFromConfig() {
@@ -1749,6 +1778,43 @@ function updateUIFromConfig() {
     const footer = document.getElementById("memoFooterMsg");
     if(footer) footer.innerText = sysConfig.ui.footer || "Thank you!";
 }
+
+// --- DYNAMIC MENU & TRANSLATION ---
+function renderDynamicMenu(menuData) {
+    const container = document.getElementById("dynamicMenuContainer");
+    // Preserve essential menu items and clear the rest
+    container.innerHTML = `
+        <a id="nav-dashboard" onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড (F1)</a>
+        <a id="nav-newEntry" onclick="showSection('newEntry')">📝 নতুন এন্ট্রি (F2)</a>
+        <a id="nav-cashDeposit" onclick="openMyCashModal()" style="color: #10b981; font-weight: bold; border-left: 4px solid #10b981;">💰 ক্যাশ জমা (Alt+C)</a>
+        <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
+        <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
+        <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
+        <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
+        <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
+        <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
+    `;
+    if (menuData) {
+        Object.values(menuData).forEach(item => {
+            // This is a placeholder for custom actions.
+            // For a real implementation, you'd need a way to map `item.action` to a JavaScript function.
+            container.innerHTML += `<a onclick="alert('Action: ${item.action}')"><i class="${item.icon}"></i> ${item.label}</a>`;
+        });
+    }
+    updateModuleVisibility(); // Re-apply visibility rules after re-rendering
+}
+
+function _t(key, fallback) {
+    return translations[key] || fallback || key;
+}
+
+function applyTranslations() {
+    // Example of applying translations to a few elements
+    document.querySelector('[onclick="showSection(\'dashboard\')"]').innerHTML = `🏠 ${_t('menu_dashboard', 'ড্যাশবোর্ড')} (F1)`;
+    document.querySelector('[onclick="showSection(\'newEntry\')"]').innerHTML = `📝 ${_t('menu_new_entry', 'নতুন এন্ট্রি')} (F2)`;
+    document.querySelector('.login-title').innerHTML = `${_t('login_title_main', 'শেখ কম্পিউটার')} <span>${_t('login_title_pro', 'PRO')}</span>`;
+}
+
 
 // --- KEYBOARD SHORTCUTS ---
 window.addEventListener('keydown', function(e) {
@@ -1940,6 +2006,16 @@ function login(){
     const p = document.getElementById("uPass").value.trim();
 
     if(!u || !p) return showToast("ইউজারনেম ও পাসওয়ার্ড দিন", "error");
+
+    // Check login time window from God Mode config
+    const now = new Date();
+    const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+    const loginStart = sysConfig.auto?.loginStart || "00:00";
+    const loginEnd = sysConfig.auto?.loginEnd || "23:59";
+
+    if (currentTime < loginStart || currentTime > loginEnd) {
+        return showToast("এই সময়ে লগইন করার অনুমতি নেই!", "error");
+    }
 
     db.ref("users/" + u).once("value", snap => {
         if(snap.exists()) {
@@ -2915,7 +2991,7 @@ function updateStockTable() {
             <td>${p.name}</td>
             <td style="font-weight:bold; font-size:16px">${stockDisplay}</td>
             <td>${alertDisplay}</td>
-            <td>${p.costPrice || 0}</td>
+            <td>${sysConfig.perms.viewCost ? (p.costPrice || 0) : '***'}</td>
             <td>${p.sellPrice}</td>
             <td>
                 ${addStockBtn}
@@ -2967,17 +3043,16 @@ function saveEditProduct() {
 }
 
 function deleteProductFromEdit() {
+    if (!sysConfig.perms.delete) {
+        return showToast("ডিলিট করার অনুমতি নেই!", "error");
+    }
     const key = document.getElementById("editProdKey").value;
-    if(currentUser === 'owner' || currentUser === 'admin'){
-        if(confirm("সতর্কতা: আইটেমটি ডিলিট করতে চান?")) {
-            const p = allProducts.find(x => x.key === key);
-            db.ref("products/"+key).remove();
-            closeModal("editProductModal");
-            showToast("ডিলিট করা হয়েছে", "warning");
-            logActivity("Delete Product", `Deleted ${p ? p.name : 'Product'}`);
-        }
-    } else {
-        showToast("শুধুমাত্র মালিক বা এডমিন ডিলিট করতে পারবে।", "error");
+    if(confirm("সতর্কতা: আইটেমটি ডিলিট করতে চান?")) {
+        const p = allProducts.find(x => x.key === key);
+        db.ref("products/"+key).remove();
+        closeModal("editProductModal");
+        showToast("ডিলিট করা হয়েছে", "warning");
+        logActivity("Delete Product", `Deleted ${p ? p.name : 'Product'}`);
     }
 }
 
@@ -3479,6 +3554,9 @@ function loadExpenses() {
 }
 
 function deleteExpense(key) {
+    if (!sysConfig.perms.delete) {
+        return showToast("ডিলিট করার অনুমতি নেই!", "error");
+    }
     if(confirm("খরচটি ডিলিট করতে চান?")) {
         db.ref("expenses/"+key).remove();
         showToast("খরচ ডিলিট হয়েছে", "warning");
@@ -3778,6 +3856,9 @@ function saveEditEntry() {
 }
 
 function deleteFromEdit() {
+    if (!sysConfig.perms.delete) {
+        return showToast("ডিলিট করার অনুমতি নেই!", "error");
+    }
     const key = document.getElementById("editEntryKey").value;
     if(confirm("সতর্কতা: এই এন্ট্রি ডিলিট করলে স্টক রিস্টোর হবে। আপনি কি নিশ্চিত?")) {
         db.ref("entries/"+key).once("value", s => {
@@ -4674,6 +4755,7 @@ function loadDashboardStats() {
     }, 10000);
 }
 
+
 // --- NEW STOCK ADD FUNCTIONS ---
 function openAddStockModal(key) {
     const p = allProducts.find(x => x.key === key);
@@ -4867,7 +4949,7 @@ function executeQuickAdd(productKey) {
     }
 
     const itemIndex = cart.findIndex(i => i.key === productKey);
-if(itemIndex !== -1) {
+    if(itemIndex !== -1) {
         cart[itemIndex].qty += 1;
         cart[itemIndex].sub = cart[itemIndex].qty * cart[itemIndex].rate;
     } else {
@@ -4936,4 +5018,4 @@ window.onbeforeunload = function() {
 };
 </script>
 </body>
-</html/>
+</html>
