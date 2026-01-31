@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Admin Ultimate (v13.5 - User Control)</title>
+<title>Sheikh Admin Ultimate (v14.0 - Full God Mode)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -68,13 +68,13 @@
         border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px;
     }
     .nav-menu { flex: 1; overflow-y: auto; padding: 10px; }
-    
+
     .nav-group {
         font-size: 11px; text-transform: uppercase; color: #64748b;
         margin: 25px 0 8px 12px; font-weight: 700; letter-spacing: 1px;
         border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px;
     }
-    
+
     .nav-item {
         padding: 12px 15px; color: var(--text-muted); cursor: pointer;
         border-radius: 8px; margin-bottom: 4px; display: flex; align-items: center;
@@ -102,7 +102,7 @@
         background: rgba(16, 185, 129, 0.1); color: var(--success);
         border: 1px solid rgba(16, 185, 129, 0.2); display: flex; align-items: center; gap: 6px;
     }
-    
+
     #workspace { flex: 1; overflow-y: auto; padding: 30px; }
     .view-section { display: none; animation: fadeIn 0.3s ease-out; }
     .view-section.active { display: block; }
@@ -128,7 +128,7 @@
         text-transform: uppercase; letter-spacing: 0.5px;
     }
     .stat-val { font-size: 32px; font-weight: 700; color: var(--text-main); }
-    
+
     /* CONTROLS & INPUTS */
     .control-bar {
         display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;
@@ -141,7 +141,7 @@
         font-size: 14px; outline: none; width: 100%; transition: 0.2s;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-    
+
     .btn {
         padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer;
         font-size: 14px; font-weight: 600; display: inline-flex; align-items: center;
@@ -158,7 +158,6 @@
     .table-wrapper {
         background: var(--bg-panel); border: 1px solid var(--border);
         border-radius: 12px; overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
     }
     table { width: 100%; border-collapse: collapse; min-width: 900px; }
     th {
@@ -172,7 +171,7 @@
     }
     tr:last-child td { border-bottom: none; }
     tr:hover { background: rgba(255,255,255,0.02); }
-    
+
     /* MODALS */
     .modal-overlay {
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -255,7 +254,7 @@
         <i class="fa-solid fa-shield-halved"></i> SHEIKH ADMIN
     </div>
     <div class="nav-menu">
-        
+
         <!-- DASHBOARD GROUP -->
         <div class="nav-group">Dashboard & Analytics</div>
         <div class="nav-item active" onclick="showView('dashboard')"><i class="fa-solid fa-chart-line"></i> Dashboard</div>
@@ -294,7 +293,7 @@
         <div class="nav-item" onclick="showView('payroll')"><i class="fa-solid fa-money-check-dollar"></i> Payroll / Salary</div>
         <div class="nav-item" onclick="showView('attendance')"><i class="fa-solid fa-calendar-check"></i> Attendance</div>
         <div class="nav-item" onclick="showView('shifts')"><i class="fa-solid fa-business-time"></i> Shift Management</div>
-        
+
         <div class="nav-item" style="margin-top: 20px; color: var(--danger); border: 1px solid var(--danger);" onclick="location.reload()">
             <i class="fa-solid fa-power-off"></i> LOGOUT
         </div>
@@ -312,7 +311,7 @@
     </header>
 
     <div id="workspace">
-        
+
         <!-- 1. DASHBOARD -->
         <div id="dashboard" class="view-section active">
             <div class="grid-4">
@@ -523,7 +522,7 @@
         <!-- 15. POS CONFIGURATION (MASTER CONTROL) -->
         <div id="pos_config" class="view-section">
             <div class="config-grid">
-                
+
                 <!-- 1. MODULE TOGGLES -->
                 <div class="config-box">
                     <h4>🔌 1. Module Toggles</h4>
@@ -577,7 +576,7 @@
                     <div class="config-item"><label>Card Charge %</label><input id="autoCardCharge" type="number" placeholder="2.0" class="config-input"></div>
                     <div class="config-item"><label>Show QR</label><label class="toggle-switch"><input type="checkbox" id="autoShowQR"><span class="slider"></span></label></div>
                     <div class="config-item"><label>QR Data</label><input id="autoQRData" placeholder="Link..." class="config-input"></div>
-                    <div class="config-item" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-top:10px"><label style="color:#f59e0b">⚠️ Force Popup</label><div style="display:flex; gap:5px; width:100%"><input id="autoPopupMsg" placeholder="Message..." class="config-input" style="flex:1"><button class="btn btn-warning" style="padding:5px 10px; font-size:12px" onclick="sendLivePopup()">SEND</button></div></div>
+                    <div class="config-item" style="border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; margin-top:10px"><label style="color:#f59e0b">⚠️ Force Popup</label><div style="display:flex; gap:5px; width:100%"><input id="autoPopupMsg" placeholder="Message..." class="config-input" style="flex:1"><div style="display:flex; gap:5px"><button class="btn btn-warning" style="padding:5px 10px; font-size:12px" onclick="sendLivePopup()">SEND</button><button class="btn btn-danger" style="padding:5px 10px; font-size:12px" onclick="stopPopup()">OFF</button></div></div></div>
                 </div>
             </div>
             <button class="btn btn-success" style="width:100%; padding:15px; font-size:16px; margin-top:20px; margin-bottom:30px" onclick="saveMasterConfig()">💾 SAVE MASTER CONFIGURATION</button>
@@ -588,12 +587,19 @@
             <div class="card">
                 <div class="card-header"><span class="card-title">Dynamic Menu Builder</span></div>
                 <div class="control-bar">
+                    <input type="hidden" id="editMenuKey">
                     <input id="menuLabel" placeholder="Menu Label (e.g. Warranty)">
                     <input id="menuIcon" placeholder="Icon Class (e.g. fa-solid fa-shield)">
                     <input id="menuAction" placeholder="Action ID (e.g. warranty_sec)">
-                    <button class="btn btn-primary" onclick="addMenuItem()">Add Menu</button>
+                    <button class="btn btn-primary" id="menuBtnAdd" onclick="addMenuItem()">Add Menu</button>
+                    <button class="btn btn-success" id="menuBtnUpdate" style="display:none" onclick="updateMenuItem()">Update Menu</button>
                 </div>
-                <div id="menuListContainer"></div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Label</th><th>Icon</th><th>Action</th><th>Visibility</th><th>Action</th></tr></thead>
+                        <tbody id="menuListTable"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -606,7 +612,12 @@
                     <input id="langVal" placeholder="Value (e.g. মোট বিল)">
                     <button class="btn btn-primary" onclick="addLangItem()">Set Translation</button>
                 </div>
-                <div id="langListContainer"></div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead><tr><th>Key</th><th>Value</th><th>Action</th></tr></thead>
+                        <tbody id="langListTable"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -657,7 +668,7 @@
         <div id="inventory" class="view-section"><div class="control-bar"><input id="invSearch" placeholder="Search Product..." style="flex:1" oninput="renderInventory()"><button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button><button class="btn btn-warning" onclick="openBulkModal()"><i class="fa-solid fa-bolt"></i> Bulk Actions</button><button class="btn btn-dark" onclick="toggleDeadStock()"><i class="fa-solid fa-skull"></i> Dead Stock</button></div><div class="table-wrapper" style="max-height: 70vh;"><table><thead><tr><th>Name</th><th>Category</th><th>Stock</th><th>Cost</th><th>Sell</th><th>Status</th><th>Action</th></tr></thead><tbody id="invTable"></tbody></table></div></div>
         <div id="sales" class="view-section"><div class="card" style="margin-bottom:20px"><div class="card-header"><span class="card-title">Invoice Manager</span></div><div style="display:flex; gap:10px"><input id="saleSearch" placeholder="Enter Memo ID..." style="flex:1"><button class="btn btn-primary" onclick="searchInvoice()">Search</button></div></div><div id="invoiceResult"></div></div>
         <div id="crm" class="view-section"><div class="control-bar"><input id="custSearch" placeholder="Search Customer..." style="flex:1" oninput="renderCustomers()"></div><div class="table-wrapper"><table><thead><tr><th>Name</th><th>Phone</th><th>Total Buy</th><th>Due</th><th>Action</th></tr></thead><tbody id="custTable"></tbody></table></div></div>
-        
+
         <!-- USER MANAGEMENT (UPDATED) -->
         <div id="users" class="view-section">
             <div class="control-bar">
@@ -668,7 +679,7 @@
         </div>
 
         <div id="logs" class="view-section"><div class="card"><div class="card-header"><span class="card-title">System Activity Logs</span><button class="btn btn-danger" style="padding:5px 10px; font-size:12px" onclick="wipeData('logs')">🗑️ Clear All Logs</button></div><div class="table-wrapper" style="max-height: 70vh;"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="logTable"></tbody></table></div></div></div>
-        <div id="system" class="view-section"><div class="grid-4"><div class="card" style="border-color:var(--danger)"><div class="card-header"><span class="card-title" style="color:var(--danger)">EMERGENCY LOCKDOWN</span><label class="toggle-switch"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider" style="background-color:#334155"></span></label></div><p style="font-size:13px; color:#94a3b8">Turn ON to instantly block all POS access.</p><div class="config-item" style="margin-top:10px"><label>Maintenance Message</label><input id="sysMaintMsg" placeholder="System under maintenance..." class="config-input" style="width:100%"></div><button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="saveSystemMsg()">Update Message</button></div><div class="card"><div class="card-header"><span class="card-title">Scrolling Notice</span></div><div style="display:flex; gap:10px"><input id="noticeInput" placeholder="Message for staff..."><button class="btn btn-primary" onclick="updateNotice()">Send</button></div></div></div><div class="card"><div class="card-header"><span class="card-title">Data Management</span></div><div style="display:flex; gap:15px; flex-wrap:wrap"><button class="btn btn-success" onclick="backupData()"><i class="fa-solid fa-download"></i> Full Backup</button><button class="btn btn-danger" onclick="wipeData('entries')"><i class="fa-solid fa-trash"></i> Clear Sales</button></div></div></div>
+        <div id="system" class="view-section"><div class="grid-4"><div class="card" style="border-color:var(--danger)"><div class="card-header"><span class="card-title" style="color:var(--danger)">EMERGENCY LOCKDOWN</span><label class="toggle-switch"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider" style="background-color:#334155"></span></label></div><p style="font-size:13px; color:#94a3b8">Turn ON to instantly block all POS access.</p><div class="config-item" style="margin-top:10px"><label>Maintenance Message</label><input id="sysMaintMsg" placeholder="System under maintenance..." class="config-input" style="width:100%"></div><button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="saveSystemMsg()">Update Message</button></div><div class="card"><div class="card-header"><span class="card-title">Scrolling Notice</span></div><div style="display:flex; gap:10px"><input id="noticeInput" placeholder="Message for staff..."><div style="display:flex; gap:5px"><button class="btn btn-primary" onclick="updateNotice()">Send</button><button class="btn btn-danger" onclick="clearNotice()">OFF</button></div></div></div></div><div class="card"><div class="card-header"><span class="card-title">Data Management</span></div><div style="display:flex; gap:15px; flex-wrap:wrap"><button class="btn btn-success" onclick="backupData()"><i class="fa-solid fa-download"></i> Full Backup</button><button class="btn btn-danger" onclick="wipeData('entries')"><i class="fa-solid fa-trash"></i> Clear Sales</button></div></div></div>
         <div id="ui_builder" class="view-section"><div class="grid-4"><div class="card" style="grid-column: span 2;"><div class="card-header"><span class="card-title">🎨 Theme & Experience</span></div><div class="config-item"><label>Primary Color</label><input type="color" id="uiPrimary" value="#4f46e5" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Background Start</label><input type="color" id="uiBg1" value="#0f172a" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Background End</label><input type="color" id="uiBg2" value="#172554" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Font Family</label><input id="uiFont" placeholder="Hind Siliguri" class="config-input" style="width:150px"></div><div class="config-item"><label>Login Message</label><input id="uiLoginMsg" placeholder="Welcome..." class="config-input" style="width:200px"></div><button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="saveUISettings()">Apply UI Changes</button></div></div></div>
 
     </div>
@@ -711,17 +722,19 @@ function safeCheck(id, val) { const el = document.getElementById(id); if(el) el.
 
 function loadData() {
     db.ref("products").on("value", s => { products = []; s.forEach(c => { let p = c.val(); p.key = c.key; products.push(p); }); renderInventory(); updateDashboard(); });
-    db.ref("entries").on("value", s => { entries = []; s.forEach(c => { let e = c.val(); e.key = c.key; entries.push(e); }); updateDashboard(); renderChart(); renderCustomers(); genReport(); });
+    db.ref("entries").on("value", s => { entries = []; s.forEach(c => { let e = c.val(); e.key = c.key; entries.push(e); }); updateDashboard(); renderChart(); renderCustomers(); genReport(); renderStaffPerf(); });
     db.ref("users").on("value", s => { users = s.val() || {}; renderUsers(); });
     db.ref("customers").on("value", s => { customers = []; s.forEach(c => { let cust = c.val(); cust.key = c.key; customers.push(cust); }); renderCustomers(); });
     db.ref("logs").limitToLast(100).on("value", s => renderLogs(s.val()));
     db.ref("settings/appLock").on("value", s => safeCheck("lockSwitch", s.val() || false));
+    db.ref("settings/maintMsg").on("value", s => safeSet("sysMaintMsg", s.val() || ""));
+    db.ref("settings/notice").on("value", s => safeSet("noticeInput", s.val() || ""));
     db.ref("suppliers").on("value", s => { suppliers = []; s.forEach(c => suppliers.push(c.val())); renderSuppliers(); });
     db.ref("payroll").on("value", s => { payroll = []; s.forEach(c => payroll.push(c.val())); renderPayroll(); });
     db.ref("attendance").on("value", s => { attendance = []; s.forEach(c => attendance.push(c.val())); renderAttendance(); });
     db.ref("shifts").on("value", s => { shifts = s.val() || []; renderShifts(); });
     db.ref("transfers").on("value", s => renderTransfers(s.val()));
-    
+
     // --- MASTER CONFIG LOADER ---
     db.ref("settings/masterConfig").on("value", s => {
         const c = s.val() || {};
@@ -734,8 +747,8 @@ function loadData() {
     });
 
     // --- ULTRA PRO LOADERS ---
-    db.ref("settings/menu").on("value", s => renderList(s.val(), "menuListContainer", "removeMenu"));
-    db.ref("settings/translations").on("value", s => renderList(s.val(), "langListContainer", "removeLang", true));
+    db.ref("settings/menu").on("value", s => renderMenuList(s.val()));
+    db.ref("settings/translations").on("value", s => renderLangList(s.val()));
     db.ref("settings/payments").on("value", s => renderList(s.val(), "pmListContainer", "removePM"));
     db.ref("settings/css").on("value", s => safeSet("customCssArea", s.val() || ""));
     db.ref("settings/invoiceDesign").on("value", s => { const d = s.val() || {}; safeCheck("invShowSerial", d.showSerial); safeCheck("invShowDesc", d.showDesc); safeCheck("invShowRate", d.showRate); safeSet("invLogoUrl", d.logoUrl || ""); safeSet("invHeaderColor", d.headerColor || "#000000"); });
@@ -775,15 +788,54 @@ function saveMasterConfig() {
 }
 
 // --- ULTRA PRO FUNCTIONS ---
-function addMenuItem() { const l = document.getElementById("menuLabel").value, i = document.getElementById("menuIcon").value, a = document.getElementById("menuAction").value; db.ref("settings/menu").push({label:l, icon:i, action:a}); }
+function addMenuItem() { const l = document.getElementById("menuLabel").value, i = document.getElementById("menuIcon").value, a = document.getElementById("menuAction").value; if(l && a) db.ref("settings/menu").push({label:l, icon:i, action:a, visible:true}); }
 function removeMenu(k) { db.ref("settings/menu/"+k).remove(); }
-function addLangItem() { const k = document.getElementById("langKey").value, v = document.getElementById("langVal").value; db.ref("settings/translations/"+k).set(v); }
+function editMenu(k) {
+    db.ref("settings/menu/"+k).once("value", s => {
+        const m = s.val();
+        document.getElementById("editMenuKey").value = k;
+        document.getElementById("menuLabel").value = m.label;
+        document.getElementById("menuIcon").value = m.icon;
+        document.getElementById("menuAction").value = m.action;
+        document.getElementById("menuBtnAdd").style.display = "none";
+        document.getElementById("menuBtnUpdate").style.display = "inline-block";
+    });
+}
+function updateMenuItem() {
+    const k = document.getElementById("editMenuKey").value;
+    const data = { label: document.getElementById("menuLabel").value, icon: document.getElementById("menuIcon").value, action: document.getElementById("menuAction").value };
+    db.ref("settings/menu/"+k).update(data).then(() => {
+        alert("Menu Updated!");
+        document.getElementById("menuBtnAdd").style.display = "inline-block";
+        document.getElementById("menuBtnUpdate").style.display = "none";
+        document.getElementById("menuLabel").value = ""; document.getElementById("menuIcon").value = ""; document.getElementById("menuAction").value = "";
+    });
+}
+function renderMenuList(data) {
+    const t = document.getElementById("menuListTable"); t.innerHTML = "";
+    if(!data) return;
+    Object.keys(data).forEach(k => {
+        const m = data[k];
+        t.innerHTML += `<tr><td>${m.label}</td><td><i class="${m.icon}"></i></td><td>${m.action}</td><td><input type="checkbox" ${m.visible?'checked':''} onchange="db.ref('settings/menu/${k}/visible').set(this.checked)"></td><td><button class="btn btn-primary" style="padding:5px" onclick="editMenu('${k}')">Edit</button> <button class="btn btn-danger" style="padding:5px" onclick="removeMenu('${k}')">Del</button></td></tr>`;
+    });
+}
+
+function addLangItem() { const k = document.getElementById("langKey").value, v = document.getElementById("langVal").value; if(k && v) db.ref("settings/translations/"+k).set(v); }
 function removeLang(k) { db.ref("settings/translations/"+k).remove(); }
+function renderLangList(data) {
+    const t = document.getElementById("langListTable"); t.innerHTML = "";
+    if(!data) return;
+    Object.keys(data).forEach(k => {
+        t.innerHTML += `<tr><td>${k}</td><td>${data[k]}</td><td><button class="btn btn-danger" style="padding:5px" onclick="removeLang('${k}')">Delete</button></td></tr>`;
+    });
+}
+
 function addPaymentMethod() { const n = document.getElementById("pmName").value, c = document.getElementById("pmCharge").value; db.ref("settings/payments").push({name:n, charge:c}); }
 function removePM(k) { db.ref("settings/payments/"+k).remove(); }
 function saveCustomCSS() { db.ref("settings/css").set(document.getElementById("customCssArea").value); alert("CSS Injected!"); }
 function saveInvoiceDesign() { const d = { showSerial: document.getElementById("invShowSerial").checked, showDesc: document.getElementById("invShowDesc").checked, showRate: document.getElementById("invShowRate").checked, logoUrl: document.getElementById("invLogoUrl").value, headerColor: document.getElementById("invHeaderColor").value }; db.ref("settings/invoiceDesign").set(d); alert("Design Saved!"); }
-function sendLivePopup() { const msg = document.getElementById("autoPopupMsg").value; if(msg) db.ref("settings/popup").set({msg:msg, time:Date.now()}); alert("Sent!"); }
+function sendLivePopup() { const msg = document.getElementById("autoPopupMsg").value; if(msg) db.ref("settings/popup").set({msg:msg, time:Date.now(), active:true}); alert("Sent!"); }
+function stopPopup() { db.ref("settings/popup/active").set(false); alert("Popup Stopped!"); }
 
 function renderList(data, containerId, removeFunc, isObj=false) {
     const c = document.getElementById(containerId); c.innerHTML = "";
@@ -796,19 +848,19 @@ function renderList(data, containerId, removeFunc, isObj=false) {
 }
 
 // --- USER MANAGEMENT FUNCTIONS (UPDATED) ---
-function renderUsers() { 
-    const g = document.getElementById("userGrid"); g.innerHTML = ""; 
+function renderUsers() {
+    const g = document.getElementById("userGrid"); g.innerHTML = "";
     Object.keys(users).forEach(k => {
         const u = users[k]; const isBanned = u.blocked === true; const statusColor = isBanned ? '#ef4444' : '#10b981'; const statusText = isBanned ? 'BANNED' : 'ACTIVE'; const cardBorder = isBanned ? '2px solid #ef4444' : '1px solid #334155';
-        g.innerHTML += `<div class="card" style="border:${cardBorder}; position:relative; opacity:${isBanned ? 0.7 : 1}"><div class="card-header" style="margin-bottom:10px"><span class="card-title" style="font-size:16px; color:#fff">${k.toUpperCase()}</span><span style="font-size:10px; background:${statusColor}20; color:${statusColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${statusText}</span></div><div style="font-size:13px; color:#94a3b8; margin-bottom:15px"><p>🔑 Role: <b style="color:#fff">${u.role.toUpperCase()}</b></p><p>🔒 Pass: ${u.pass}</p></div><div style="display:flex; gap:10px; margin-bottom:10px"><button class="btn btn-primary" style="flex:1; font-size:12px; padding:8px" onclick="openUserModal('${k}')">✏️ Edit</button><button class="btn btn-warning" style="flex:1; font-size:12px; padding:8px" onclick="kickUser('${k}')">⚡ Kick</button></div>${!isBanned ? `<button class="btn btn-danger" style="width:100%; font-size:12px; padding:8px" onclick="toggleBan('${k}', true)">🚫 BAN USER</button>` : `<button class="btn btn-success" style="width:100%; font-size:12px; padding:8px" onclick="toggleBan('${k}', false)">✅ UNBAN USER</button>`}</div>`; 
-    }); 
+        g.innerHTML += `<div class="card" style="border:${cardBorder}; position:relative; opacity:${isBanned ? 0.7 : 1}"><div class="card-header" style="margin-bottom:10px"><span class="card-title" style="font-size:16px; color:#fff">${k.toUpperCase()}</span><span style="font-size:10px; background:${statusColor}20; color:${statusColor}; padding:3px 8px; border-radius:4px; font-weight:bold">${statusText}</span></div><div style="font-size:13px; color:#94a3b8; margin-bottom:15px"><p>🔑 Role: <b style="color:#fff">${u.role.toUpperCase()}</b></p><p>🔒 Pass: ${u.pass}</p></div><div style="display:flex; gap:10px; margin-bottom:10px"><button class="btn btn-primary" style="flex:1; font-size:12px; padding:8px" onclick="openUserModal('${k}')">✏️ Edit</button><button class="btn btn-warning" style="flex:1; font-size:12px; padding:8px" onclick="kickUser('${k}')">⚡ Kick</button></div>${!isBanned ? `<button class="btn btn-danger" style="width:100%; font-size:12px; padding:8px" onclick="toggleBan('${k}', true)">🚫 BAN USER</button>` : `<button class="btn btn-success" style="width:100%; font-size:12px; padding:8px" onclick="toggleBan('${k}', false)">✅ UNBAN USER</button>`}</div>`;
+    });
 }
 function openUserModal(key = "") {
     document.getElementById("uKey").value = key; document.getElementById("uName").value = ""; document.getElementById("uPass").value = ""; document.getElementById("uRole").value = "staff"; document.getElementById("uBlocked").checked = false; document.getElementById("uName").disabled = false;
     if(key && users[key]) { const u = users[key]; document.getElementById("uName").value = key; document.getElementById("uName").disabled = true; document.getElementById("uPass").value = u.pass; document.getElementById("uRole").value = u.role; document.getElementById("uBlocked").checked = u.blocked === true; }
     document.getElementById("userModal").style.display = "flex";
 }
-function saveUser() { 
+function saveUser() {
     const key = document.getElementById("uKey").value; const u = document.getElementById("uName").value.trim().toLowerCase(); const p = document.getElementById("uPass").value; const r = document.getElementById("uRole").value; const b = document.getElementById("uBlocked").checked;
     if(!u || !p) return alert("Username and Password required!");
     db.ref("users/" + u).update({ pass: p, role: r, blocked: b, forceLogout: b }).then(() => { alert("User Saved Successfully!"); closeModal('userModal'); });
@@ -829,7 +881,8 @@ function searchInvoice() { const q = document.getElementById("saleSearch").value
 function renderCustomers() { const q = document.getElementById("custSearch").value.toLowerCase(); const t = document.getElementById("custTable"); t.innerHTML = ""; customers.filter(c => c.name.toLowerCase().includes(q)).forEach(c => t.innerHTML += `<tr><td>${c.name}</td><td>${c.phone}</td><td>-</td><td>-</td><td>X</td></tr>`); }
 function renderLogs(l) { const t = document.getElementById("logTable"); t.innerHTML = ""; if(l) Object.values(l).reverse().forEach(x => t.innerHTML += `<tr><td>${x.time}</td><td>${x.user}</td><td>${x.action}</td><td>${x.details}</td></tr>`); }
 function toggleLock() { const s = document.getElementById("lockSwitch").checked; db.ref("settings/appLock").set(s); updateNotice(s ? "MAINTENANCE MODE" : ""); }
-function updateNotice(m) { db.ref("settings/notice").set(m || document.getElementById("noticeInput").value); }
+function updateNotice() { db.ref("settings/notice").set(document.getElementById("noticeInput").value); alert("Notice Updated!"); }
+function clearNotice() { db.ref("settings/notice").set(""); document.getElementById("noticeInput").value = ""; alert("Notice Cleared!"); }
 function backupData() { const d = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({products, entries, users})); const a = document.createElement('a'); a.href = d; a.download = "backup.json"; a.click(); }
 function wipeData(n) { if(confirm("Sure?")) db.ref(n).remove(); }
 function addSupplier() { db.ref("suppliers").push({ name: document.getElementById("supName").value, phone: document.getElementById("supPhone").value }); alert("Supplier Added"); }
@@ -847,6 +900,7 @@ function optimizeDB() { if(confirm("Clear old logs?")) { db.ref("logs").remove()
 function genAPI() { document.getElementById("apiKeyDisplay").value = "sk_live_" + Math.random().toString(36).substr(2, 16); }
 function saveWhiteLabel() { db.ref("settings/whiteLabel").set(document.getElementById("wlTitle").value); alert("Saved"); }
 function genReport() { const t = document.getElementById("repTable").querySelector("tbody"); t.innerHTML = ""; entries.forEach(e => { t.innerHTML += `<tr><td>${e.date}</td><td>${e.memoId||'-'}</td><td>${e.note}</td><td>${e.total}</td><td>-</td></tr>`; }); }
+function renderStaffPerf() { const t = document.getElementById("staffTable").querySelector("tbody"); t.innerHTML = ""; const perf = {}; entries.forEach(e => { if(!perf[e.user]) perf[e.user] = {sale:0, count:0}; perf[e.user].sale += parseFloat(e.total); perf[e.user].count++; }); Object.keys(perf).forEach(u => t.innerHTML += `<tr><td>${u}</td><td>${perf[u].sale}</td><td>${perf[u].count}</td><td>-</td></tr>`); }
 function exportData(type) { let data = []; if(type==='products') data = products; if(type==='sales') data = entries; if(type==='customers') data = customers; const ws = XLSX.utils.json_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Sheet1"); XLSX.writeFile(wb, type + "_export.xlsx"); }
 function closeModal(id) { document.getElementById(id).style.display = "none"; }
 </script>
