@@ -751,9 +751,15 @@ tr:hover { background-color: #f8fafc; }
 
                 <div id="cartList"></div>
 
-                <hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0">
+<hr style="border:0; border-top:1px dashed #cbd5e1; margin:20px 0">
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+<!-- NEW QUICK SALE CHECKBOX -->
+<div style="background:#fffbeb; padding:10px; border-radius:6px; margin-bottom:15px; border:1px solid #fcd34d; display:flex; align-items:center; gap:10px;">
+    <input type="checkbox" id="quickSaleToggle" onchange="toggleQuickSaleMode()" style="width:18px; height:18px; margin:0; cursor:pointer">
+    <label for="quickSaleToggle" style="margin:0; font-weight:bold; color:#d97706; cursor:pointer; font-size:14px;">⚡ নাম/নাম্বার ছাড়া সেল (Quick Sale)</label>
+</div>
+
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
                     <div class="form-group">
                         <label>কাস্টমারের নাম (খালি থাকলে 'General Customer'):</label>
                         <input id="note" placeholder="কাস্টমারের নাম (ঐচ্ছিক)...">
@@ -968,10 +974,11 @@ tr:hover { background-color: #f8fafc; }
         </div>
     </div>
 
-    <!-- FIXED ASSET MANAGEMENT (NEW SECTION) -->
 <!-- FIXED ASSET MANAGEMENT (UPDATED DESIGN) -->
     <div id="assetManager" class="section">
         <div class="card-glass" style="max-width:1100px; margin:auto;">
+            
+            <!-- ১. হেডার সেকশন (টাইটেল এবং মোট ভ্যালু) -->
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom: 25px;">
                 <h3 style="margin:0; color:#8b5cf6;">🏢 দোকানের স্থায়ী সম্পদ (Fixed Assets)</h3>
                 <div style="text-align:right; background:#f5f3ff; padding:10px 20px; border-radius:10px; border:1px solid #ddd6fe">
@@ -980,36 +987,50 @@ tr:hover { background-color: #f8fafc; }
                 </div>
             </div>
 
-            <!-- Add New Asset Form -->
+            <!-- ২. ইনপুট ফর্ম (২টা উপরে, ২টা নিচে) -->
             <div style="background:#fff; padding:25px; border-radius:12px; margin-bottom:30px; border:1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <h4 style="margin-top:0; color:#4b5563; margin-bottom:20px; border-bottom:1px dashed #cbd5e1; padding-bottom:10px;">➕ নতুন মালামাল যুক্ত করুন</h4>
-                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:20px; align-items:end;">
-                    <div class="form-group" style="margin:0">
-                        <label>পণ্যের নাম ও বিবরণ:</label>
-                        <input id="assetName" placeholder="যেমন: Epson L130 Printer..." style="border:1px solid #cbd5e1">
+                
+                <div style="display:flex; flex-direction:column; gap:15px;">
+                    
+                    <!-- প্রথম লাইন: নাম এবং তারিখ -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="form-group" style="margin:0">
+                            <label>পণ্যের নাম ও বিবরণ:</label>
+                            <input id="assetName" placeholder="যেমন: Epson L130 Printer..." style="border:1px solid #cbd5e1">
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label>কেনার তারিখ:</label>
+                            <input id="assetDate" type="date" class="en" style="border:1px solid #cbd5e1">
+                        </div>
                     </div>
-                    <div class="form-group" style="margin:0">
-                        <label>কেনার তারিখ:</label>
-                        <input id="assetDate" type="date" class="en" style="border:1px solid #cbd5e1">
+
+                    <!-- দ্বিতীয় লাইন: স্ট্যাটাস এবং দাম -->
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        <div class="form-group" style="margin:0">
+                            <label>বর্তমান অবস্থা:</label>
+                            <select id="assetStatus" style="border:1px solid #cbd5e1">
+                                <option value="Active">Active (ভালো)</option>
+                                <option value="Repairing">Repairing (মেরামত)</option>
+                                <option value="Damaged">Damaged (নষ্ট)</option>
+                                <option value="Sold">Sold (বিক্রি)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0">
+                            <label>কেনা দাম (Tk):</label>
+                            <input id="assetPrice" type="number" class="en" placeholder="0" style="border:1px solid #cbd5e1; font-weight:bold">
+                        </div>
                     </div>
-                    <div class="form-group" style="margin:0">
-                        <label>বর্তমান অবস্থা:</label>
-                        <select id="assetStatus" style="border:1px solid #cbd5e1">
-                            <option value="Active">Active (ভালো)</option>
-                            <option value="Repairing">Repairing (মেরামত)</option>
-                            <option value="Damaged">Damaged (নষ্ট)</option>
-                            <option value="Sold">Sold (বিক্রি)</option>
-                        </select>
+
+                    <!-- বাটন (নিচে ডানপাশে) -->
+                    <div style="text-align:right;">
+                        <button onclick="saveAsset()" style="height:45px; width: 150px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color:white; font-weight:bold; border-radius:8px;">💾 সেভ করুন</button>
                     </div>
-                    <div class="form-group" style="margin:0">
-                        <label>কেনা দাম (Tk):</label>
-                        <input id="assetPrice" type="number" class="en" placeholder="0" style="border:1px solid #cbd5e1; font-weight:bold">
-                    </div>
-                    <button onclick="saveAsset()" style="height:48px; width: 100px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color:white; font-weight:bold; border-radius:8px;">💾 সেভ</button>
+
                 </div>
             </div>
 
-            <!-- Asset Table -->
+            <!-- ৩. অ্যাসেট টেবিল (লিস্ট) -->
             <div class="table-box">
                 <table class="en" style="width:100%">
                     <thead>
@@ -1025,9 +1046,11 @@ tr:hover { background-color: #f8fafc; }
                     <tbody id="assetBody"></tbody>
                 </table>
             </div>
+
         </div>
     </div>
 
+           
     <!-- BUSINESS ANALYTICS -->
     <div id="analytics" class="section">
         <div class="card-glass">
@@ -2242,7 +2265,8 @@ function openMyCashModal() {
     });
 
     allExpenses.forEach(exp => {
-        if(exp.user === currentUser && exp.date === today) {
+        // এখানে !exp.isNonCash মানে হলো: যদি এটা 'নন-ক্যাশ' না হয়, তবেই ক্যাশ থেকে বাদ দাও
+        if(exp.user === currentUser && exp.date === today && !exp.isNonCash) {
             myExpense += parseFloat(exp.amount) || 0;
         }
     });
@@ -3544,20 +3568,70 @@ function deleteHeldOrder(index) {
         openHoldModal();
     }
 }
+// --- QUICK SALE TOGGLE FUNCTION (NEW) ---
+function toggleQuickSaleMode() {
+    const isQuick = document.getElementById("quickSaleToggle").checked;
+    const phoneInput = document.getElementById("phone");
+    const errorSpan = document.getElementById("phoneError");
+
+    if (isQuick) {
+        phoneInput.placeholder = "অটো জেনারেট হবে (Auto)";
+        phoneInput.disabled = true; 
+        phoneInput.style.background = "#f1f5f9";
+        errorSpan.style.display = "none";
+        phoneInput.classList.remove("invalid");
+        phoneInput.value = ""; 
+    } else {
+        phoneInput.placeholder = "017xxxxxxxx";
+        phoneInput.disabled = false;
+        phoneInput.style.background = "#fff";
+    }
+}
 
 // --- SEQUENTIAL MEMO ID LOGIC ---
 function saveBulkEntry(showMemoFlag){
     if(!cart.length) return showToast("কার্ট খালি!", "error");
 
     const isQuotation = document.getElementById("quotationMode").checked;
+    // কুইক সেল মোড চেক করা হচ্ছে
+    const isQuickSale = document.getElementById("quickSaleToggle") ? document.getElementById("quickSaleToggle").checked : false;
 
     let noteVal = document.getElementById("note").value.trim();
-    if(!noteVal) noteVal = isQuotation ? "Quotation / Estimate" : "General Customer";
-    const phoneVal = document.getElementById("phone").value.trim();
+    let phoneVal = document.getElementById("phone").value.trim();
+
+    // --- QUICK SALE LOGIC (NEW) ---
+    if (isQuickSale) {
+        if (!noteVal) noteVal = "General Customer";
+        
+        // অটোমেটিক ইউনিক আইডি জেনারেট হবে
+        if (!phoneVal) {
+            const uniqueId = Math.floor(Date.now() / 1000).toString().slice(-5); 
+            phoneVal = "QC-" + uniqueId;
+        }
+    } else {
+        // --- NORMAL LOGIC (OLD) ---
+        if(!noteVal) noteVal = isQuotation ? "Quotation / Estimate" : "General Customer";
+
+        if(sysConfig.rules.phoneReq && phoneVal.length < 11) {
+            showToast("❌ মোবাইল নম্বর বাধ্যতামূলক (Admin Rule)!", "error");
+            return;
+        }
+        
+        if(phoneVal.length > 0) {
+            const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
+            if(!bdPhoneRegex.test(phoneVal)) {
+                showToast("❌ ভুল মোবাইল নম্বর! (013-019 দিয়ে শুরু হতে হবে)", "error");
+                return;
+            }
+        }
+    }
+    
+    // ভেরিয়েবলগুলো আগে ডিফাইন করা হলো যাতে নিচের কোড ঠিক থাকে
     const totalVal = parseFloat(document.getElementById("total").value);
     const takenVal = parseFloat(document.getElementById("taken").value) || 0;
     const dueVal = totalVal - takenVal;
 
+    // --- QUOTATION LOGIC ---
     if(isQuotation) {
         const dummyEntry = {
             date: new Date().toLocaleDateString("en-GB"),
@@ -3576,25 +3650,14 @@ function saveBulkEntry(showMemoFlag){
         return;
     }
 
-    if(sysConfig.rules.phoneReq && phoneVal.length < 11) {
-        showToast("❌ মোবাইল নম্বর বাধ্যতামূলক (Admin Rule)!", "error");
-        return;
-    }
-
+    // --- DUE LIMIT CHECK ---
     const dueLimit = parseFloat(sysConfig.rules.dueLimit);
     if(dueLimit > 0 && dueVal > dueLimit) {
         showToast(`❌ বাকি লিমিট অতিক্রম করেছে! সর্বোচ্চ বাকি: ৳${dueLimit}`, "error");
         return;
     }
 
-    if(phoneVal.length > 0) {
-        const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
-        if(!bdPhoneRegex.test(phoneVal)) {
-            showToast("❌ ভুল মোবাইল নম্বর! (013-019 দিয়ে শুরু হতে হবে)", "error");
-            return;
-        }
-    }
-
+    // --- SAVE TO DATABASE ---
     if (!navigator.onLine) {
         const offlineId = "OFF-" + Date.now().toString().slice(-6);
         processEntry(offlineId, totalVal, takenVal, noteVal, phoneVal, showMemoFlag);
