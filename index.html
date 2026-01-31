@@ -575,6 +575,8 @@ tr:hover { background-color: #f8fafc; }
             <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
             <a id="nav-stockAdjustment" onclick="showSection('stockAdjustment')" style="color:#f59e0b; font-weight:bold;">🛠️ স্টক অ্যাডজাস্টমেন্ট</a>
             <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
+            <!-- NEW ASSET MENU -->
+            <a id="nav-assets" onclick="showSection('assetManager')" style="color:#8b5cf6; font-weight:bold;">🏢 দোকানের মালামাল (Assets)</a>
             <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
             <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
         </div>
@@ -966,6 +968,66 @@ tr:hover { background-color: #f8fafc; }
         </div>
     </div>
 
+    <!-- FIXED ASSET MANAGEMENT (NEW SECTION) -->
+<!-- FIXED ASSET MANAGEMENT (UPDATED DESIGN) -->
+    <div id="assetManager" class="section">
+        <div class="card-glass" style="max-width:1100px; margin:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom: 25px;">
+                <h3 style="margin:0; color:#8b5cf6;">🏢 দোকানের স্থায়ী সম্পদ (Fixed Assets)</h3>
+                <div style="text-align:right; background:#f5f3ff; padding:10px 20px; border-radius:10px; border:1px solid #ddd6fe">
+                    <span style="display:block; font-size:12px; color:#64748b">বর্তমান মোট ভ্যালু</span>
+                    <b style="font-size:24px; color:#7c3aed">৳ <span id="totalAssetValue">0</span></b>
+                </div>
+            </div>
+
+            <!-- Add New Asset Form -->
+            <div style="background:#fff; padding:25px; border-radius:12px; margin-bottom:30px; border:1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <h4 style="margin-top:0; color:#4b5563; margin-bottom:20px; border-bottom:1px dashed #cbd5e1; padding-bottom:10px;">➕ নতুন মালামাল যুক্ত করুন</h4>
+                <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:20px; align-items:end;">
+                    <div class="form-group" style="margin:0">
+                        <label>পণ্যের নাম ও বিবরণ:</label>
+                        <input id="assetName" placeholder="যেমন: Epson L130 Printer..." style="border:1px solid #cbd5e1">
+                    </div>
+                    <div class="form-group" style="margin:0">
+                        <label>কেনার তারিখ:</label>
+                        <input id="assetDate" type="date" class="en" style="border:1px solid #cbd5e1">
+                    </div>
+                    <div class="form-group" style="margin:0">
+                        <label>বর্তমান অবস্থা:</label>
+                        <select id="assetStatus" style="border:1px solid #cbd5e1">
+                            <option value="Active">Active (ভালো)</option>
+                            <option value="Repairing">Repairing (মেরামত)</option>
+                            <option value="Damaged">Damaged (নষ্ট)</option>
+                            <option value="Sold">Sold (বিক্রি)</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0">
+                        <label>কেনা দাম (Tk):</label>
+                        <input id="assetPrice" type="number" class="en" placeholder="0" style="border:1px solid #cbd5e1; font-weight:bold">
+                    </div>
+                    <button onclick="saveAsset()" style="height:48px; width: 100px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color:white; font-weight:bold; border-radius:8px;">💾 সেভ</button>
+                </div>
+            </div>
+
+            <!-- Asset Table -->
+            <div class="table-box">
+                <table class="en" style="width:100%">
+                    <thead>
+                        <tr style="background:#f8fafc; text-transform:uppercase; font-size:12px; letter-spacing:0.5px;">
+                            <th style="padding:15px;">তারিখ</th>
+                            <th style="padding:15px;">পণ্যের বিবরণ</th>
+                            <th style="padding:15px;">অবস্থা (Status)</th>
+                            <th style="padding:15px; text-align:right">কেনা দাম</th>
+                            <th style="padding:15px; text-align:right; color:#7c3aed">বর্তমান দাম</th>
+                            <th style="padding:15px; text-align:center">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assetBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- BUSINESS ANALYTICS -->
     <div id="analytics" class="section">
         <div class="card-glass">
@@ -1137,7 +1199,10 @@ tr:hover { background-color: #f8fafc; }
     </div>
 </div>
 
+--- START OF PART 2 ---
+
 <!-- CASH DEPOSIT MODAL (UPDATED WITH LOGIC) -->
+
 <div id="myCashModal" class="modal" style="width:500px">
     <h3 style="margin-top:0; color:#10b981; border-bottom: 1px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">💰 আমার ক্যাশ হিসাব (Net Cash)</h3>
     <div style="background:#f0fdf4; padding:20px; border-radius:12px; text-align:center; margin-bottom:15px; border:1px solid #bbf7d0">
@@ -1831,6 +1896,7 @@ function renderDynamicMenu(menuData) {
         <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
         <a id="nav-stockAdjustment" onclick="showSection('stockAdjustment')" style="color:#f59e0b; font-weight:bold;">🛠️ স্টক অ্যাডজাস্টমেন্ট</a>
         <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
+        <a id="nav-assets" onclick="showSection('assetManager')" style="color:#8b5cf6; font-weight:bold;">🏢 দোকানের মালামাল (Assets)</a>
         <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
         <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
     `;
@@ -2119,6 +2185,7 @@ function setupUser(u) {
     loadAllCustomers();
     loadExpenses();
     loadStockAdjustments();
+    loadAssets(); // ADDED: Load Assets
     setupChat();
     showSection('dashboard');
     setupLiveSearch();
@@ -5181,6 +5248,130 @@ function updateQuickButtonDropdown() {
         html += `<option value="${p.key}">${p.name} (${p.category}) - ৳${p.sellPrice}</option>`;
     });
     sel.innerHTML = html;
+}
+
+// --- FIXED ASSET MANAGEMENT WITH DEPRECIATION ---
+let allAssets = [];
+
+function saveAsset() {
+    const name = document.getElementById("assetName").value.trim();
+    const date = document.getElementById("assetDate").value;
+    const status = document.getElementById("assetStatus").value;
+    const price = parseFloat(document.getElementById("assetPrice").value) || 0;
+
+    if(!name) return showToast("পণ্যের নাম অবশ্যই দিতে হবে!", "error");
+
+    const assetData = {
+        name: name,
+        date: date || new Date().toISOString().split('T')[0],
+        status: status,
+        originalPrice: price, // কেনা দাম ফিক্সড থাকবে
+        currentValue: price,  // বর্তমান দাম কমবে
+        addedBy: currentUser,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    db.ref("fixed_assets").push(assetData).then(() => {
+        showToast("স্থায়ী সম্পদ যুক্ত হয়েছে!", "success");
+        document.getElementById("assetName").value = "";
+        document.getElementById("assetPrice").value = "";
+    });
+}
+
+function loadAssets() {
+    db.ref("fixed_assets").on("value", s => {
+        allAssets = [];
+        let totalCurrentValue = 0;
+        const tbody = document.getElementById("assetBody");
+        tbody.innerHTML = "";
+
+        s.forEach(c => {
+            let a = c.val();
+            a.key = c.key;
+            // পুরনো ডাটার জন্য হ্যান্ডলিং
+            if(!a.originalPrice) a.originalPrice = a.price;
+            if(!a.currentValue) a.currentValue = a.price;
+            
+            allAssets.push(a);
+
+            if(a.status === 'Active' || a.status === 'Repairing') {
+                totalCurrentValue += parseFloat(a.currentValue) || 0;
+            }
+
+            let statusColor = '#10b981';
+            if(a.status === 'Repairing') statusColor = '#f59e0b';
+            if(a.status === 'Damaged') statusColor = '#ef4444';
+            if(a.status === 'Sold') statusColor = '#64748b';
+
+            tbody.innerHTML += `
+            <tr>
+                <td>${a.date}</td>
+                <td>
+                    <span style="font-weight:bold">${a.name}</span>
+                    ${a.lastDepreciation ? `<br><small style="color:#ef4444; font-size:10px">Last Dep: ${a.lastDepreciation}</small>` : ''}
+                </td>
+                <td><span style="background:${statusColor}20; color:${statusColor}; padding:3px 8px; border-radius:4px; font-size:12px; font-weight:bold">${a.status}</span></td>
+                <td style="color:#64748b">৳ ${a.originalPrice}</td>
+                <td style="font-weight:bold; color:#3b82f6">৳ ${a.currentValue}</td>
+                <td>
+                    <button onclick="openDepreciationModal('${a.key}', '${a.name}', ${a.currentValue})" style="padding:5px 10px; background:#f59e0b; color:#fff; border:none; border-radius:4px; font-size:12px; cursor:pointer" title="মান কমান (Depreciation)">📉 মান কমান</button>
+                    <button class="btn-action btn-delete" onclick="deleteAsset('${a.key}')">🗑️</button>
+                </td>
+            </tr>`;
+        });
+
+        setText("totalAssetValue", totalCurrentValue.toLocaleString());
+    });
+}
+
+// --- DEPRECIATION LOGIC ---
+function openDepreciationModal(key, name, currentVal) {
+    const percent = prompt(`"${name}" এর বর্তমান দাম ৳${currentVal}।\n\nকত পারসেন্ট (%) দাম কমাতে চান? (যেমন: 10, 20)`);
+    
+    if(percent) {
+        const p = parseFloat(percent);
+        if(isNaN(p) || p <= 0 || p > 100) return showToast("সঠিক পারসেন্টেজ দিন!", "error");
+
+        const lossAmount = Math.round(currentVal * (p / 100));
+        const newValue = currentVal - lossAmount;
+
+        if(confirm(`আপনি কি নিশ্চিত?\n\nকমানোর পরিমাণ: ৳${lossAmount} (${p}%)\nনতুন দাম হবে: ৳${newValue}\n\nএটি খরচ (Expense) হিসেবে যুক্ত হবে।`)) {
+            applyDepreciation(key, name, lossAmount, newValue, p);
+        }
+    }
+}
+
+function applyDepreciation(key, name, lossAmount, newValue, percent) {
+    const today = new Date().toLocaleDateString("en-GB");
+
+    // ১. অ্যাসেটের দাম আপডেট করা
+    db.ref("fixed_assets/" + key).update({
+        currentValue: newValue,
+        lastDepreciation: `${today} (-${percent}%)`
+    });
+
+    // ২. অটোমেটিক খরচ হিসেবে এন্ট্রি দেওয়া
+    const expData = {
+        date: today,
+        desc: `Asset Depreciation: ${name} (-${percent}%)`,
+        category: "Depreciation Cost", // এই ক্যাটাগরি অটো তৈরি হবে
+        amount: lossAmount,
+        user: currentUser,
+        isNonCash: true // এটি ক্যাশ থেকে কমবে না, শুধু প্রফিট থেকে কমবে
+    };
+
+    db.ref("expenses").push(expData).then(() => {
+        showToast(`সফল! ৳${lossAmount} খরচ হিসেবে দেখানো হয়েছে।`, "success");
+        logActivity("Depreciation", `Reduced value of ${name} by ৳${lossAmount}`);
+    });
+}
+
+function deleteAsset(key) {
+    if (!sysConfig.perms.delete) return showToast("ডিলিট করার অনুমতি নেই!", "error");
+    if(confirm("এই সম্পদটি তালিকা থেকে মুছে ফেলতে চান?")) {
+        db.ref("fixed_assets/"+key).remove();
+        showToast("মুছে ফেলা হয়েছে", "warning");
+    }
 }
 
 window.onbeforeunload = function() {
