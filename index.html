@@ -564,7 +564,7 @@ tr:hover { background-color: #f8fafc; }
         <div class="sidebar-header">Sheikh Computer</div>
         <div style="text-align:right;padding:10px 20px;font-size:24px;cursor:pointer;color:#ef4444; display:none" onclick="closeSidebar()" id="closeBtn">✕</div>
         <div id="userShow"></div>
-        
+
         <!-- DYNAMIC MENU CONTAINER -->
         <div id="dynamicMenuContainer">
             <a id="nav-dashboard" onclick="showSection('dashboard')">🏠 ড্যাশবোর্ড (F1)</a>
@@ -573,11 +573,12 @@ tr:hover { background-color: #f8fafc; }
             <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
             <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
             <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
+            <a id="nav-stockAdjustment" onclick="showSection('stockAdjustment')" style="color:#f59e0b; font-weight:bold;">🛠️ স্টক অ্যাডজাস্টমেন্ট</a>
             <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
             <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
             <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
         </div>
-        
+
         <a onclick="logout()" style="color:#ef4444; margin-top:20px; border-top:1px solid rgba(255,255,255,0.1);">🚪 লগআউট</a>
 
         <!-- SIDEBAR FOOTER -->
@@ -773,7 +774,7 @@ tr:hover { background-color: #f8fafc; }
                         <input id="due" readonly class="en" value="0" style="background:#fef2f2; color:#ef4444; font-weight:bold; font-size: 18px;">
                     </div>
                 </div>
-                
+
                 <!-- QUOTATION MODE TOGGLE (ADDED) -->
                 <div style="margin-top:15px; display:flex; align-items:center; gap:10px; background:#eff6ff; padding:10px; border-radius:8px">
                     <input type="checkbox" id="quotationMode" style="width:20px; height:20px; margin:0">
@@ -890,6 +891,44 @@ tr:hover { background-color: #f8fafc; }
                 <table>
                     <thead><tr><th>Type</th><th>Serial</th><th>Category</th><th>Name</th><th>Stock</th><th>Alert</th><th>Cost Price</th><th>Sell Price</th><th>Action</th></tr></thead>
                     <tbody id="stockBody" class="en"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- STOCK ADJUSTMENT (INTERNAL USE) SECTION -->
+    <div id="stockAdjustment" class="section">
+        <div class="card-glass" style="max-width:800px; margin:auto">
+            <h3 style="color:var(--warning); margin-bottom:20px">🛠️ স্টক অ্যাডজাস্টমেন্ট (Internal Use)</h3>
+            <p style="color:var(--text-light); margin-bottom:20px">দোকানে ব্যবহার, ব্যক্তিগত ব্যবহার বা পণ্য নষ্ট হলে এখান থেকে স্টক কমিয়ে দিন। এটি অটোমেটিক খরচ হিসেবে গণ্য হবে।</p>
+
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:15px; align-items:end; margin-bottom:20px">
+                <div class="form-group" style="position:relative">
+                    <label>🔍 পণ্য খুঁজুন:</label>
+                    <input id="adjSearch" placeholder="নাম বা সিরিয়াল..." class="en" oninput="searchAdjProduct(this.value)">
+                    <div id="adjSearchResults" class="live-search-results" style="top:70px"></div>
+                    <input type="hidden" id="adjProductKey">
+                </div>
+                <div class="form-group">
+                    <label>পরিমাণ (Qty):</label>
+                    <input id="adjQty" type="number" class="en" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>কারণ (Reason):</label>
+                    <select id="adjReason">
+                        <option value="Shop Use">দোকানে ব্যবহার (Shop Use)</option>
+                        <option value="Personal Use">ব্যক্তিগত ব্যবহার (Personal)</option>
+                        <option value="Damaged">নষ্ট হয়েছে (Damaged)</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="saveStockAdjustment()" style="background:var(--warning); color:#000; font-weight:bold">💾 স্টক থেকে বাদ দিন (Deduct Stock)</button>
+
+            <h4 style="margin:30px 0 15px 0; color:var(--text-main)">সাম্প্রতিক অ্যাডজাস্টমেন্ট হিস্ট্রি</h4>
+            <div class="table-box">
+                <table class="en">
+                    <thead><tr><th>তারিখ</th><th>পণ্য</th><th>পরিমাণ</th><th>কারণ</th><th>খরচ (Cost)</th><th>ইউজার</th></tr></thead>
+                    <tbody id="adjHistoryBody"></tbody>
                 </table>
             </div>
         </div>
@@ -1115,7 +1154,7 @@ tr:hover { background-color: #f8fafc; }
             <div style="font-size:32px; font-weight:800; color:#16a34a; margin-top:5px">৳ <span id="myNetCash">0</span></div>
         </div>
     </div>
-    
+
     <!-- Quick Expense Button Inside Cash Modal -->
     <div style="text-align:center; margin-bottom:20px;">
         <button onclick="closeModal('myCashModal'); showSection('expenseManager')" style="width:auto; padding:5px 15px; font-size:12px; background:#ef4444">💸 খরচ / টাকা আউট করুন</button>
@@ -1201,7 +1240,7 @@ tr:hover { background-color: #f8fafc; }
         <h3 style="margin:0; color:#ef4444;">🔄 স্মার্ট সেলস রিটার্ন</h3>
         <button onclick="closeModal('returnModal')" style="background:none; color:#ef4444; font-size:28px; padding:0; width:auto; box-shadow:none;">×</button>
     </div>
-    
+
     <!-- Search Section -->
     <div style="background:#fef2f2; padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid #fecaca">
         <label style="font-weight:bold; color:#b91c1c; display:block; margin-bottom:10px">১. ইনভয়েস খুঁজুন (Memo No / Name / Phone):</label>
@@ -1739,7 +1778,7 @@ function loadGodModeListeners() {
     db.ref("settings/css").on("value", snap => {
         document.getElementById("adminDynamicStyle").innerHTML = snap.val() || "";
     });
-    
+
     // 6. Force Popup Listener
     db.ref("settings/popup").on("value", snap => {
         const popup = snap.val();
@@ -1774,7 +1813,7 @@ function updateModuleVisibility() {
 function updateUIFromConfig() {
     const memoLabel = document.getElementById("memoTypeHeader");
     if(memoLabel) memoLabel.innerText = sysConfig.ui.memoLabel || "MEMO / BILL";
-    
+
     const footer = document.getElementById("memoFooterMsg");
     if(footer) footer.innerText = sysConfig.ui.footer || "Thank you!";
 }
@@ -1790,18 +1829,17 @@ function renderDynamicMenu(menuData) {
         <a id="nav-return" onclick="openReturnModal()" style="color:#ef4444;">🔄 সেলস রিটার্ন / ফেরত</a>
         <a id="nav-customerManager" onclick="showSection('customerManager')">👥 কাস্টমার ম্যানেজমেন্ট</a>
         <a id="nav-inventory" onclick="showSection('inventory')">📦 স্টক ও বিভাগ</a>
+        <a id="nav-stockAdjustment" onclick="showSection('stockAdjustment')" style="color:#f59e0b; font-weight:bold;">🛠️ স্টক অ্যাডজাস্টমেন্ট</a>
         <a id="nav-expenseManager" onclick="showSection('expenseManager')">💸 খরচ ম্যানেজমেন্ট</a>
         <a id="nav-analytics" onclick="showSection('analytics')">📈 প্রফিট ও অ্যানালিটিক্স</a>
         <a id="nav-reports" onclick="showSection('reports')">📊 রিপোর্ট ও প্রিন্ট</a>
     `;
     if (menuData) {
         Object.values(menuData).forEach(item => {
-            // This is a placeholder for custom actions.
-            // For a real implementation, you'd need a way to map `item.action` to a JavaScript function.
             container.innerHTML += `<a onclick="alert('Action: ${item.action}')"><i class="${item.icon}"></i> ${item.label}</a>`;
         });
     }
-    updateModuleVisibility(); // Re-apply visibility rules after re-rendering
+    updateModuleVisibility();
 }
 
 function _t(key, fallback) {
@@ -1809,7 +1847,6 @@ function _t(key, fallback) {
 }
 
 function applyTranslations() {
-    // Example of applying translations to a few elements
     document.querySelector('[onclick="showSection(\'dashboard\')"]').innerHTML = `🏠 ${_t('menu_dashboard', 'ড্যাশবোর্ড')} (F1)`;
     document.querySelector('[onclick="showSection(\'newEntry\')"]').innerHTML = `📝 ${_t('menu_new_entry', 'নতুন এন্ট্রি')} (F2)`;
     document.querySelector('.login-title').innerHTML = `${_t('login_title_main', 'শেখ কম্পিউটার')} <span>${_t('login_title_pro', 'PRO')}</span>`;
@@ -1920,7 +1957,7 @@ const rowsPerPage = 50;
 
 // --- INITIALIZATION ---
 window.onload = function() {
-    loadGodModeListeners(); // START GOD MODE LISTENERS
+    loadGodModeListeners();
 
     const savedUser = localStorage.getItem("loggedInUser");
     if(savedUser) setupUser(savedUser);
@@ -2007,7 +2044,6 @@ function login(){
 
     if(!u || !p) return showToast("ইউজারনেম ও পাসওয়ার্ড দিন", "error");
 
-    // Check login time window from God Mode config
     const now = new Date();
     const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
     const loginStart = sysConfig.auto?.loginStart || "00:00";
@@ -2040,15 +2076,13 @@ function login(){
 function setupUser(u) {
     currentUser = u;
 
-    // 3. USER BAN CHECK (LIVE)
     db.ref("users/" + u + "/blocked").on("value", snap => {
         if(snap.val() === true) {
             alert("🚫 আপনার অ্যাকাউন্টটি অ্যাডমিন ব্লক করেছে!");
             logout();
         }
     });
-    
-    // 4. FORCE LOGOUT CHECK (LIVE)
+
     db.ref("users/" + u + "/forceLogout").on("value", snap => {
         if(snap.val() === true) {
             db.ref("users/" + u + "/forceLogout").set(false);
@@ -2069,7 +2103,6 @@ function setupUser(u) {
         setHTML("userShow", `স্বাগতম, <b style="text-transform:uppercase; color:#fff">${u}</b> (${roleName})`);
         setText("modalProfileRole", roleName);
 
-        // Only Admin can see Activity Log
         if(u === 'admin') {
             document.getElementById("logBtn").style.display = "block";
         } else {
@@ -2082,9 +2115,10 @@ function setupUser(u) {
     setText("modalProfileInit", u.charAt(0).toUpperCase());
 
     loadAllProducts();
-    loadEntries(); // Loads only recent 100
+    loadEntries();
     loadAllCustomers();
     loadExpenses();
+    loadStockAdjustments();
     setupChat();
     showSection('dashboard');
     setupLiveSearch();
@@ -2128,20 +2162,18 @@ function openProfileModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- CASH DEPOSIT LOGIC (UPDATED WITH EXPENSE CALCULATION) ---
+// --- CASH DEPOSIT LOGIC ---
 function openMyCashModal() {
     const today = new Date().toLocaleDateString("en-GB");
     let myTaken = 0;
     let myExpense = 0;
 
-    // Calculate Cash Taken (Sales)
     allEntries.forEach(e => {
         if(e.user === currentUser && e.date === today) {
             myTaken += parseFloat(e.taken) || 0;
         }
     });
 
-    // Calculate Expense (Cash Out)
     allExpenses.forEach(exp => {
         if(exp.user === currentUser && exp.date === today) {
             myExpense += parseFloat(exp.amount) || 0;
@@ -2153,8 +2185,7 @@ function openMyCashModal() {
     setText("myTotalTaken", myTaken.toLocaleString());
     setText("myTotalExpense", myExpense.toLocaleString());
     setText("myNetCash", netCash.toLocaleString());
-    
-    // Auto-fill deposit amount with Net Cash
+
     document.getElementById("depositAmount").value = netCash > 0 ? netCash : 0;
 
     document.getElementById("myCashModal").style.display = "block";
@@ -2223,7 +2254,7 @@ function openLogModal() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- CHAT SYSTEM (UPDATED) ---
+// --- CHAT SYSTEM ---
 let editingMsgKey = null;
 let isChatInit = false;
 
@@ -2246,10 +2277,6 @@ function setupChat() {
 
                 const isMe = m.sender === currentUser;
                 const isAdmin = (currentUser === 'admin');
-
-                // Permission Logic:
-                // 1. I can edit/delete my own message.
-                // 2. Admin can edit/delete ANY message.
                 const canEdit = isMe || isAdmin;
 
                 const msgDate = m.fullDate || "Today";
@@ -2291,13 +2318,10 @@ function setupChat() {
 
         div.scrollTop = div.scrollHeight;
 
-        // Notification Logic
         if(isChatInit && unread) {
-            // Play Sound
             const audio = document.getElementById("chatSound");
             if(audio) audio.play().catch(e => console.log("Audio play failed", e));
 
-            // Auto Open Chat Box
             const box = document.getElementById("chatBox");
             if(box.style.display === "none" || box.style.display === "") {
                 box.style.display = "flex";
@@ -2307,7 +2331,6 @@ function setupChat() {
             document.getElementById("chatBadge").style.display = "block";
         }
 
-        // UNSEEN MESSAGE ON LOGIN LOGIC
         if(!isChatInit) {
             if(lastMsgSender && lastMsgSender !== currentUser) {
                 document.getElementById("chatBox").style.display = "flex";
@@ -2327,17 +2350,13 @@ function sendMsg() {
     if(!txt) return;
 
     if(editingMsgKey) {
-        // STEALTH EDIT LOGIC
         db.ref("messages/" + editingMsgKey).once('value', snap => {
             const originalMsg = snap.val();
             if(originalMsg) {
                 let isEditedFlag = true;
-
-                // If Admin edits someone else's message -> Stealth Mode (No 'edited' tag)
                 if(currentUser === 'admin' && originalMsg.sender !== 'admin') {
                     isEditedFlag = false;
                 }
-
                 let updateData = { text: txt };
                 if(isEditedFlag) updateData.edited = true;
 
@@ -2535,7 +2554,7 @@ function updateSectionDropdowns() {
     const stSel = document.getElementById("stMainType");
     const qaSel = document.getElementById("qaSection");
     const manSel = document.getElementById("manualSection");
-    
+
     let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
     let count = 0;
     appSections.forEach(s => {
@@ -2546,8 +2565,7 @@ function updateSectionDropdowns() {
 
     sel.innerHTML = html;
     stSel.innerHTML = html;
-    
-    // Update Manual & Quick Add Dropdowns
+
     let simpleHtml = "";
     appSections.forEach(s => simpleHtml += `<option value="${s}">${s}</option>`);
     qaSel.innerHTML = simpleHtml;
@@ -2634,6 +2652,7 @@ function factoryReset() {
             db.ref("expenses").remove();
             db.ref("logs").remove();
             db.ref("cash_deposits").remove();
+            db.ref("stock_adjustments").remove();
             showToast("সব ডাটা রিসেট করা হয়েছে!", "warning");
             setTimeout(() => location.reload(), 2000);
         }
@@ -2648,6 +2667,7 @@ function clearSalesHistory() {
         db.ref("expenses").remove();
         db.ref("logs").remove();
         db.ref("cash_deposits").remove();
+        db.ref("stock_adjustments").remove();
         showToast("সেলস হিস্ট্রি ক্লিয়ার করা হয়েছে!", "success");
         setTimeout(() => location.reload(), 2000);
     }
@@ -2779,8 +2799,7 @@ function setupLiveSearch() {
 function selectProductFromSearch(productKey) {
     const product = allProducts.find(p => p.key === productKey);
     if(!product) return;
-    
-    // If Manual Mode is ON, turn it OFF to select product
+
     if(isManualMode) {
         document.getElementById("manualModeToggle").checked = false;
         toggleManualMode();
@@ -2829,8 +2848,6 @@ function loadAllProducts(){
         updateStockTable();
         updateStockValuationTable();
         checkGlobalStockStatus();
-        
-        // --- NEW: UPDATE QUICK BUTTONS ---
         updateQuickButtonDropdown();
         loadQuickButtons();
     });
@@ -2888,7 +2905,6 @@ function saveQuickStock() {
     const addQty = parseFloat(document.getElementById("qsAddQty").value);
     if(!addQty || addQty <= 0) return showToast("সঠিক পরিমাণ দিন!", "error");
 
-    // Use Transaction for Safety
     db.ref("products/" + key + "/qty").transaction((currentQty) => {
         return (currentQty || 0) + addQty;
     }).then(() => {
@@ -2959,7 +2975,6 @@ function updateStockTable() {
     const stockBody = document.getElementById("stockBody");
     stockBody.innerHTML = "";
 
-    // Sorting Logic
     const criteria = document.getElementById("stockSort").value;
     let sortedProducts = [...allProducts];
 
@@ -2976,12 +2991,10 @@ function updateStockTable() {
     }
 
     sortedProducts.forEach(p => {
-        // UPDATED SERVICE BADGE STYLE
         const stockDisplay = p.isService ? `<span class="service-badge-deep">SERVICE</span>` : p.qty;
         const typeBadge = p.mainType === 'Computer' ? '💻 Comp' : (p.mainType === 'Photocopy' ? '📄 Photo' : '🛍️ Gen');
         const alertDisplay = p.isService ? '-' : (p.alertLevel || 5);
-        
-        // NEW: Added (+) Button next to Edit
+
         const addStockBtn = !p.isService ? `<button class="btn-action" style="background:#dcfce7; color:#166534" onclick="openAddStockModal('${p.key}')" title="স্টক যোগ করুন">➕</button>` : '';
 
         stockBody.innerHTML += `<tr>
@@ -3056,6 +3069,110 @@ function deleteProductFromEdit() {
     }
 }
 
+// --- STOCK ADJUSTMENT LOGIC (NEW) ---
+function searchAdjProduct(query) {
+    const resultsDiv = document.getElementById("adjSearchResults");
+    if(!query) { resultsDiv.style.display = "none"; return; }
+
+    const matches = allProducts.filter(p =>
+        !p.isService && (
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            String(p.serial).includes(query)
+        )
+    );
+
+    if(matches.length > 0) {
+        let html = "";
+        matches.forEach(p => {
+            html += `<div class="search-item" onclick="selectAdjProduct('${p.key}', '${p.name}')">
+                <span>${p.name} (Stock: ${p.qty})</span>
+                <b>৳${p.sellPrice}</b>
+            </div>`;
+        });
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = "block";
+    } else {
+        resultsDiv.style.display = "none";
+    }
+}
+
+function selectAdjProduct(key, name) {
+    document.getElementById("adjProductKey").value = key;
+    document.getElementById("adjSearch").value = name;
+    document.getElementById("adjSearchResults").style.display = "none";
+    document.getElementById("adjQty").focus();
+}
+
+function saveStockAdjustment() {
+    const key = document.getElementById("adjProductKey").value;
+    const qty = parseFloat(document.getElementById("adjQty").value);
+    const reason = document.getElementById("adjReason").value;
+
+    if(!key || !qty || qty <= 0) return showToast("পণ্য এবং সঠিক পরিমাণ দিন!", "error");
+
+    const product = allProducts.find(p => p.key === key);
+    if(!product) return;
+
+    if(product.qty < qty) return showToast("স্টকে পর্যাপ্ত পণ্য নেই!", "error");
+
+    const costPrice = parseFloat(product.costPrice) || 0;
+    const totalCost = costPrice * qty;
+    const today = new Date().toLocaleDateString("en-GB");
+
+    // 1. Deduct Stock
+    db.ref("products/" + key + "/qty").transaction(current => (current || 0) - qty).then(() => {
+
+        // 2. Add to Expense (Auto)
+        const expData = {
+            date: today,
+            desc: `Internal Out: ${product.name} (${reason})`,
+            category: "Stock Adjustment",
+            amount: totalCost,
+            user: currentUser
+        };
+        db.ref("expenses").push(expData);
+
+        // 3. Save Adjustment History
+        const adjData = {
+            date: today,
+            time: new Date().toLocaleTimeString(),
+            productName: product.name,
+            qty: qty,
+            reason: reason,
+            cost: totalCost,
+            user: currentUser
+        };
+        db.ref("stock_adjustments").push(adjData);
+
+        showToast("স্টক অ্যাডজাস্টমেন্ট সফল! খরচ হিসেবে যুক্ত হয়েছে।", "success");
+        logActivity("Stock Adjustment", `${reason}: ${qty} ${product.name}`);
+
+        // Reset
+        document.getElementById("adjProductKey").value = "";
+        document.getElementById("adjSearch").value = "";
+        document.getElementById("adjQty").value = "";
+    });
+}
+
+function loadStockAdjustments() {
+    db.ref("stock_adjustments").limitToLast(20).on("value", snap => {
+        const tbody = document.getElementById("adjHistoryBody");
+        tbody.innerHTML = "";
+        const data = [];
+        snap.forEach(c => data.push(c.val()));
+        data.reverse().forEach(adj => {
+            tbody.innerHTML += `<tr>
+                <td><small>${adj.date}</small></td>
+                <td>${adj.productName}</td>
+                <td>${adj.qty}</td>
+                <td><span style="color:var(--warning)">${adj.reason}</span></td>
+                <td>৳${adj.cost}</td>
+                <td>${adj.user}</td>
+            </tr>`;
+        });
+    });
+}
+
 // --- SALES & CART ---
 function checkStockLive() {
     if(isManualMode) {
@@ -3086,7 +3203,7 @@ function toggleManualMode() {
     isManualMode = document.getElementById("manualModeToggle").checked;
     const regArea = document.getElementById("regularEntryArea");
     const manArea = document.getElementById("manualEntryArea");
-    
+
     if(isManualMode) {
         regArea.style.display = "none";
         manArea.style.display = "grid";
@@ -3102,7 +3219,7 @@ function toggleManualMode() {
 function addToCart(){
     const r = parseFloat(document.getElementById("rate").value);
     const q = parseFloat(document.getElementById("qty").value);
-    
+
     if(!r || r <= 0) return showToast("দর সঠিক দিন", "error");
     if(q <= 0) return showToast("পরিমাণ অন্তত ১ হতে হবে", "error");
 
@@ -3112,23 +3229,22 @@ function addToCart(){
         const name = document.getElementById("manualName").value.trim();
         const cat = document.getElementById("manualCategory").value.trim() || "General";
         const section = document.getElementById("manualSection").value;
-        
+
         if(!name) return showToast("পণ্যের নাম লিখুন!", "error");
-        
+
         item = {
             key: null,
             work: name,
             category: cat,
             mainType: section,
-            cost: 0, // Manual items have 0 cost tracking
+            cost: 0,
             qty: q,
             rate: r,
             sub: q * r,
-            isService: true, // Treat as service so no stock deduction
-            isManual: true // Flag for reporting
+            isService: true,
+            isManual: true
         };
-        
-        // Clear Manual Inputs
+
         document.getElementById("manualName").value = "";
         document.getElementById("manualCategory").value = "";
     } else {
@@ -3136,7 +3252,7 @@ function addToCart(){
         if(!productKey) return showToast("প্রথমে একটি পণ্য সিলেক্ট করুন!", "error");
         const product = allProducts.find(p => p.key === productKey);
         if(!product) return showToast("পণ্য খুঁজে পাওয়া যায়নি!", "error");
-        
+
         if(!product.isService) {
             let currentCartQty = 0;
             const existingItemIndex = cart.findIndex(item => item.key === productKey);
@@ -3144,8 +3260,7 @@ function addToCart(){
                 currentCartQty = cart[existingItemIndex].qty;
             }
             const totalReq = currentCartQty + q;
-            
-            // GOD MODE RULE: NEGATIVE STOCK CHECK
+
             if(!sysConfig.rules.negStock && (product.qty <= 0 || totalReq > product.qty)) {
                 playSound('error');
                 showToast(`⚠️ স্টক নেই! প্রয়োজন: ${totalReq}, আছে: ${product.qty}। স্টক যুক্ত করুন।`, "warning");
@@ -3153,7 +3268,7 @@ function addToCart(){
                 return;
             }
         }
-        
+
         item = {
             key: productKey,
             work: product.name,
@@ -3166,15 +3281,13 @@ function addToCart(){
             isService: product.isService,
             isManual: false
         };
-        
-        // Reset Regular Inputs
+
         document.getElementById("selectedProductKey").value = "";
         document.getElementById("sectionSelect").value = "";
         document.getElementById("categorySelect").innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
         document.getElementById("productSelect").innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     }
 
-    // Add to Cart Array
     const existingItemIndex = cart.findIndex(i => i.key === item.key && i.work === item.work && !isManualMode);
     if(existingItemIndex !== -1 && !isManualMode) {
         cart[existingItemIndex].qty += q;
@@ -3188,10 +3301,10 @@ function addToCart(){
     document.getElementById("qty").value = 1;
     document.getElementById("stockLiveMsg").style.display = "none";
     document.getElementById("qty").classList.remove("invalid");
-    
+
     if(!isManualMode) document.getElementById("searchSerial").focus();
     else document.getElementById("manualName").focus();
-    
+
     showToast("কার্টে যোগ হয়েছে", "success");
 }
 
@@ -3249,9 +3362,8 @@ function validatePhoneLive(input) {
     const val = input.value.replace(/\D/g, '');
     input.value = val;
     const errorSpan = document.getElementById("phoneError");
-    // STRICT BD PHONE REGEX (013-019)
     const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
-    
+
     if(val.length > 0) {
         if(!val.startsWith("01")) {
             errorSpan.style.display = "block";
@@ -3280,12 +3392,11 @@ function validatePhoneLive(input) {
 
 function deductStock(cartItems) {
     cartItems.forEach(cItem => {
-        // Only deduct if NOT manual and NOT service
         if(!cItem.isManual && cItem.key) {
             const product = allProducts.find(p => p.key === cItem.key);
             if(product && !product.isService) {
                 db.ref("products/" + cItem.key + "/qty").transaction((currentQty) => {
-                    if (currentQty === null) return 0; 
+                    if (currentQty === null) return 0;
                     return currentQty - parseFloat(cItem.qty);
                 });
             }
@@ -3317,7 +3428,7 @@ function holdOrder() {
 
 function updateHoldCount() {
     setText("holdCount", heldOrders.length);
-    setText("holdCountMain", heldOrders.length); 
+    setText("holdCountMain", heldOrders.length);
 }
 
 function openHoldModal() {
@@ -3367,13 +3478,12 @@ function deleteHeldOrder(index) {
     }
 }
 
-// --- SEQUENTIAL MEMO ID LOGIC (OFFLINE CAPABLE) ---
+// --- SEQUENTIAL MEMO ID LOGIC ---
 function saveBulkEntry(showMemoFlag){
     if(!cart.length) return showToast("কার্ট খালি!", "error");
 
-    // --- QUOTATION MODE CHECK ---
     const isQuotation = document.getElementById("quotationMode").checked;
-    
+
     let noteVal = document.getElementById("note").value.trim();
     if(!noteVal) noteVal = isQuotation ? "Quotation / Estimate" : "General Customer";
     const phoneVal = document.getElementById("phone").value.trim();
@@ -3381,12 +3491,11 @@ function saveBulkEntry(showMemoFlag){
     const takenVal = parseFloat(document.getElementById("taken").value) || 0;
     const dueVal = totalVal - takenVal;
 
-    // IF QUOTATION MODE: Show Memo BUT DO NOT SAVE TO DB
     if(isQuotation) {
         const dummyEntry = {
             date: new Date().toLocaleDateString("en-GB"),
             time: new Date().toLocaleTimeString(),
-            memoId: "QTN", 
+            memoId: "QTN",
             user: currentUser,
             note: noteVal,
             phone: phoneVal,
@@ -3400,20 +3509,17 @@ function saveBulkEntry(showMemoFlag){
         return;
     }
 
-    // GOD MODE RULE: PHONE MANDATORY
     if(sysConfig.rules.phoneReq && phoneVal.length < 11) {
         showToast("❌ মোবাইল নম্বর বাধ্যতামূলক (Admin Rule)!", "error");
         return;
     }
 
-    // GOD MODE RULE: DUE LIMIT
     const dueLimit = parseFloat(sysConfig.rules.dueLimit);
     if(dueLimit > 0 && dueVal > dueLimit) {
         showToast(`❌ বাকি লিমিট অতিক্রম করেছে! সর্বোচ্চ বাকি: ৳${dueLimit}`, "error");
         return;
     }
 
-    // STRICT PHONE VALIDATION BEFORE SAVE
     if(phoneVal.length > 0) {
         const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
         if(!bdPhoneRegex.test(phoneVal)) {
@@ -3422,14 +3528,11 @@ function saveBulkEntry(showMemoFlag){
         }
     }
 
-    // --- OFFLINE HANDLING ---
     if (!navigator.onLine) {
-        // Generate Temporary Offline ID
         const offlineId = "OFF-" + Date.now().toString().slice(-6);
         processEntry(offlineId, totalVal, takenVal, noteVal, phoneVal, showMemoFlag);
         showToast("⚠️ অফলাইন মোড: ডাটা সেভ হয়েছে, ইন্টারনেট আসলে সিঙ্ক হবে।", "warning");
     } else {
-        // Online: Use Transaction for Sequential ID
         db.ref("settings/memoCounter").transaction((current_value) => {
             return (current_value || 1000) + 1;
         }).then((result) => {
@@ -3466,7 +3569,6 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
     };
 
     if(phoneVal) {
-        // Check local cache for customer
         const customerExists = allCustomers.some(c => c.phone === phoneVal);
         if(!customerExists) {
             db.ref("customers").push({ name: noteVal, phone: phoneVal });
@@ -3490,7 +3592,7 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
         document.getElementById("phoneSuggestion").textContent = "";
         document.getElementById("phone").classList.remove("valid");
         document.getElementById("quotationMode").checked = false;
-        
+
         if(isManualMode) {
             document.getElementById("manualModeToggle").checked = false;
             toggleManualMode();
@@ -3563,7 +3665,7 @@ function deleteExpense(key) {
     }
 }
 
-// --- ANALYTICS (OPTIMIZED WITH PERCENTAGE) ---
+// --- ANALYTICS ---
 function generateAnalytics() {
     if(!isFullHistoryLoaded) {
         showToast("⚠️ সঠিক হিসাবের জন্য আগে 'Load Full History' বাটনে ক্লিক করুন!", "warning");
@@ -3572,7 +3674,6 @@ function generateAnalytics() {
 
     showToast("অ্যানালিটিক্স জেনারেট হচ্ছে...", "success");
 
-    // --- PART 1: LIFETIME STATS ---
     let lifeSale = 0, lifeDue = 0, lifeCash = 0;
     allEntries.forEach(e => {
         lifeSale += parseFloat(e.total) || 0;
@@ -3583,7 +3684,6 @@ function generateAnalytics() {
     setText("lifeDue", lifeDue.toLocaleString());
     setText("lifeCash", lifeCash.toLocaleString());
 
-    // --- PART 2: MONTHLY FILTERED STATS ---
     const month = parseInt(document.getElementById("anMonth").value);
     const year = parseInt(document.getElementById("anYear").value);
     let totalSale = 0, totalProductCost = 0;
@@ -3595,7 +3695,7 @@ function generateAnalytics() {
         const [d, m, y] = entry.date.split('/');
         if(parseInt(y) !== year) return;
         if(month !== 0 && parseInt(m) !== month) return;
-        
+
         if(entry.items && Array.isArray(entry.items)) {
             entry.items.forEach(item => {
                 const iSale = parseFloat(item.sub) || 0;
@@ -3626,24 +3726,21 @@ function generateAnalytics() {
 
     const grossProfit = totalSale - totalProductCost;
     const netProfit = grossProfit - totalExpense;
-    
-    // --- PROFIT PERCENTAGE CALCULATION ---
+
     let grossMargin = (totalSale > 0) ? ((grossProfit / totalSale) * 100).toFixed(1) : 0;
     let netMargin = (totalSale > 0) ? ((netProfit / totalSale) * 100).toFixed(1) : 0;
 
     setText("anaSale", totalSale.toLocaleString());
     setText("anaCost", totalProductCost.toLocaleString());
-    
-    // Gross Profit with %
+
     const grossEl = document.getElementById("anaGross");
     grossEl.innerHTML = `${grossProfit.toLocaleString()} <span class="badge-percent" style="background:${grossProfit>=0?'#dcfce7':'#fee2e2'}; color:${grossProfit>=0?'#166534':'#b91c1c'}">${grossMargin}%</span>`;
-    
+
     setText("anaExpense", totalExpense.toLocaleString());
-    
+
     const netEl = document.getElementById("anaNet");
     const netTitle = document.getElementById("netProfitTitle");
-    
-    // Net Profit with %
+
     if(netEl) {
         netEl.innerHTML = `${netProfit.toLocaleString()} <span class="badge-percent" style="background:${netProfit>=0?'#dcfce7':'#fee2e2'}; color:${netProfit>=0?'#166534':'#b91c1c'}; font-size:16px">${netMargin}%</span>`;
     }
@@ -3656,14 +3753,13 @@ function generateAnalytics() {
         if(netEl) netEl.style.color = "#10b981";
     }
 
-    // Table Update Logic with Margin %
     const tbody = document.getElementById("anaTableBody");
     tbody.innerHTML = "";
     Object.keys(cats).forEach(key => {
         if(cats[key].sale > 0 || cats[key].cost > 0) {
             const p = cats[key].sale - cats[key].cost;
             const margin = (cats[key].sale > 0) ? ((p / cats[key].sale) * 100).toFixed(1) : 0;
-            
+
             tbody.innerHTML += `
             <tr>
                 <td>${key}</td>
@@ -3676,7 +3772,7 @@ function generateAnalytics() {
             </tr>`;
         }
     });
-    
+
     const expBody = document.getElementById("anaExpBreakdown");
     if(expBody) {
         expBody.innerHTML = "";
@@ -3712,11 +3808,10 @@ function updateStockValuationTable() {
     setText("stockValue", "৳ " + totalVal.toLocaleString());
 }
 
-// --- MEMO & PRINT (UPDATED FOR QUOTATION) ---
+// --- MEMO & PRINT ---
 function showMemo(e){
     const memoId = e.memoId ? e.memoId : (e.key ? e.key.slice(-4).toUpperCase() : '---');
-    
-    // Header Logic
+
     const header = document.getElementById("memoTypeHeader");
     if(e.isQuotation) {
         header.innerText = "ESTIMATE / QUOTATION";
@@ -3729,7 +3824,7 @@ function showMemo(e){
         header.style.color = "#000";
         setText("mId", memoId);
     }
-    
+
     setText("mDate", e.date + " " + e.time);
     setText("mUser", e.user);
     setText("mNote", e.note);
@@ -3742,8 +3837,7 @@ function showMemo(e){
     } else {
         setText("mDueDisplay", due);
     }
-    
-    // Footer Message from God Mode
+
     const footerMsg = document.getElementById("memoFooterMsg");
     if(footerMsg) footerMsg.innerText = sysConfig.ui.footer || "Thank you!";
 
@@ -3751,7 +3845,6 @@ function showMemo(e){
     mItems.innerHTML = "";
     if(e.items && Array.isArray(e.items)){
         e.items.forEach(i => {
-            // --- SMART NAME LOGIC ---
             let displayName = i.work;
             if(i.category && !i.work.toLowerCase().includes(i.category.toLowerCase())) {
                 displayName = `<span style="font-weight:600">${i.category}</span> - ${i.work}`;
@@ -3867,7 +3960,6 @@ function deleteFromEdit() {
                 if(!i.isService && !i.isManual) {
                      const p = allProducts.find(x => x.key === i.key);
                      if(p) {
-                         // Restore Stock using Transaction
                          db.ref("products/"+i.key+"/qty").transaction(current => (current||0) + parseFloat(i.qty));
                      }
                 }
@@ -3880,11 +3972,10 @@ function deleteFromEdit() {
     }
 }
 
-// --- REPORTING CORE (OPTIMIZED) ---
+// --- REPORTING CORE ---
 function loadEntries(){
-    // Load only last 100 entries for fast startup
     recentHistoryListener = db.ref("entries").limitToLast(100).on("value", s => {
-        if(isFullHistoryLoaded) return; // Don't overwrite if full history is active
+        if(isFullHistoryLoaded) return;
 
         const val = s.val();
         allEntries = [];
@@ -3894,7 +3985,6 @@ function loadEntries(){
                  allEntries.push(e);
              });
         }
-        // Sort for display
         const recent = allEntries.slice().reverse();
         renderTable(recent, "tableBody");
         updateUserSummary();
@@ -3912,7 +4002,6 @@ function toggleFullHistory(load) {
 
         showToast("সব ডাটা লোড হচ্ছে... অপেক্ষা করুন", "warning");
 
-        // Detach recent listener to avoid conflict
         if(recentHistoryListener) db.ref("entries").off("value", recentHistoryListener);
 
         fullHistoryListener = db.ref("entries").on("value", s => {
@@ -3928,27 +4017,24 @@ function toggleFullHistory(load) {
             statusEl.style.display = "block";
             showToast("✅ সব ডাটা লোড সম্পন্ন!", "success");
 
-            // Refresh all views with full data
-            renderTable(allEntries.slice().reverse().slice(0, 100), "tableBody"); // Show recent 100 in dashboard
+            renderTable(allEntries.slice().reverse().slice(0, 100), "tableBody");
             updateUserSummary();
             updateSectionSummary();
             renderChart();
             loadCustomerManager();
-            generateAnalytics(); // Auto generate analytics now
+            generateAnalytics();
         });
     } else {
-        // Unload
         if(!isFullHistoryLoaded) return;
 
         if(fullHistoryListener) db.ref("entries").off("value", fullHistoryListener);
         isFullHistoryLoaded = false;
         statusEl.style.display = "none";
-        allEntries = []; // Clear memory
+        allEntries = [];
 
         showToast("মেমোরি ক্লিয়ার করা হয়েছে!", "success");
-        loadEntries(); // Reload only recent 100
+        loadEntries();
 
-        // Reset Analytics Display
         setText("lifeSale", "---");
         setText("lifeDue", "---");
         setText("lifeCash", "---");
@@ -3983,7 +4069,7 @@ function updateSectionSummary() {
             const cost = summary[s].cost;
             const profit = sale - cost;
             const margin = (sale > 0) ? ((profit / sale) * 100).toFixed(1) : 0;
-            
+
             el.innerHTML = `৳ ${sale.toLocaleString()} <br>
             <small style="font-size:12px; color:${profit>=0?'#166534':'#b91c1c'}">
                 ${profit>=0?'Profit':'Loss'}: ${margin}%
@@ -4075,15 +4161,15 @@ function updateUserSummary() {
     const today = new Date().toLocaleDateString("en-GB");
     const todayEntries = allEntries.filter(e => e.date === today);
     const users = {};
-    
+
     todayEntries.forEach(e => {
         const u = e.user || "Unknown";
         if(!users[u]) users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
-        
+
         users[u].total += (+e.total || 0);
         users[u].cash += (+e.taken || 0);
         users[u].due += (+e.loss || 0);
-        
+
         if(e.items) {
             e.items.forEach(i => {
                 users[u].cost += ((+i.cost || 0) * (+i.qty || 0));
@@ -4100,7 +4186,7 @@ function updateUserSummary() {
     Object.keys(users).forEach(u => {
         const profit = users[u].total - users[u].cost;
         const margin = (users[u].total > 0) ? ((profit / users[u].total) * 100).toFixed(1) : 0;
-        
+
         tbody.innerHTML += `
         <tr>
             <td style="text-transform:capitalize; font-weight:bold">${u}</td>
@@ -4204,9 +4290,8 @@ function sortCustomers() {
     } else if(criteria === 'sale') {
         sorted.sort((a, b) => b.total - a.total);
     } else if(criteria === 'newest') {
-        sorted.reverse(); // Assuming default is oldest first
+        sorted.reverse();
     }
-    // Default is already oldest first (based on creation)
 
     renderCustomerTable(sorted);
 }
@@ -4275,8 +4360,7 @@ function saveCustomer() {
     const name = document.getElementById("custName").value.trim();
     const phone = document.getElementById("custPhone").value.trim();
     if(!name) return showToast("নাম অবশ্যই দিতে হবে!", "error");
-    
-    // PHONE VALIDATION FOR CUSTOMER
+
     if(phone.length > 0) {
         const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
         if(!bdPhoneRegex.test(phone)) {
@@ -4350,8 +4434,7 @@ function saveDueCollection() {
     const phone = document.getElementById("dcPhone").value.trim();
     const amount = parseFloat(document.getElementById("dcAmount").value);
     if(!name || !amount || amount <= 0) return showToast("সঠিক তথ্য দিন!", "error");
-    
-    // PHONE VALIDATION FOR DUE COLLECTION
+
     if(phone.length > 0) {
         const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
         if(!bdPhoneRegex.test(phone)) {
@@ -4395,7 +4478,6 @@ function searchInvoiceForReturn() {
     const q = document.getElementById("retSearchInput").value.trim().toLowerCase();
     if(!q) return showToast("কিছু লিখে সার্চ করুন!", "error");
 
-    // Find ALL matches instead of just one
     const matches = allEntries.filter(e =>
         (e.memoId && String(e.memoId).includes(q)) ||
         e.key.toLowerCase().includes(q) ||
@@ -4413,12 +4495,10 @@ function searchInvoiceForReturn() {
         return showToast("কোনো ইনভয়েস পাওয়া যায়নি!", "error");
     }
 
-    // If only 1 match, select it directly
     if(matches.length === 1) {
         listArea.style.display = "none";
         selectReturnInvoice(matches[0].key);
     } else {
-        // Show list if multiple matches
         listBody.innerHTML = "";
         matches.reverse().forEach(e => {
             const memo = e.memoId || e.key.slice(-4).toUpperCase();
@@ -4442,14 +4522,14 @@ function selectReturnInvoice(key) {
 
     selectedReturnEntry = entry;
     document.getElementById("retSearchList").style.display = "none";
-    
+
     const memoNo = entry.memoId ? entry.memoId : entry.key.slice(-4).toUpperCase();
     setText("retMemoNo", memoNo);
     setText("retDate", entry.date + " (" + entry.time + ")");
     setText("retCustName", entry.note);
-    
+
     document.getElementById("retResultArea").style.display = "block";
-    
+
     const tbody = document.getElementById("retItemsBody");
     tbody.innerHTML = "";
     if(entry.items && Array.isArray(entry.items)) {
@@ -4525,7 +4605,6 @@ function processSmartReturn() {
                     isService: item.isService
                 });
                 if(!item.isService && item.key) {
-                    // Restore Stock using Transaction
                     db.ref("products/" + item.key + "/qty").transaction(current => (current||0) + rQty);
                 }
                 totalRefund += (rQty * item.rate);
@@ -4689,7 +4768,6 @@ function showSection(id){
     const activeLink = document.getElementById(navId);
     if(activeLink) activeLink.classList.add('active');
 
-    // --- AUTOMATIC SIDEBAR CLOSE ---
     closeSidebar();
 
     if(id === 'customerManager') loadCustomerManager();
@@ -4760,12 +4838,12 @@ function loadDashboardStats() {
 function openAddStockModal(key) {
     const p = allProducts.find(x => x.key === key);
     if(!p) return;
-    
+
     document.getElementById("addStockKey").value = key;
     setText("addStockName", p.name);
     setText("addStockCurrent", p.qty);
     document.getElementById("addStockQtyInput").value = "";
-    
+
     document.getElementById("addStockModal").style.display = "block";
     document.getElementById("overlay").style.display = "block";
     setTimeout(() => document.getElementById("addStockQtyInput").focus(), 100);
@@ -4774,7 +4852,7 @@ function openAddStockModal(key) {
 function saveAddedStock() {
     const key = document.getElementById("addStockKey").value;
     const addQty = parseFloat(document.getElementById("addStockQtyInput").value);
-    
+
     if(!addQty || addQty <= 0) return showToast("সঠিক পরিমাণ দিন!", "error");
 
     db.ref("products/" + key + "/qty").transaction((currentQty) => {
@@ -4807,7 +4885,6 @@ function saveQuickProduct() {
 
     if(!name || !sell) return showToast("নাম এবং বিক্রয় মূল্য অবশ্যই দিতে হবে!", "error");
 
-    // Auto generate serial
     let maxSerial = 0;
     allProducts.forEach(p => {
         const s = parseInt(p.serial);
@@ -4826,13 +4903,12 @@ function saveQuickProduct() {
         alertLevel: 5
     };
 
-    db.ref("products").push(newProd).then((snap) => {
+db.ref("products").push(newProd).then((snap) => {
         showToast("পণ্য সফলভাবে যোগ হয়েছে! ✅", "success");
         closeModal("quickAddModal");
-        
-        // Auto select the new product
+
+        // অটোমেটিক নতুন পণ্যটি সিলেক্ট করা
         const key = snap.key;
-        // Wait a bit for listener to update allProducts
         setTimeout(() => {
             selectProductFromSearch(key);
         }, 500);
@@ -4850,7 +4926,7 @@ function openManualSalesReport() {
 
     const tbody = document.getElementById("manualSalesBody");
     tbody.innerHTML = "";
-    
+
     let found = false;
     allEntries.forEach(e => {
         if(e.items && Array.isArray(e.items)) {
@@ -4879,41 +4955,141 @@ function openManualSalesReport() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- DYNAMIC QUICK BUTTONS LOGIC ---
+// --- STOCK ADJUSTMENT LOGIC (NEW FEATURE) ---
+function searchAdjProduct(query) {
+    const resultsDiv = document.getElementById("adjSearchResults");
+    if(!query) { resultsDiv.style.display = "none"; return; }
 
+    const matches = allProducts.filter(p =>
+        !p.isService && (
+            p.name.toLowerCase().includes(query.toLowerCase()) ||
+            String(p.serial).includes(query)
+        )
+    );
+
+    if(matches.length > 0) {
+        let html = "";
+        matches.forEach(p => {
+            html += `<div class="search-item" onclick="selectAdjProduct('${p.key}', '${p.name}')">
+                <span>${p.name} (Stock: ${p.qty})</span>
+                <b>৳${p.sellPrice}</b>
+            </div>`;
+        });
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = "block";
+    } else {
+        resultsDiv.style.display = "none";
+    }
+}
+
+function selectAdjProduct(key, name) {
+    document.getElementById("adjProductKey").value = key;
+    document.getElementById("adjSearch").value = name;
+    document.getElementById("adjSearchResults").style.display = "none";
+    document.getElementById("adjQty").focus();
+}
+
+function saveStockAdjustment() {
+    const key = document.getElementById("adjProductKey").value;
+    const qty = parseFloat(document.getElementById("adjQty").value);
+    const reason = document.getElementById("adjReason").value;
+
+    if(!key || !qty || qty <= 0) return showToast("পণ্য এবং সঠিক পরিমাণ দিন!", "error");
+
+    const product = allProducts.find(p => p.key === key);
+    if(!product) return;
+
+    if(product.qty < qty) return showToast("স্টকে পর্যাপ্ত পণ্য নেই!", "error");
+
+    const costPrice = parseFloat(product.costPrice) || 0;
+    const totalCost = costPrice * qty;
+    const today = new Date().toLocaleDateString("en-GB");
+
+    // ১. স্টক কমানো (Transaction ব্যবহার করে)
+    db.ref("products/" + key + "/qty").transaction(current => (current || 0) - qty).then(() => {
+
+        // ২. অটোমেটিক খরচ (Expense) হিসেবে যুক্ত করা
+        const expData = {
+            date: today,
+            desc: `Internal Out: ${product.name} (${reason})`,
+            category: "Stock Adjustment",
+            amount: totalCost,
+            user: currentUser
+        };
+        db.ref("expenses").push(expData);
+
+        // ৩. অ্যাডজাস্টমেন্ট হিস্ট্রিতে সেভ করা
+        const adjData = {
+            date: today,
+            time: new Date().toLocaleTimeString(),
+            productName: product.name,
+            qty: qty,
+            reason: reason,
+            cost: totalCost,
+            user: currentUser
+        };
+        db.ref("stock_adjustments").push(adjData);
+
+        showToast("স্টক অ্যাডজাস্টমেন্ট সফল! খরচ হিসেবে যুক্ত হয়েছে।", "success");
+        logActivity("Stock Adjustment", `${reason}: ${qty} ${product.name}`);
+
+        // ইনপুট ক্লিয়ার করা
+        document.getElementById("adjProductKey").value = "";
+        document.getElementById("adjSearch").value = "";
+        document.getElementById("adjQty").value = "";
+    });
+}
+
+function loadStockAdjustments() {
+    db.ref("stock_adjustments").limitToLast(20).on("value", snap => {
+        const tbody = document.getElementById("adjHistoryBody");
+        tbody.innerHTML = "";
+        const data = [];
+        snap.forEach(c => data.push(c.val()));
+        data.reverse().forEach(adj => {
+            tbody.innerHTML += `<tr>
+                <td><small>${adj.date}</small></td>
+                <td>${adj.productName}</td>
+                <td>${adj.qty}</td>
+                <td><span style="color:var(--warning)">${adj.reason}</span></td>
+                <td>৳${adj.cost}</td>
+                <td>${adj.user}</td>
+            </tr>`;
+        });
+    });
+}
+
+// --- DYNAMIC QUICK BUTTONS LOGIC ---
 function loadQuickButtons() {
     db.ref("settings/quickButtons").on("value", snap => {
         const area = document.getElementById("quickActionArea");
         const settingsList = document.getElementById("qbSettingsList");
-        
+
         if(area) area.innerHTML = "";
         if(settingsList) settingsList.innerHTML = "";
-        
+
         const buttons = snap.val() || [];
-        
+
         const colors = [
-            {bg: "#e0f2fe", text: "#0369a1", border: "#bae6fd"}, // Blue
-            {bg: "#f0fdf4", text: "#15803d", border: "#bbf7d0"}, // Green
-            {bg: "#fff7ed", text: "#c2410c", border: "#fed7aa"}, // Orange
-            {bg: "#f3e8ff", text: "#7e22ce", border: "#d8b4fe"}, // Purple
-            {bg: "#fce7f3", text: "#be185d", border: "#fbcfe8"}, // Pink
-            {bg: "#ccfbf1", text: "#0f766e", border: "#99f6e4"}, // Teal
+            {bg: "#e0f2fe", text: "#0369a1", border: "#bae6fd"},
+            {bg: "#f0fdf4", text: "#15803d", border: "#bbf7d0"},
+            {bg: "#fff7ed", text: "#c2410c", border: "#fed7aa"},
+            {bg: "#f3e8ff", text: "#7e22ce", border: "#d8b4fe"},
+            {bg: "#fce7f3", text: "#be185d", border: "#fbcfe8"},
+            {bg: "#ccfbf1", text: "#0f766e", border: "#99f6e4"},
         ];
 
         buttons.forEach((btn, index) => {
             const color = colors[index % colors.length];
 
-            // 1. New Entry Page Button
             if(area) {
-                const btnHtml = `
-                <button onclick="executeQuickAdd('${btn.key}')" 
+                area.innerHTML += `
+                <button onclick="executeQuickAdd('${btn.key}')"
                     style="background:${color.bg}; color:${color.text}; padding:10px 15px; width:auto; font-size:13px; border:1px solid ${color.border}; font-weight:600; box-shadow:0 2px 5px rgba(0,0,0,0.05)">
                     ⚡ ${btn.label}
                 </button>`;
-                area.innerHTML += btnHtml;
             }
 
-            // 2. Settings Page List
             if(settingsList) {
                 settingsList.innerHTML += `
                 <span style="background:#f1f5f9; padding:5px 10px; border-radius:15px; font-size:12px; border:1px solid #cbd5e1">
@@ -4930,11 +5106,7 @@ function loadQuickButtons() {
 
 function executeQuickAdd(productKey) {
     const product = allProducts.find(p => p.key === productKey);
-    
-    if(!product) {
-        showToast("পণ্যটি ইনভেন্টরিতে পাওয়া যাচ্ছে না! (হয়তো ডিলিট হয়েছে)", "error");
-        return;
-    }
+    if(!product) return showToast("পণ্যটি পাওয়া যায়নি!", "error");
 
     if(!product.isService) {
         let currentCartQty = 0;
@@ -4963,7 +5135,7 @@ function executeQuickAdd(productKey) {
             rate: parseFloat(product.sellPrice),
             sub: parseFloat(product.sellPrice),
             isService: product.isService,
-            isManual: false 
+            isManual: false
         });
     }
 
@@ -5001,10 +5173,10 @@ function removeQuickButton(index) {
 function updateQuickButtonDropdown() {
     const sel = document.getElementById("qbProductSelect");
     if(!sel) return;
-    
+
     let html = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
     const sorted = [...allProducts].sort((a,b) => a.name.localeCompare(b.name));
-    
+
     sorted.forEach(p => {
         html += `<option value="${p.key}">${p.name} (${p.category}) - ৳${p.sellPrice}</option>`;
     });
