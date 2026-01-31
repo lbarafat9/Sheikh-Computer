@@ -902,13 +902,37 @@ tr:hover { background-color: #f8fafc; }
             <h3 style="color:var(--warning); margin-bottom:20px">🛠️ স্টক অ্যাডজাস্টমেন্ট (Internal Use)</h3>
             <p style="color:var(--text-light); margin-bottom:20px">দোকানে ব্যবহার, ব্যক্তিগত ব্যবহার বা পণ্য নষ্ট হলে এখান থেকে স্টক কমিয়ে দিন। এটি অটোমেটিক খরচ হিসেবে গণ্য হবে।</p>
 
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:15px; align-items:end; margin-bottom:20px">
-                <div class="form-group" style="position:relative">
-                    <label>🔍 পণ্য খুঁজুন:</label>
-                    <input id="adjSearch" placeholder="নাম বা সিরিয়াল..." class="en" oninput="searchAdjProduct(this.value)">
-                    <div id="adjSearchResults" class="live-search-results" style="top:70px"></div>
-                    <input type="hidden" id="adjProductKey">
+            <!-- SMART SEARCH FOR ADJUSTMENT -->
+            <div class="form-group" style="position: relative;">
+                <label>🔍 স্মার্ট সার্চ (সিরিয়াল, নাম বা ক্যাটাগরি):</label>
+                <input id="adjSearch" placeholder="উদাহরণ: 101, A4 Paper, Pen..." class="en" autocomplete="off" oninput="searchAdjProduct(this.value)" style="padding: 16px; border-color: #94a3b8;">
+                <div id="adjSearchResults" class="live-search-results"></div>
+                <input type="hidden" id="adjProductKey">
+            </div>
+
+            <!-- 3-STEP DROPDOWN FOR ADJUSTMENT -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:15px">
+                <div class="form-group">
+                    <label>১. বিভাগ (Section):</label>
+                    <select id="adjSectionSelect" onchange="updateAdjCategories()" style="background:#fffbeb; border-color:#fcd34d; font-weight:bold;">
+                        <option value="" disabled selected>সিলেক্ট করুন...</option>
+                    </select>
                 </div>
+                <div class="form-group">
+                    <label>২. ক্যাটাগরি:</label>
+                    <select id="adjCategorySelect" onchange="loadAdjProductsByCategory()" style="background:#f0fdf4; border-color:#10b981; font-weight:600;">
+                        <option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>৩. পণ্য:</label>
+                    <select id="adjProductSelect" onchange="adjProductSelectedFromDropdown()">
+                        <option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; align-items:end; margin-bottom:20px">
                 <div class="form-group">
                     <label>পরিমাণ (Qty):</label>
                     <input id="adjQty" type="number" class="en" placeholder="0">
@@ -1129,7 +1153,7 @@ tr:hover { background-color: #f8fafc; }
 
             <div class="table-box" style="border:1px solid #e2e8f0">
                 <table class="en">
-                    <thead><tr><th>Memo/ID</th><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
+                    <thead><tr><th>Memo/ID</th><th>সময়</th><th>বিবরণ/কাস্টমার</th><th>মোাবাইল</th><th>মোট</th><th>নগদ</th><th>বাকি</th><th>ইউজার</th><th class="noPrint">অ্যাকশন</th></tr></thead>
                     <tbody id="reportTableBody"></tbody>
                 </table>
             </div>
@@ -2554,6 +2578,7 @@ function updateSectionDropdowns() {
     const stSel = document.getElementById("stMainType");
     const qaSel = document.getElementById("qaSection");
     const manSel = document.getElementById("manualSection");
+    const adjSel = document.getElementById("adjSectionSelect");
 
     let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
     let count = 0;
@@ -2565,6 +2590,7 @@ function updateSectionDropdowns() {
 
     sel.innerHTML = html;
     stSel.innerHTML = html;
+    if(adjSel) adjSel.innerHTML = html;
 
     let simpleHtml = "";
     appSections.forEach(s => simpleHtml += `<option value="${s}">${s}</option>`);
@@ -3069,38 +3095,105 @@ function deleteProductFromEdit() {
     }
 }
 
-// --- STOCK ADJUSTMENT LOGIC (NEW) ---
+// --- STOCK ADJUSTMENT LOGIC (UPDATED) ---
 function searchAdjProduct(query) {
     const resultsDiv = document.getElementById("adjSearchResults");
     if(!query) { resultsDiv.style.display = "none"; return; }
 
     const matches = allProducts.filter(p =>
         !p.isService && (
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            String(p.serial).includes(query)
+            (p.serial && String(p.serial).toLowerCase().includes(query.toLowerCase())) ||
+            (p.name && p.name.toLowerCase().includes(query.toLowerCase())) ||
+            (p.category && p.category.toLowerCase().includes(query.toLowerCase()))
         )
     );
 
     if(matches.length > 0) {
         let html = "";
         matches.forEach(p => {
-            html += `<div class="search-item" onclick="selectAdjProduct('${p.key}', '${p.name}')">
-                <span>${p.name} (Stock: ${p.qty})</span>
-                <b>৳${p.sellPrice}</b>
+            const typeIcon = p.mainType === 'Computer' ? '💻' : (p.mainType === 'Photocopy' ? '📄' : '🛍️');
+            html += `
+            <div class="search-item" onclick="selectAdjProduct('${p.key}')">
+                <div>
+                    <div style="font-weight:bold; color:var(--text-main)">${typeIcon} ${p.name}</div>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <span style="color:#64748b; font-size:12px">${p.serial || 'No Serial'}</span>
+                        <span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px">${p.category}</span>
+                        <span style="font-size:12px">স্টক: ${p.qty}</span>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:bold; color:#10b981">৳${p.sellPrice}</div>
+                </div>
             </div>`;
         });
         resultsDiv.innerHTML = html;
         resultsDiv.style.display = "block";
     } else {
-        resultsDiv.style.display = "none";
+        resultsDiv.innerHTML = '<div class="search-item" style="color:#666; justify-content:center;">কোনো পণ্য পাওয়া যায়নি</div>';
+        resultsDiv.style.display = "block";
     }
 }
 
-function selectAdjProduct(key, name) {
+function selectAdjProduct(key) {
+    const product = allProducts.find(p => p.key === key);
+    if(!product) return;
+
     document.getElementById("adjProductKey").value = key;
-    document.getElementById("adjSearch").value = name;
+    document.getElementById("adjSearch").value = "";
     document.getElementById("adjSearchResults").style.display = "none";
+
+    // Update Dropdowns to match selected product
+    const adjSec = document.getElementById("adjSectionSelect");
+    adjSec.value = product.mainType;
+    updateAdjCategories();
+    document.getElementById("adjCategorySelect").value = product.category;
+    loadAdjProductsByCategory();
+    document.getElementById("adjProductSelect").value = key;
+
     document.getElementById("adjQty").focus();
+    showToast(`${product.name} সিলেক্ট করা হয়েছে`, "success");
+}
+
+function updateAdjCategories() {
+    const section = document.getElementById("adjSectionSelect").value;
+    const catSelect = document.getElementById("adjCategorySelect");
+    const prodSelect = document.getElementById("adjProductSelect");
+
+    catSelect.innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+    prodSelect.innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
+
+    if(!section) return;
+
+    const filtered = allProducts.filter(p => p.mainType === section && !p.isService);
+    const uniqueCategories = [...new Set(filtered.map(p => p.category))].filter(Boolean).sort();
+
+    let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
+    uniqueCategories.forEach(c => html += `<option value="${c}">${c}</option>`);
+    catSelect.innerHTML = html;
+}
+
+function loadAdjProductsByCategory() {
+    const selectedCat = document.getElementById("adjCategorySelect").value;
+    const selectedSection = document.getElementById("adjSectionSelect").value;
+    const prodSelect = document.getElementById("adjProductSelect");
+
+    prodSelect.innerHTML = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+
+    if (!selectedCat) return;
+
+    const filteredProducts = allProducts.filter(p => p.category === selectedCat && p.mainType === selectedSection && !p.isService);
+
+    let html = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+    filteredProducts.forEach(p => {
+        html += `<option value="${p.key}">${p.name} (স্টক: ${p.qty})</option>`;
+    });
+    prodSelect.innerHTML = html;
+}
+
+function adjProductSelectedFromDropdown() {
+    const key = document.getElementById("adjProductSelect").value;
+    if(key) document.getElementById("adjProductKey").value = key;
 }
 
 function saveStockAdjustment() {
@@ -3119,10 +3212,7 @@ function saveStockAdjustment() {
     const totalCost = costPrice * qty;
     const today = new Date().toLocaleDateString("en-GB");
 
-    // 1. Deduct Stock
     db.ref("products/" + key + "/qty").transaction(current => (current || 0) - qty).then(() => {
-
-        // 2. Add to Expense (Auto)
         const expData = {
             date: today,
             desc: `Internal Out: ${product.name} (${reason})`,
@@ -3132,7 +3222,6 @@ function saveStockAdjustment() {
         };
         db.ref("expenses").push(expData);
 
-        // 3. Save Adjustment History
         const adjData = {
             date: today,
             time: new Date().toLocaleTimeString(),
@@ -3147,10 +3236,12 @@ function saveStockAdjustment() {
         showToast("স্টক অ্যাডজাস্টমেন্ট সফল! খরচ হিসেবে যুক্ত হয়েছে।", "success");
         logActivity("Stock Adjustment", `${reason}: ${qty} ${product.name}`);
 
-        // Reset
         document.getElementById("adjProductKey").value = "";
         document.getElementById("adjSearch").value = "";
         document.getElementById("adjQty").value = "";
+        document.getElementById("adjSectionSelect").value = "";
+        document.getElementById("adjCategorySelect").innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+        document.getElementById("adjProductSelect").innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     });
 }
 
@@ -3598,71 +3689,6 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
             toggleManualMode();
         }
     });
-}
-
-// --- EXPENSE MANAGEMENT ---
-function saveExpense() {
-    const desc = document.getElementById("expDesc").value.trim();
-    const cat = document.getElementById("expCat").value;
-    const amount = parseFloat(document.getElementById("expAmount").value);
-    if(!desc && isNaN(amount)) {
-        showToast("⚠️ বিবরণ এবং টাকার পরিমাণ দিন!", "error");
-        return;
-    }
-    if(!desc) {
-        showToast("⚠️ খরচের বিবরণ লিখুন!", "error");
-        return;
-    }
-    if(isNaN(amount) || amount <= 0) {
-        showToast("⚠️ সঠিক টাকার পরিমাণ দিন!", "error");
-        return;
-    }
-    const expenseData = {
-        date: new Date().toLocaleDateString("en-GB"),
-        desc: desc,
-        category: cat,
-        amount: amount,
-        user: currentUser
-    };
-    db.ref("expenses").push(expenseData).then(() => {
-        showToast("খরচ সেভ হয়েছে!", "success");
-        document.getElementById("expDesc").value = "";
-        document.getElementById("expAmount").value = "";
-    });
-}
-
-function loadExpenses() {
-    db.ref("expenses").on("value", s => {
-        allExpenses = [];
-        let totalExp = 0;
-        const tbody = document.getElementById("expenseBody");
-        tbody.innerHTML = "";
-        s.forEach(c => {
-            let e = c.val();
-            e.key = c.key;
-            allExpenses.push(e);
-            totalExp += parseFloat(e.amount) || 0;
-            tbody.innerHTML += `
-            <tr>
-                <td>${e.date}</td>
-                <td>${e.desc}</td>
-                <td>${e.category}</td>
-                <td>${e.amount}</td>
-                <td><button class="btn-action btn-delete" onclick="deleteExpense('${e.key}')">🗑️</button></td>
-            </tr>`;
-        });
-        setText("totalExpenseDisplay", totalExp);
-    });
-}
-
-function deleteExpense(key) {
-    if (!sysConfig.perms.delete) {
-        return showToast("ডিলিট করার অনুমতি নেই!", "error");
-    }
-    if(confirm("খরচটি ডিলিট করতে চান?")) {
-        db.ref("expenses/"+key).remove();
-        showToast("খরচ ডিলিট হয়েছে", "warning");
-    }
 }
 
 // --- ANALYTICS ---
@@ -4955,38 +4981,105 @@ function openManualSalesReport() {
     document.getElementById("overlay").style.display = "block";
 }
 
-// --- STOCK ADJUSTMENT LOGIC (NEW FEATURE) ---
+// --- STOCK ADJUSTMENT LOGIC (UPDATED WITH 3-STEP & SMART SEARCH) ---
 function searchAdjProduct(query) {
     const resultsDiv = document.getElementById("adjSearchResults");
     if(!query) { resultsDiv.style.display = "none"; return; }
 
     const matches = allProducts.filter(p =>
         !p.isService && (
-            p.name.toLowerCase().includes(query.toLowerCase()) ||
-            String(p.serial).includes(query)
+            (p.serial && String(p.serial).toLowerCase().includes(query.toLowerCase())) ||
+            (p.name && p.name.toLowerCase().includes(query.toLowerCase())) ||
+            (p.category && p.category.toLowerCase().includes(query.toLowerCase()))
         )
     );
 
     if(matches.length > 0) {
         let html = "";
         matches.forEach(p => {
-            html += `<div class="search-item" onclick="selectAdjProduct('${p.key}', '${p.name}')">
-                <span>${p.name} (Stock: ${p.qty})</span>
-                <b>৳${p.sellPrice}</b>
+            const typeIcon = p.mainType === 'Computer' ? '💻' : (p.mainType === 'Photocopy' ? '📄' : '🛍️');
+            html += `
+            <div class="search-item" onclick="selectAdjProduct('${p.key}')">
+                <div>
+                    <div style="font-weight:bold; color:var(--text-main)">${typeIcon} ${p.name}</div>
+                    <div style="display:flex; gap:10px; margin-top:5px;">
+                        <span style="color:#64748b; font-size:12px">${p.serial || 'No Serial'}</span>
+                        <span style="background:#f1f5f9; padding:2px 6px; border-radius:4px; font-size:12px">${p.category}</span>
+                        <span style="font-size:12px">স্টক: ${p.qty}</span>
+                    </div>
+                </div>
+                <div style="text-align:right">
+                    <div style="font-weight:bold; color:#10b981">৳${p.sellPrice}</div>
+                </div>
             </div>`;
         });
         resultsDiv.innerHTML = html;
         resultsDiv.style.display = "block";
     } else {
-        resultsDiv.style.display = "none";
+        resultsDiv.innerHTML = '<div class="search-item" style="color:#666; justify-content:center;">কোনো পণ্য পাওয়া যায়নি</div>';
+        resultsDiv.style.display = "block";
     }
 }
 
-function selectAdjProduct(key, name) {
+function selectAdjProduct(key) {
+    const product = allProducts.find(p => p.key === key);
+    if(!product) return;
+
     document.getElementById("adjProductKey").value = key;
-    document.getElementById("adjSearch").value = name;
+    document.getElementById("adjSearch").value = "";
     document.getElementById("adjSearchResults").style.display = "none";
+
+    // ড্রপডাউনগুলো অটো আপডেট করা
+    const adjSec = document.getElementById("adjSectionSelect");
+    adjSec.value = product.mainType;
+    updateAdjCategories();
+    document.getElementById("adjCategorySelect").value = product.category;
+    loadAdjProductsByCategory();
+    document.getElementById("adjProductSelect").value = key;
+
     document.getElementById("adjQty").focus();
+    showToast(`${product.name} সিলেক্ট করা হয়েছে`, "success");
+}
+
+function updateAdjCategories() {
+    const section = document.getElementById("adjSectionSelect").value;
+    const catSelect = document.getElementById("adjCategorySelect");
+    const prodSelect = document.getElementById("adjProductSelect");
+
+    catSelect.innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+    prodSelect.innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
+
+    if(!section) return;
+
+    const filtered = allProducts.filter(p => p.mainType === section && !p.isService);
+    const uniqueCategories = [...new Set(filtered.map(p => p.category))].filter(Boolean).sort();
+
+    let html = '<option value="" disabled selected>সিলেক্ট করুন...</option>';
+    uniqueCategories.forEach(c => html += `<option value="${c}">${c}</option>`);
+    catSelect.innerHTML = html;
+}
+
+function loadAdjProductsByCategory() {
+    const selectedCat = document.getElementById("adjCategorySelect").value;
+    const selectedSection = document.getElementById("adjSectionSelect").value;
+    const prodSelect = document.getElementById("adjProductSelect");
+
+    prodSelect.innerHTML = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+
+    if (!selectedCat) return;
+
+    const filteredProducts = allProducts.filter(p => p.category === selectedCat && p.mainType === selectedSection && !p.isService);
+
+    let html = '<option value="" disabled selected>পণ্য সিলেক্ট করুন...</option>';
+    filteredProducts.forEach(p => {
+        html += `<option value="${p.key}">${p.name} (স্টক: ${p.qty})</option>`;
+    });
+    prodSelect.innerHTML = html;
+}
+
+function adjProductSelectedFromDropdown() {
+    const key = document.getElementById("adjProductSelect").value;
+    if(key) document.getElementById("adjProductKey").value = key;
 }
 
 function saveStockAdjustment() {
@@ -5005,10 +5098,7 @@ function saveStockAdjustment() {
     const totalCost = costPrice * qty;
     const today = new Date().toLocaleDateString("en-GB");
 
-    // ১. স্টক কমানো (Transaction ব্যবহার করে)
     db.ref("products/" + key + "/qty").transaction(current => (current || 0) - qty).then(() => {
-
-        // ২. অটোমেটিক খরচ (Expense) হিসেবে যুক্ত করা
         const expData = {
             date: today,
             desc: `Internal Out: ${product.name} (${reason})`,
@@ -5018,7 +5108,6 @@ function saveStockAdjustment() {
         };
         db.ref("expenses").push(expData);
 
-        // ৩. অ্যাডজাস্টমেন্ট হিস্ট্রিতে সেভ করা
         const adjData = {
             date: today,
             time: new Date().toLocaleTimeString(),
@@ -5033,10 +5122,12 @@ function saveStockAdjustment() {
         showToast("স্টক অ্যাডজাস্টমেন্ট সফল! খরচ হিসেবে যুক্ত হয়েছে।", "success");
         logActivity("Stock Adjustment", `${reason}: ${qty} ${product.name}`);
 
-        // ইনপুট ক্লিয়ার করা
         document.getElementById("adjProductKey").value = "";
         document.getElementById("adjSearch").value = "";
         document.getElementById("adjQty").value = "";
+        document.getElementById("adjSectionSelect").value = "";
+        document.getElementById("adjCategorySelect").innerHTML = '<option value="" disabled selected>আগে বিভাগ সিলেক্ট করুন</option>';
+        document.getElementById("adjProductSelect").innerHTML = '<option value="" disabled selected>আগে ক্যাটাগরি সিলেক্ট করুন</option>';
     });
 }
 
