@@ -977,7 +977,7 @@ tr:hover { background-color: #f8fafc; }
 <!-- FIXED ASSET MANAGEMENT (UPDATED DESIGN) -->
     <div id="assetManager" class="section">
         <div class="card-glass" style="max-width:1100px; margin:auto;">
-            
+
             <!-- ১. হেডার সেকশন (টাইটেল এবং মোট ভ্যালু) -->
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom: 25px;">
                 <h3 style="margin:0; color:#8b5cf6;">🏢 দোকানের স্থায়ী সম্পদ (Fixed Assets)</h3>
@@ -990,9 +990,9 @@ tr:hover { background-color: #f8fafc; }
             <!-- ২. ইনপুট ফর্ম (২টা উপরে, ২টা নিচে) -->
             <div style="background:#fff; padding:25px; border-radius:12px; margin-bottom:30px; border:1px solid #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                 <h4 style="margin-top:0; color:#4b5563; margin-bottom:20px; border-bottom:1px dashed #cbd5e1; padding-bottom:10px;">➕ নতুন মালামাল যুক্ত করুন</h4>
-                
+
                 <div style="display:flex; flex-direction:column; gap:15px;">
-                    
+
                     <!-- প্রথম লাইন: নাম এবং তারিখ -->
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
                         <div class="form-group" style="margin:0">
@@ -1050,7 +1050,7 @@ tr:hover { background-color: #f8fafc; }
         </div>
     </div>
 
-           
+
     <!-- BUSINESS ANALYTICS -->
     <div id="analytics" class="section">
         <div class="card-glass">
@@ -1808,15 +1808,15 @@ let lastPopupTime = 0;
 function loadGodModeListeners() {
     // 1. Master Config Listener
     db.ref("settings/masterConfig").on("value", snap => {
-        const val = snap.val();
-        if(val) {
-            sysConfig = { ...sysConfig, ...val };
-            updateModuleVisibility();
-            updateUIFromConfig();
-            // Apply permission-based UI changes
-            document.getElementById('rate').readOnly = !sysConfig.perms.priceEdit;
-        }
-    });
+    const val = snap.val();
+    if(val) {
+        sysConfig = val;
+        updateModuleVisibility();
+        updateUIFromConfig();
+        const rateInput = document.getElementById('rate');
+        if(rateInput) rateInput.readOnly = !sysConfig.perms.priceEdit;
+    }
+});
 
     // 2. App Lock Listener
     db.ref("settings/appLock").on("value", snap => {
@@ -1869,12 +1869,13 @@ function loadGodModeListeners() {
 
     // 6. Force Popup Listener
     db.ref("settings/popup").on("value", snap => {
-        const popup = snap.val();
-        if(popup && popup.msg && popup.time > lastPopupTime) {
-            alert("📢 ADMIN ALERT:\n\n" + popup.msg);
-            lastPopupTime = popup.time;
-        }
-    });
+    const popup = snap.val();
+    // এখানে popup.active === true চেকটি যোগ করা হয়েছে
+    if(popup && popup.active === true && popup.msg && popup.time > lastPopupTime) {
+        alert("📢 ADMIN ALERT:\n\n" + popup.msg);
+        lastPopupTime = popup.time;
+    }
+});
 
     // 7. Dynamic Menu Listener
     db.ref("settings/menu").on("value", snap => {
@@ -3576,11 +3577,11 @@ function toggleQuickSaleMode() {
 
     if (isQuick) {
         phoneInput.placeholder = "অটো জেনারেট হবে (Auto)";
-        phoneInput.disabled = true; 
+        phoneInput.disabled = true;
         phoneInput.style.background = "#f1f5f9";
         errorSpan.style.display = "none";
         phoneInput.classList.remove("invalid");
-        phoneInput.value = ""; 
+        phoneInput.value = "";
     } else {
         phoneInput.placeholder = "017xxxxxxxx";
         phoneInput.disabled = false;
@@ -3602,10 +3603,10 @@ function saveBulkEntry(showMemoFlag){
     // --- QUICK SALE LOGIC (NEW) ---
     if (isQuickSale) {
         if (!noteVal) noteVal = "General Customer";
-        
+
         // অটোমেটিক ইউনিক আইডি জেনারেট হবে
         if (!phoneVal) {
-            const uniqueId = Math.floor(Date.now() / 1000).toString().slice(-5); 
+            const uniqueId = Math.floor(Date.now() / 1000).toString().slice(-5);
             phoneVal = "QC-" + uniqueId;
         }
     } else {
@@ -3616,7 +3617,7 @@ function saveBulkEntry(showMemoFlag){
             showToast("❌ মোবাইল নম্বর বাধ্যতামূলক (Admin Rule)!", "error");
             return;
         }
-        
+
         if(phoneVal.length > 0) {
             const bdPhoneRegex = /^01[3-9][0-9]{8}$/;
             if(!bdPhoneRegex.test(phoneVal)) {
@@ -3625,7 +3626,7 @@ function saveBulkEntry(showMemoFlag){
             }
         }
     }
-    
+
     // ভেরিয়েবলগুলো আগে ডিফাইন করা হলো যাতে নিচের কোড ঠিক থাকে
     const totalVal = parseFloat(document.getElementById("total").value);
     const takenVal = parseFloat(document.getElementById("taken").value) || 0;
@@ -5354,7 +5355,7 @@ function loadAssets() {
             // পুরনো ডাটার জন্য হ্যান্ডলিং
             if(!a.originalPrice) a.originalPrice = a.price;
             if(!a.currentValue) a.currentValue = a.price;
-            
+
             allAssets.push(a);
 
             if(a.status === 'Active' || a.status === 'Repairing') {
@@ -5390,7 +5391,7 @@ function loadAssets() {
 // --- DEPRECIATION LOGIC ---
 function openDepreciationModal(key, name, currentVal) {
     const percent = prompt(`"${name}" এর বর্তমান দাম ৳${currentVal}।\n\nকত পারসেন্ট (%) দাম কমাতে চান? (যেমন: 10, 20)`);
-    
+
     if(percent) {
         const p = parseFloat(percent);
         if(isNaN(p) || p <= 0 || p > 100) return showToast("সঠিক পারসেন্টেজ দিন!", "error");
