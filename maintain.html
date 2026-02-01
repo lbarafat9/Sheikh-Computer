@@ -777,16 +777,47 @@ function renderChart() {
 // --- SAVE MASTER CONFIG ---
 function saveMasterConfig() {
     const config = {
-        modules: { chat: document.getElementById("modChat").checked, manual: document.getElementById("modManual").checked, due: document.getElementById("modDue").checked, return: document.getElementById("modReturn").checked, expense: document.getElementById("modExpense").checked },
-        perms: { priceEdit: document.getElementById("permPriceEdit").checked, delete: document.getElementById("permDelete").checked, viewCost: document.getElementById("permViewCost").checked, backdate: document.getElementById("permBackdate").checked },
-        rules: { phoneReq: document.getElementById("rulePhoneReq").checked, negStock: document.getElementById("ruleNegStock").checked, dueLimit: document.getElementById("ruleDueLimit").value, stockAlert: document.getElementById("ruleStockAlert").value },
-        ui: { memoLabel: document.getElementById("uiMemoLabel").value, printFormat: document.getElementById("uiPrintFormat").value, currency: document.getElementById("uiCurrency").value, footer: document.getElementById("uiFooter").value },
-        logic: { vatEnable: document.getElementById("logicVatEnable").checked, vatPercent: document.getElementById("logicVatPercent").value, maxDisc: document.getElementById("logicMaxDisc").value },
-        auto: { loginStart: document.getElementById("autoLoginStart").value, loginEnd: document.getElementById("autoLoginEnd").value, bkashCharge: document.getElementById("autoBkashCharge").value, cardCharge: document.getElementById("autoCardCharge").value, showQR: document.getElementById("autoShowQR").checked, qrData: document.getElementById("autoQRData").value }
+        modules: {
+            chat: document.getElementById("modChat").checked,
+            manual: document.getElementById("modManual").checked,
+            due: document.getElementById("modDue").checked,
+            return: document.getElementById("modReturn").checked,
+            expense: document.getElementById("modExpense").checked
+        },
+        perms: {
+            priceEdit: document.getElementById("permPriceEdit").checked,
+            delete: document.getElementById("permDelete").checked,
+            viewCost: document.getElementById("permViewCost").checked,
+            backdate: document.getElementById("permBackdate").checked
+        },
+        rules: {
+            phoneReq: document.getElementById("rulePhoneReq").checked,
+            negStock: document.getElementById("ruleNegStock").checked,
+            dueLimit: document.getElementById("ruleDueLimit").value || 0,
+            stockAlert: document.getElementById("ruleStockAlert").value || 5
+        },
+        ui: {
+            memoLabel: document.getElementById("uiMemoLabel").value || "MEMO / BILL",
+            printFormat: document.getElementById("uiPrintFormat").value,
+            currency: document.getElementById("uiCurrency").value || "৳",
+            footer: document.getElementById("uiFooter").value || ""
+        },
+        logic: {
+            vatEnable: document.getElementById("logicVatEnable").checked,
+            vatPercent: document.getElementById("logicVatPercent").value || 0,
+            maxDisc: document.getElementById("logicMaxDisc").value || 100
+        },
+        auto: {
+            loginStart: document.getElementById("autoLoginStart").value || "00:00",
+            loginEnd: document.getElementById("autoLoginEnd").value || "23:59",
+            bkashCharge: document.getElementById("autoBkashCharge").value || 0,
+            cardCharge: document.getElementById("autoCardCharge").value || 0,
+            showQR: document.getElementById("autoShowQR").checked,
+            qrData: document.getElementById("autoQRData").value || ""
+        }
     };
-    db.ref("settings/masterConfig").set(config).then(() => alert("✅ MASTER CONFIGURATION SAVED!"));
+    db.ref("settings/masterConfig").set(config).then(() => alert("✅ God Mode Settings Saved!"));
 }
-
 // --- ULTRA PRO FUNCTIONS ---
 function addMenuItem() { const l = document.getElementById("menuLabel").value, i = document.getElementById("menuIcon").value, a = document.getElementById("menuAction").value; if(l && a) db.ref("settings/menu").push({label:l, icon:i, action:a, visible:true}); }
 function removeMenu(k) { db.ref("settings/menu/"+k).remove(); }
@@ -835,7 +866,13 @@ function removePM(k) { db.ref("settings/payments/"+k).remove(); }
 function saveCustomCSS() { db.ref("settings/css").set(document.getElementById("customCssArea").value); alert("CSS Injected!"); }
 function saveInvoiceDesign() { const d = { showSerial: document.getElementById("invShowSerial").checked, showDesc: document.getElementById("invShowDesc").checked, showRate: document.getElementById("invShowRate").checked, logoUrl: document.getElementById("invLogoUrl").value, headerColor: document.getElementById("invHeaderColor").value }; db.ref("settings/invoiceDesign").set(d); alert("Design Saved!"); }
 function sendLivePopup() { const msg = document.getElementById("autoPopupMsg").value; if(msg) db.ref("settings/popup").set({msg:msg, time:Date.now(), active:true}); alert("Sent!"); }
-function stopPopup() { db.ref("settings/popup/active").set(false); alert("Popup Stopped!"); }
+function stopPopup() {
+    db.ref("settings/popup").update({
+        active: false,
+        msg: ""
+    });
+    alert("📢 Admin Alert is now OFF!");
+}
 
 function renderList(data, containerId, removeFunc, isObj=false) {
     const c = document.getElementById(containerId); c.innerHTML = "";
