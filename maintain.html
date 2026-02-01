@@ -13,6 +13,32 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
 
 <style>
+
+/* POS Mode Link Button Style for Admin Page */
+.pos-mode-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(139, 92, 246, 0.2); /* এডমিন থিমের বেগুনি কালার */
+    color: white;
+    padding: 10px 18px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: bold;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    transition: 0.3s;
+    z-index: 10000; /* যাতে এটি লগইন বক্সের উপরে থাকে */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.pos-mode-link:hover {
+    background: #8b5cf6;
+    color: white;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+}
     :root {
         --bg-dark: #0f172a;
         --bg-panel: #1e293b;
@@ -240,6 +266,7 @@
 
 <!-- AUTH GATE -->
 <div id="authGate">
+    <a href="https://sheikhcomputer.nett.to/" class="pos-mode-link">🛒 POS Mode</a>
     <div class="auth-box">
         <h1><i class="fa-solid fa-user-shield"></i> GOD MODE</h1>
         <p style="color:#94a3b8; font-size:13px;">Super Admin Access Only</p>
