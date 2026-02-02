@@ -2249,12 +2249,17 @@ function setupUser(u) {
     setText("modalProfileName", u.toUpperCase());
     setText("modalProfileInit", u.charAt(0).toUpperCase());
 
+    // --- এই লাইনটি আপনার সমস্যার সমাধান করবে ---
+    if(document.getElementById("itemUser")) {
+        document.getElementById("itemUser").value = u;
+    }
+
     loadAllProducts();
     loadEntries();
     loadAllCustomers();
     loadExpenses();
     loadStockAdjustments();
-    loadAssets(); // ADDED: Load Assets
+    loadAssets();
     setupChat();
     showSection('dashboard');
     setupLiveSearch();
@@ -5375,7 +5380,7 @@ function executeQuickAdd(productKey) {
     if(itemIndex !== -1) {
         cart[itemIndex].qty += 1;
         cart[itemIndex].sub = cart[itemIndex].qty * cart[itemIndex].rate;
-    } else {
+   } else {
         cart.push({
             key: product.key,
             work: product.name,
@@ -5386,7 +5391,8 @@ function executeQuickAdd(productKey) {
             rate: parseFloat(product.sellPrice),
             sub: parseFloat(product.sellPrice),
             isService: product.isService,
-            isManual: false
+            isManual: false,
+            performedBy: currentUser // এই নতুন লাইনটি যোগ করুন
         });
     }
 
