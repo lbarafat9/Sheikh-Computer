@@ -647,10 +647,16 @@ tr:hover { background-color: #f8fafc; }
                 <span>আজকের ক্যাশ (৳)</span>
                 <b id="cTaken" style="color:#f59e0b">---</b>
             </div>
-            <div class="card" style="border-bottom-color:#ef4444">
-                <span>আজকের বাকি (৳)</span>
-                <b id="cDue" style="color:#ef4444">---</b>
-            </div>
+           <div class="card" style="border-bottom-color:#ef4444">
+    <span>আজকের বাকি (৳)</span>
+    <b id="cDue" style="color:#ef4444">---</b>
+</div>
+<!-- নিচে এই নতুন কার্ডটি যোগ হলো -->
+<!-- এখানে id="adminShareCard" এবং style="display:none" যোগ করা হয়েছে -->
+<div id="adminShareCard" class="card" style="border-bottom-color:#8b5cf6; background: #f5f3ff; display:none;">
+    <span style="color:#7c3aed">আমার আয় (৫০%)</span>
+    <b id="myShareToday" style="color:#7c3aed">---</b>
+</div>
         </div>
 
         <!-- SECTION WISE SALES SUMMARY -->
@@ -2294,7 +2300,6 @@ function openMyCashModal() {
     });
 
     allExpenses.forEach(exp => {
-        // এখানে !exp.isNonCash মানে হলো: যদি এটা 'নন-ক্যাশ' না হয়, তবেই ক্যাশ থেকে বাদ দাও
         if(exp.user === currentUser && exp.date === today && !exp.isNonCash) {
             myExpense += parseFloat(exp.amount) || 0;
         }
@@ -2304,9 +2309,28 @@ function openMyCashModal() {
 
     setText("myTotalTaken", myTaken.toLocaleString());
     setText("myTotalExpense", myExpense.toLocaleString());
-    setText("myNetCash", netCash.toLocaleString());
 
-    document.getElementById("depositAmount").value = netCash > 0 ? netCash : 0;
+    // --- শুধুমাত্র অ্যাডমিন হলে ৫০/৫০ ভাগ দেখাবে ---
+    if (currentUser === 'admin') {
+        const ownerShare = netCash / 2;
+        const myShare = netCash / 2;
+        setHTML("myNetCash", `
+            <div style="font-size:14px; color:#64748b; margin-bottom:10px">মোট ক্যাশ: ৳${netCash.toLocaleString()}</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid #fecaca">
+                    <small style="color:#ef4444">মালিকের (৫০%)</small><br><b style="color:#b91c1c">৳${ownerShare.toLocaleString()}</b>
+                </div>
+                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid #bbf7d0">
+                    <small style="color:#10b981">আমার (৫০%)</small><br><b style="color:#15803d">৳${myShare.toLocaleString()}</b>
+                </div>
+            </div>
+        `);
+        document.getElementById("depositAmount").value = ownerShare > 0 ? ownerShare : 0;
+    } else {
+        // অন্য ইউজারদের জন্য সাধারণ ভিউ
+        setText("myNetCash", netCash.toLocaleString());
+        document.getElementById("depositAmount").value = netCash > 0 ? netCash : 0;
+    }
 
     document.getElementById("myCashModal").style.display = "block";
     document.getElementById("overlay").style.display = "block";
@@ -3908,7 +3932,12 @@ function generateAnalytics() {
         if(netTitle) { netTitle.innerText = "NET LOSS ⚠️"; netTitle.style.color = "#ef4444"; }
         if(netEl) netEl.style.color = "#ef4444";
     } else {
-        if(netTitle) { netTitle.innerText = "NET PROFIT"; netTitle.style.color = "#64748b"; }
+        // লাভ হলে সেটাকে দুই ভাগ করে দেখানো
+        let share = netProfit / 2;
+        if(netTitle) {
+            netTitle.innerHTML = `NET PROFIT (আপনার ভাগ: <span style="color:#10b981">৳${share.toLocaleString()}</span>)`;
+            netTitle.style.color = "#64748b";
+        }
         if(netEl) netEl.style.color = "#10b981";
     }
 
@@ -4983,11 +5012,23 @@ function loadDashboardStats() {
     setText("cTaken", totalTaken.toLocaleString());
     setText("cDue", totalDue.toLocaleString());
 
+    // --- শুধুমাত্র অ্যাডমিনের জন্য ৫০% হিসাব ---
+    const shareCard = document.getElementById("adminShareCard");
+    if (currentUser === 'admin') {
+        shareCard.style.display = "block"; // কার্ডটি দেখাও
+        let myShare = totalTaken / 2;
+        setText("myShareToday", myShare.toLocaleString());
+    } else {
+        shareCard.style.display = "none"; // অন্য ইউজার হলে লুকিয়ে রাখো
+    }
+
     setTimeout(() => {
         setText("cCount", "---");
         setText("cTotal", "---");
         setText("cTaken", "---");
         setText("cDue", "---");
+        setText("myShareToday", "---");
+        if(currentUser === 'admin') shareCard.style.display = "none"; // ১০ সেকেন্ড পর আবার লুকিয়ে যাবে
         showToast("হিসাব হাইড করা হয়েছে (Security)", "warning");
     }, 10000);
 }
