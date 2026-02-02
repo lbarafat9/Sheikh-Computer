@@ -760,13 +760,24 @@ tr:hover { background-color: #f8fafc; }
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px">
                 <div class="form-group">
                     <label>পরিমাণ (Qty):</label>
                     <input id="qty" type="number" value="1" min="1" class="en" oninput="checkStockLive()" onkeydown="if(event.key === 'Enter'){ addToCart(); }">
                     <span id="stockLiveMsg" class="error-msg" style="color:red; font-size:12px"></span>
                 </div>
-                <div class="form-group"><label>দর (Rate ৳):</label><input id="rate" type="number" min="0" class="en"></div>
+                <div class="form-group">
+                    <label>দর (Rate ৳):</label>
+                    <input id="rate" type="number" min="0" class="en">
+                </div>
+                <div class="form-group">
+                    <label>কাজটি করেছে:</label>
+                    <select id="itemUser" style="background:#f0f9ff; border-color:#7dd3fc; font-weight:bold">
+                        <option value="admin">Admin</option>
+                        <option value="owner">Owner</option>
+                        <option value="roky">Roky</option>
+                    </select>
+                </div>
             </div>
 
             <!-- NEW RECALL BUTTON BEFORE ADD BUTTON -->
@@ -3369,6 +3380,8 @@ function addToCart(){
 
     let item = {};
 
+    const performedBy = document.getElementById("itemUser").value; // ইউজার সিলেক্ট করা হলো
+
     if(isManualMode) {
         const name = document.getElementById("manualName").value.trim();
         const cat = document.getElementById("manualCategory").value.trim() || "General";
@@ -3386,7 +3399,8 @@ function addToCart(){
             rate: r,
             sub: q * r,
             isService: true,
-            isManual: true
+            isManual: true,
+            performedBy: performedBy // ইউজার সেভ হলো
         };
 
         document.getElementById("manualName").value = "";
@@ -3423,7 +3437,8 @@ function addToCart(){
             rate: r,
             sub: q * r,
             isService: product.isService,
-            isManual: false
+            isManual: false,
+            performedBy: performedBy // ইউজার সেভ হলো
         };
 
         document.getElementById("selectedProductKey").value = "";
@@ -4351,18 +4366,26 @@ function updateUserSummary() {
     const users = {};
 
     todayEntries.forEach(e => {
-        const u = e.user || "Unknown";
-        if(!users[u]) users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
-
-        users[u].total += (+e.total || 0);
-        users[u].cash += (+e.taken || 0);
-        users[u].due += (+e.loss || 0);
-
-        if(e.items) {
-            e.items.forEach(i => {
-                users[u].cost += ((+i.cost || 0) * (+i.qty || 0));
+        // মেমোর ভেতরের আইটেম অনুযায়ী কাজের ক্রেডিট ভাগ করা
+        if(e.items && Array.isArray(e.items)) {
+            e.items.forEach(item => {
+                const worker = item.performedBy || e.user || "Unknown";
+                if(!users[worker]) users[worker] = { total: 0, cash: 0, due: 0, cost: 0 };
+                users[worker].total += (+item.sub || 0);
+                users[worker].cost += ((+item.cost || 0) * (+item.qty || 0));
             });
+        } else {
+            // যদি আইটেম লিস্ট না থাকে (পুরনো ডাটা)
+            const u = e.user || "Unknown";
+            if(!users[u]) users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
+            users[u].total += (+e.total || 0);
         }
+
+        // নগদ টাকা এবং বাকিটা মেমো যে কেটেছে তার নামেই থাকবে
+        const memoCutter = e.user || "Unknown";
+        if(!users[memoCutter]) users[memoCutter] = { total: 0, cash: 0, due: 0, cost: 0 };
+        users[memoCutter].cash += (+e.taken || 0);
+        users[memoCutter].due += (+e.loss || 0);
     });
 
     const tbody = document.getElementById("userSummaryBody");
@@ -4997,6 +5020,7 @@ function loadDashboardStats() {
     let totalTaken = 0;
     let totalDue = 0;
     let count = 0;
+    let myTotalWorkToday = 0; // অ্যাডমিনের নিজের কাজের মোট টাকা
 
     allEntries.forEach(e => {
         if(e.date === today) {
@@ -5004,6 +5028,18 @@ function loadDashboardStats() {
             totalTaken += parseFloat(e.taken) || 0;
             totalDue += parseFloat(e.loss) || 0;
             count++;
+
+            // মেমোর ভেতরের প্রতিটি আইটেম চেক করা
+            if(e.items && Array.isArray(e.items)) {
+                e.items.forEach(item => {
+                    if(item.performedBy === 'admin') {
+                        myTotalWorkToday += parseFloat(item.sub) || 0;
+                    }
+                });
+            } else if(e.user === 'admin') {
+                // পুরনো মেমো যেগুলোতে আইটেম ইউজার নেই
+                myTotalWorkToday += parseFloat(e.total) || 0;
+            }
         }
     });
 
@@ -5012,14 +5048,14 @@ function loadDashboardStats() {
     setText("cTaken", totalTaken.toLocaleString());
     setText("cDue", totalDue.toLocaleString());
 
-    // --- শুধুমাত্র অ্যাডমিনের জন্য ৫০% হিসাব ---
+    // শুধুমাত্র অ্যাডমিনের জন্য ৫০% কার্ড দেখানো
     const shareCard = document.getElementById("adminShareCard");
     if (currentUser === 'admin') {
-        shareCard.style.display = "block"; // কার্ডটি দেখাও
-        let myShare = totalTaken / 2;
+        shareCard.style.display = "block";
+        let myShare = myTotalWorkToday / 2;
         setText("myShareToday", myShare.toLocaleString());
     } else {
-        shareCard.style.display = "none"; // অন্য ইউজার হলে লুকিয়ে রাখো
+        if(shareCard) shareCard.style.display = "none";
     }
 
     setTimeout(() => {
@@ -5028,9 +5064,9 @@ function loadDashboardStats() {
         setText("cTaken", "---");
         setText("cDue", "---");
         setText("myShareToday", "---");
-        if(currentUser === 'admin') shareCard.style.display = "none"; // ১০ সেকেন্ড পর আবার লুকিয়ে যাবে
+        if(currentUser === 'admin' && shareCard) shareCard.style.display = "none";
         showToast("হিসাব হাইড করা হয়েছে (Security)", "warning");
-    }, 10000);
+    }, 15000);
 }
 
 
