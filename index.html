@@ -3456,10 +3456,12 @@ function addToCart(){
     }
 
     renderCart();
+    renderCart();
     document.getElementById("rate").value = "";
     document.getElementById("qty").value = 1;
     document.getElementById("stockLiveMsg").style.display = "none";
     document.getElementById("qty").classList.remove("invalid");
+    document.getElementById("itemUser").value = currentUser;
 
     if(!isManualMode) document.getElementById("searchSerial").focus();
     else document.getElementById("manualName").focus();
@@ -4981,8 +4983,15 @@ function showSection(id){
 
     closeSidebar();
 
+    // --- নতুন অংশ: নিউ এন্ট্রিতে গেলে ডিফল্ট ইউজার সেট করা ---
+    if(id === 'newEntry') {
+        const itemUserSelect = document.getElementById("itemUser");
+        if(itemUserSelect) itemUserSelect.value = currentUser;
+    }
+
     if(id === 'customerManager') loadCustomerManager();
 }
+
 function closeSidebar(){ document.getElementById("sidebar").style.left="-300px"; document.getElementById("overlay").style.display="none"; }
 function openSidebar(){ document.getElementById("sidebar").style.left="0"; document.getElementById("overlay").style.display="block"; }
 
