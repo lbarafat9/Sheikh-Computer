@@ -3456,12 +3456,10 @@ function addToCart(){
     }
 
     renderCart();
-    renderCart();
     document.getElementById("rate").value = "";
     document.getElementById("qty").value = 1;
     document.getElementById("stockLiveMsg").style.display = "none";
     document.getElementById("qty").classList.remove("invalid");
-    document.getElementById("itemUser").value = currentUser;
 
     if(!isManualMode) document.getElementById("searchSerial").focus();
     else document.getElementById("manualName").focus();
@@ -3478,12 +3476,22 @@ function renderCart(){
     cart.forEach((item, index) => {
         grandTotal += item.sub;
         cartList.innerHTML += `
-            <div class="cart-item">
-                <div>
+            <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                <div style="flex: 2;">
                     <div style="font-weight:bold; color:var(--text-main)">${item.work} ${item.isManual ? '<span style="color:red; font-size:10px">(Manual)</span>' : ''}</div>
                     <div style="font-size:12px; color:#64748b">${item.mainType} | ${item.qty} x ৳${item.rate}</div>
                 </div>
-                <div>
+
+                <!-- এখানে প্রতিটি মালের জন্য আলাদা ইউজার সিলেক্ট করার অপশন -->
+                <div style="flex: 1; text-align: center;">
+                    <select onchange="updateItemUser(${index}, this.value)" style="padding: 4px; font-size: 11px; width: 85px; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+                        <option value="admin" ${item.performedBy === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="owner" ${item.performedBy === 'owner' ? 'selected' : ''}>Owner</option>
+                        <option value="roky" ${item.performedBy === 'roky' ? 'selected' : ''}>Roky</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; text-align: right;">
                     <b style="color:var(--primary)">৳${item.sub}</b>
                     <span onclick="removeCart(${index})" style="color:#ef4444;cursor:pointer;margin-left:10px;font-weight:bold">✕</span>
                 </div>
@@ -3491,6 +3499,11 @@ function renderCart(){
     });
     document.getElementById("total").value = grandTotal;
     calcDue();
+}
+// কার্টের ভেতরে ইউজার পরিবর্তন করলে তা সেভ করার ফাংশন
+function updateItemUser(index, newUser) {
+    cart[index].performedBy = newUser;
+    showToast(`আইটেম ক্রেডিট আপডেট: ${newUser.toUpperCase()}`, "success");
 }
 
 function removeCart(index){
@@ -4983,15 +4996,8 @@ function showSection(id){
 
     closeSidebar();
 
-    // --- নতুন অংশ: নিউ এন্ট্রিতে গেলে ডিফল্ট ইউজার সেট করা ---
-    if(id === 'newEntry') {
-        const itemUserSelect = document.getElementById("itemUser");
-        if(itemUserSelect) itemUserSelect.value = currentUser;
-    }
-
     if(id === 'customerManager') loadCustomerManager();
 }
-
 function closeSidebar(){ document.getElementById("sidebar").style.left="-300px"; document.getElementById("overlay").style.display="none"; }
 function openSidebar(){ document.getElementById("sidebar").style.left="0"; document.getElementById("overlay").style.display="block"; }
 
