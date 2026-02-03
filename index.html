@@ -647,10 +647,16 @@ tr:hover { background-color: #f8fafc; }
                 <span>আজকের ক্যাশ (৳)</span>
                 <b id="cTaken" style="color:#f59e0b">---</b>
             </div>
-            <div class="card" style="border-bottom-color:#ef4444">
-                <span>আজকের বাকি (৳)</span>
-                <b id="cDue" style="color:#ef4444">---</b>
-            </div>
+           <div class="card" style="border-bottom-color:#ef4444">
+    <span>আজকের বাকি (৳)</span>
+    <b id="cDue" style="color:#ef4444">---</b>
+</div>
+<!-- নিচে এই নতুন কার্ডটি যোগ হলো -->
+<!-- এখানে id="adminShareCard" এবং style="display:none" যোগ করা হয়েছে -->
+<div id="adminShareCard" class="card" style="border-bottom-color:#8b5cf6; background: #f5f3ff; display:none;">
+    <span style="color:#7c3aed">আমার আয় (৫০%)</span>
+    <b id="myShareToday" style="color:#7c3aed">---</b>
+</div>
         </div>
 
         <!-- SECTION WISE SALES SUMMARY -->
@@ -754,13 +760,24 @@ tr:hover { background-color: #f8fafc; }
                 </div>
             </div>
 
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px">
                 <div class="form-group">
                     <label>পরিমাণ (Qty):</label>
                     <input id="qty" type="number" value="1" min="1" class="en" oninput="checkStockLive()" onkeydown="if(event.key === 'Enter'){ addToCart(); }">
                     <span id="stockLiveMsg" class="error-msg" style="color:red; font-size:12px"></span>
                 </div>
-                <div class="form-group"><label>দর (Rate ৳):</label><input id="rate" type="number" min="0" class="en"></div>
+                <div class="form-group">
+                    <label>দর (Rate ৳):</label>
+                    <input id="rate" type="number" min="0" class="en">
+                </div>
+                <div class="form-group">
+                    <label>কাজটি করেছে:</label>
+                    <select id="itemUser" style="background:#f0f9ff; border-color:#7dd3fc; font-weight:bold">
+                        <option value="admin">Admin</option>
+                        <option value="owner">Owner</option>
+                        <option value="roky">Roky</option>
+                    </select>
+                </div>
             </div>
 
             <!-- NEW RECALL BUTTON BEFORE ADD BUTTON -->
@@ -800,7 +817,7 @@ tr:hover { background-color: #f8fafc; }
                     </div>
                 </div>
 
-<div style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div style="background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
                         <div class="form-group"><label>মোট বিল (Total):</label><input id="total" class="en" value="0" oninput="calcDue()" style="background:#fff; font-weight:bold; font-size: 18px; color: var(--text-main);"></div>
                         <div class="form-group"><label>নগদ জমা (Paid):</label><input id="taken" type="number" min="0" class="en" oninput="calcDue()" style="font-size: 18px;"></div>
@@ -808,21 +825,24 @@ tr:hover { background-color: #f8fafc; }
                     <div class="form-group">
                         <label id="dueLabel" style="color:#ef4444">বাকি (Due):</label>
                         <input id="due" readonly class="en" value="0" style="background:#fef2f2; color:#ef4444; font-weight:bold; font-size: 18px;">
-                    </div>
+</div>
 
-                    <!-- NEW MANUAL DUE SPLIT -->
-                    <div id="dueSplitArea" style="display:none; margin-top:15px; background:#fff7ed; padding:10px; border:1px solid #fed7aa; border-radius:8px;">
-                        <div style="text-align:center; margin-bottom:5px;">
-                            <button onclick="document.getElementById('splitInputs').style.display='grid'" style="background:#f97316; font-size:12px; padding:6px 15px; width:auto; color:white; border:none; border-radius:4px;">⚠️ বাকি ভাগ করে দিন (Custom Split)</button>
-                        </div>
-                        <div id="splitInputs" style="display:none; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:10px;">
-                            <div><label style="font-size:11px; font-weight:bold">Admin Due:</label><input id="splitAdmin" type="number" class="en" placeholder="0" oninput="checkSplitTotal()" style="padding:5px;"></div>
-                            <div><label style="font-size:11px; font-weight:bold">Owner Due:</label><input id="splitOwner" type="number" class="en" placeholder="0" oninput="checkSplitTotal()" style="padding:5px;"></div>
-                            <div><label style="font-size:11px; font-weight:bold">Roky Due:</label><input id="splitRoky" type="number" class="en" placeholder="0" oninput="checkSplitTotal()" style="padding:5px;"></div>
-                        </div>
-                        <div id="splitError" style="color:red; font-size:11px; text-align:center; margin-top:5px; display:none; font-weight:bold;">বাকি মিলছে না!</div>
-                    </div>
-                </div>
+<!-- নতুন বাটন এবং ইনপুট এরিয়া -->
+<div id="splitDueBtnContainer" style="display:none; margin-top:10px; text-align:center;">
+    <button type="button" onclick="toggleSplitInputs()" style="background:linear-gradient(to right, #f59e0b, #d97706); font-size:14px; padding:10px; width:100%; border-radius:8px; box-shadow:0 4px 10px rgba(245, 158, 11, 0.2);">⚠️ বাকি ভাগ করে দিন (Custom Split)</button>
+</div>
+
+<div id="splitInputsArea" style="display:none; background:#fff7ed; padding:15px; border-radius:12px; border:1px solid #fed7aa; margin-top:10px; animation: fadeIn 0.3s;">
+    <p style="font-size:12px; font-weight:bold; margin-bottom:10px; color:#c2410c; text-align:center;">কার কত টাকা বাকি (Due Split):</p>
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
+        <div class="form-group" style="margin:0"><label style="font-size:11px;">Admin</label><input id="splitAdmin" type="number" class="en" placeholder="0" style="padding:8px; font-size:13px;"></div>
+        <div class="form-group" style="margin:0"><label style="font-size:11px;">Owner</label><input id="splitOwner" type="number" class="en" placeholder="0" style="padding:8px; font-size:13px;"></div>
+        <div class="form-group" style="margin:0"><label style="font-size:11px;">Roky</label><input id="splitRoky" type="number" class="en" placeholder="0" style="padding:8px; font-size:13px;"></div>
+    </div>
+</div>
+<!-- নতুন এরিয়া শেষ -->
+
+</div>
 
                 <!-- QUOTATION MODE TOGGLE (ADDED) -->
                 <div style="margin-top:15px; display:flex; align-items:center; gap:10px; background:#eff6ff; padding:10px; border-radius:8px">
@@ -1262,8 +1282,6 @@ tr:hover { background-color: #f8fafc; }
         </div>
     </div>
 </div>
-
---- START OF PART 2 ---
 
 <!-- CASH DEPOSIT MODAL (UPDATED WITH LOGIC) -->
 
@@ -2245,12 +2263,17 @@ function setupUser(u) {
     setText("modalProfileName", u.toUpperCase());
     setText("modalProfileInit", u.charAt(0).toUpperCase());
 
+    // --- এই লাইনটি আপনার সমস্যার সমাধান করবে ---
+    if(document.getElementById("itemUser")) {
+        document.getElementById("itemUser").value = u;
+    }
+
     loadAllProducts();
     loadEntries();
     loadAllCustomers();
     loadExpenses();
     loadStockAdjustments();
-    loadAssets(); // ADDED: Load Assets
+    loadAssets();
     setupChat();
     showSection('dashboard');
     setupLiveSearch();
@@ -2307,7 +2330,6 @@ function openMyCashModal() {
     });
 
     allExpenses.forEach(exp => {
-        // এখানে !exp.isNonCash মানে হলো: যদি এটা 'নন-ক্যাশ' না হয়, তবেই ক্যাশ থেকে বাদ দাও
         if(exp.user === currentUser && exp.date === today && !exp.isNonCash) {
             myExpense += parseFloat(exp.amount) || 0;
         }
@@ -2317,9 +2339,28 @@ function openMyCashModal() {
 
     setText("myTotalTaken", myTaken.toLocaleString());
     setText("myTotalExpense", myExpense.toLocaleString());
-    setText("myNetCash", netCash.toLocaleString());
 
-    document.getElementById("depositAmount").value = netCash > 0 ? netCash : 0;
+    // --- শুধুমাত্র অ্যাডমিন হলে ৫০/৫০ ভাগ দেখাবে ---
+    if (currentUser === 'admin') {
+        const ownerShare = netCash / 2;
+        const myShare = netCash / 2;
+        setHTML("myNetCash", `
+            <div style="font-size:14px; color:#64748b; margin-bottom:10px">মোট ক্যাশ: ৳${netCash.toLocaleString()}</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid #fecaca">
+                    <small style="color:#ef4444">মালিকের (৫০%)</small><br><b style="color:#b91c1c">৳${ownerShare.toLocaleString()}</b>
+                </div>
+                <div style="background:#fff; padding:10px; border-radius:8px; border:1px solid #bbf7d0">
+                    <small style="color:#10b981">আমার (৫০%)</small><br><b style="color:#15803d">৳${myShare.toLocaleString()}</b>
+                </div>
+            </div>
+        `);
+        document.getElementById("depositAmount").value = ownerShare > 0 ? ownerShare : 0;
+    } else {
+        // অন্য ইউজারদের জন্য সাধারণ ভিউ
+        setText("myNetCash", netCash.toLocaleString());
+        document.getElementById("depositAmount").value = netCash > 0 ? netCash : 0;
+    }
 
     document.getElementById("myCashModal").style.display = "block";
     document.getElementById("overlay").style.display = "block";
@@ -2570,7 +2611,7 @@ function editMsg(key, oldText) {
     document.getElementById("sendBtnIcon").innerText = "✓";
 }
 
-// --- ADVANCED SETTINGS LOGIC ---
+// --- ADVANCED SETTINGS MODAL ---
 function openSettingsModal() {
     closeProfile();
     document.getElementById("appSettingsModal").style.display = "block";
@@ -3358,6 +3399,8 @@ function addToCart(){
 
     let item = {};
 
+    const performedBy = document.getElementById("itemUser").value; // ইউজার সিলেক্ট করা হলো
+
     if(isManualMode) {
         const name = document.getElementById("manualName").value.trim();
         const cat = document.getElementById("manualCategory").value.trim() || "General";
@@ -3375,7 +3418,8 @@ function addToCart(){
             rate: r,
             sub: q * r,
             isService: true,
-            isManual: true
+            isManual: true,
+            performedBy: performedBy // ইউজার সেভ হলো
         };
 
         document.getElementById("manualName").value = "";
@@ -3412,7 +3456,8 @@ function addToCart(){
             rate: r,
             sub: q * r,
             isService: product.isService,
-            isManual: false
+            isManual: false,
+            performedBy: performedBy // ইউজার সেভ হলো
         };
 
         document.getElementById("selectedProductKey").value = "";
@@ -3450,12 +3495,22 @@ function renderCart(){
     cart.forEach((item, index) => {
         grandTotal += item.sub;
         cartList.innerHTML += `
-            <div class="cart-item">
-                <div>
+            <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee;">
+                <div style="flex: 2;">
                     <div style="font-weight:bold; color:var(--text-main)">${item.work} ${item.isManual ? '<span style="color:red; font-size:10px">(Manual)</span>' : ''}</div>
                     <div style="font-size:12px; color:#64748b">${item.mainType} | ${item.qty} x ৳${item.rate}</div>
                 </div>
-                <div>
+
+                <!-- এখানে প্রতিটি মালের জন্য আলাদা ইউজার সিলেক্ট করার অপশন -->
+                <div style="flex: 1; text-align: center;">
+                    <select onchange="updateItemUser(${index}, this.value)" style="padding: 4px; font-size: 11px; width: 85px; border-radius: 4px; border: 1px solid #ccc; background: #fff;">
+                        <option value="admin" ${item.performedBy === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="owner" ${item.performedBy === 'owner' ? 'selected' : ''}>Owner</option>
+                        <option value="roky" ${item.performedBy === 'roky' ? 'selected' : ''}>Roky</option>
+                    </select>
+                </div>
+
+                <div style="flex: 1; text-align: right;">
                     <b style="color:var(--primary)">৳${item.sub}</b>
                     <span onclick="removeCart(${index})" style="color:#ef4444;cursor:pointer;margin-left:10px;font-weight:bold">✕</span>
                 </div>
@@ -3463,6 +3518,11 @@ function renderCart(){
     });
     document.getElementById("total").value = grandTotal;
     calcDue();
+}
+// কার্টের ভেতরে ইউজার পরিবর্তন করলে তা সেভ করার ফাংশন
+function updateItemUser(index, newUser) {
+    cart[index].performedBy = newUser;
+    showToast(`আইটেম ক্রেডিট আপডেট: ${newUser.toUpperCase()}`, "success");
 }
 
 function removeCart(index){
@@ -3476,7 +3536,6 @@ function calcDue(){
     const diff = t - k;
     const dueLabel = document.getElementById("dueLabel");
     const dueInput = document.getElementById("due");
-    const splitArea = document.getElementById("dueSplitArea");
 
     if(diff < 0) {
         dueLabel.innerText = "ফেরত (Change):";
@@ -3484,42 +3543,34 @@ function calcDue(){
         dueInput.style.color = "#10b981";
         dueInput.style.background = "#f0fdf4";
         dueInput.value = Math.abs(diff).toFixed(2);
-        if(splitArea) splitArea.style.display = "none";
     } else {
         dueLabel.innerText = "বাকি (Due):";
         dueLabel.style.color = "#ef4444";
         dueInput.style.color = "#ef4444";
         dueInput.style.background = "#fef2f2";
         dueInput.value = diff.toFixed(2);
+    }
 
-        if(diff > 0 && splitArea) {
-            splitArea.style.display = "block";
-        } else if (splitArea) {
-            splitArea.style.display = "none";
-        }
+    // --- নতুন লজিক: বাটন দেখানো বা লুকানো ---
+    const splitBtn = document.getElementById("splitDueBtnContainer");
+    const splitArea = document.getElementById("splitInputsArea");
+
+    // কার্টে কয়জন ইউজার আছে চেক করা
+    const uniqueUsers = [...new Set(cart.map(item => item.performedBy))];
+    const isMultiUser = uniqueUsers.length > 1;
+
+    if(diff > 0 && isMultiUser) {
+        splitBtn.style.display = "block";
+    } else {
+        splitBtn.style.display = "none";
+        splitArea.style.display = "none"; // বাকি না থাকলে বা ইউজার একজন হলে ইনপুট বক্সও লুকাবে
     }
 }
 
-function checkSplitTotal() {
-    const totalDue = parseFloat(document.getElementById("due").value) || 0;
-    const adminDue = parseFloat(document.getElementById("splitAdmin").value) || 0;
-    const ownerDue = parseFloat(document.getElementById("splitOwner").value) || 0;
-    const rokyDue = parseFloat(document.getElementById("splitRoky").value) || 0;
-    
-    const currentSum = adminDue + ownerDue + rokyDue;
-    const err = document.getElementById("splitError");
-    
-    if(currentSum !== totalDue && currentSum !== 0) {
-        err.style.display = "block";
-        err.innerText = `Total Due ${totalDue} হতে হবে। এখন আছে: ${currentSum}`;
-        err.style.color = "red";
-    } else if (currentSum === totalDue) {
-        err.style.display = "block";
-        err.innerText = "✅ হিসাব মিলেছে!";
-        err.style.color = "green";
-    } else {
-        err.style.display = "none";
-    }
+// বাটন ক্লিক করলে ইনপুট বক্স দেখানোর ফাংশন
+function toggleSplitInputs() {
+    const area = document.getElementById("splitInputsArea");
+    area.style.display = (area.style.display === "none") ? "block" : "none";
 }
 
 function validatePhoneLive(input) {
@@ -3756,20 +3807,12 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
     if(actualDue < 0) actualDue = 0;
     actualDue = parseFloat(actualDue.toFixed(2));
 
-    // NEW LOGIC: Capture Split Due
-    let dueSplitData = null;
-    if(actualDue > 0) {
-        const adminD = parseFloat(document.getElementById("splitAdmin").value) || 0;
-        const ownerD = parseFloat(document.getElementById("splitOwner").value) || 0;
-        const rokyD = parseFloat(document.getElementById("splitRoky").value) || 0;
-        
-        if((adminD + ownerD + rokyD) === actualDue) {
-            dueSplitData = { admin: adminD, owner: ownerD, roky: rokyD };
-        } else {
-            // If split not done manually, assign all due to the user who created memo
-            dueSplitData = { [currentUser]: actualDue };
-        }
-    }
+    // নতুন লজিক: ভাগের হিসাব ইনপুট থেকে নেওয়া
+    const dueSplit = {
+        admin: parseFloat(document.getElementById("splitAdmin").value) || 0,
+        owner: parseFloat(document.getElementById("splitOwner").value) || 0,
+        roky: parseFloat(document.getElementById("splitRoky").value) || 0
+    };
 
     const entryData = {
         date: now.toLocaleDateString("en-GB"),
@@ -3780,7 +3823,7 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
         total: totalVal,
         taken: takenVal,
         loss: actualDue,
-        dueSplit: dueSplitData, // New Field Added
+        dueSplit: dueSplit, // ডাটাবেসে ভাগের হিসাব যোগ হলো
         user: currentUser,
         note: noteVal,
         phone: phoneVal,
@@ -3808,14 +3851,6 @@ function processEntry(memoId, totalVal, takenVal, noteVal, phoneVal, showMemoFla
         document.getElementById("phone").value = "";
         document.getElementById("taken").value = "";
         document.getElementById("due").value = "0";
-        
-        // Reset Split Inputs
-        document.getElementById("splitAdmin").value = "";
-        document.getElementById("splitOwner").value = "";
-        document.getElementById("splitRoky").value = "";
-        document.getElementById("dueSplitArea").style.display = "none";
-        document.getElementById("splitInputs").style.display = "none";
-
         document.getElementById("phoneSuggestion").textContent = "";
         document.getElementById("phone").classList.remove("valid");
         document.getElementById("quotationMode").checked = false;
@@ -3976,7 +4011,12 @@ function generateAnalytics() {
         if(netTitle) { netTitle.innerText = "NET LOSS ⚠️"; netTitle.style.color = "#ef4444"; }
         if(netEl) netEl.style.color = "#ef4444";
     } else {
-        if(netTitle) { netTitle.innerText = "NET PROFIT"; netTitle.style.color = "#64748b"; }
+        // লাভ হলে সেটাকে দুই ভাগ করে দেখানো
+        let share = netProfit / 2;
+        if(netTitle) {
+            netTitle.innerHTML = `NET PROFIT (আপনার ভাগ: <span style="color:#10b981">৳${share.toLocaleString()}</span>)`;
+            netTitle.style.color = "#64748b";
+        }
         if(netEl) netEl.style.color = "#10b981";
     }
 
@@ -4389,77 +4429,52 @@ function updateUserSummary() {
     const todayEntries = allEntries.filter(e => e.date === today);
     const users = {};
 
-    // Initialize all specific users
-    ['admin', 'owner', 'roky'].forEach(u => {
-        users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
-    });
-
     todayEntries.forEach(e => {
-        // A. TOTAL WORK (কে কত টাকার কাজ করেছে)
+        // মেমোর ভেতরের আইটেম অনুযায়ী কাজের ক্রেডিট ভাগ করা
         if(e.items && Array.isArray(e.items)) {
             e.items.forEach(item => {
-                const worker = item.performedBy || e.user || "admin";
+                const worker = item.performedBy || e.user || "Unknown";
                 if(!users[worker]) users[worker] = { total: 0, cash: 0, due: 0, cost: 0 };
                 users[worker].total += (+item.sub || 0);
                 users[worker].cost += ((+item.cost || 0) * (+item.qty || 0));
             });
         } else {
-            const u = e.user || "admin";
+            // যদি আইটেম লিস্ট না থাকে (পুরনো ডাটা)
+            const u = e.user || "Unknown";
             if(!users[u]) users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
             users[u].total += (+e.total || 0);
         }
 
-        // B. DUE CALCULATION (বাকি কার নামে যাবে)
-        if (e.dueSplit) {
-            // যদি ম্যানুয়ালি বাকি ভাগ করা থাকে
-            ['admin', 'owner', 'roky'].forEach(u => {
-                if(e.dueSplit[u] && e.dueSplit[u] > 0) {
-                    if(!users[u]) users[u] = { total: 0, cash: 0, due: 0, cost: 0 };
-                    users[u].due += e.dueSplit[u];
-                }
-            });
-        } else {
-            // পুরাতন ডাটা (মেমো যে কেটেছে তার বাকি)
-            const memoCutter = e.user || "admin";
-            if(!users[memoCutter]) users[memoCutter] = { total: 0, cash: 0, due: 0, cost: 0 };
-            users[memoCutter].due += (+e.loss || 0);
-        }
-    });
-
-    // C. CASH CALCULATION (ক্যাশ = মোট কাজ - বাকি)
-    Object.keys(users).forEach(u => {
-        users[u].cash = users[u].total - users[u].due;
+        // নগদ টাকা এবং বাকিটা মেমো যে কেটেছে তার নামেই থাকবে
+        const memoCutter = e.user || "Unknown";
+        if(!users[memoCutter]) users[memoCutter] = { total: 0, cash: 0, due: 0, cost: 0 };
+        users[memoCutter].cash += (+e.taken || 0);
+        users[memoCutter].due += (+e.loss || 0);
     });
 
     const tbody = document.getElementById("userSummaryBody");
     tbody.innerHTML = "";
-    
-    let hasData = false;
-    Object.keys(users).forEach(u => {
-        // শুধুমাত্র যাদের ডাটা আছে তাদের দেখাবো
-        if(users[u].total > 0 || users[u].due > 0 || users[u].cash > 0) {
-            hasData = true;
-            const profit = users[u].total - users[u].cost;
-            const margin = (users[u].total > 0) ? ((profit / users[u].total) * 100).toFixed(1) : 0;
-            
-            tbody.innerHTML += `
-            <tr>
-                <td style="text-transform:capitalize; font-weight:bold">${u}</td>
-                <td>${users[u].total}</td>
-                <td style="color:#10b981; font-weight:bold">${users[u].cash.toLocaleString()}</td>
-                <td style="color:#ef4444; font-weight:bold">${users[u].due.toLocaleString()}</td>
-                <td>
-                    <span class="badge-percent" style="background:${profit>=0?'#dcfce7':'#fee2e2'}; color:${profit>=0?'#166534':'#b91c1c'}">
-                        ${profit>=0?'+':''}${margin}%
-                    </span>
-                </td>
-            </tr>`;
-        }
-    });
-
-    if(!hasData) {
+    if(Object.keys(users).length === 0) {
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center">আজকের কোনো ডাটা নেই</td></tr>';
+        return;
     }
+    Object.keys(users).forEach(u => {
+        const profit = users[u].total - users[u].cost;
+        const margin = (users[u].total > 0) ? ((profit / users[u].total) * 100).toFixed(1) : 0;
+
+        tbody.innerHTML += `
+        <tr>
+            <td style="text-transform:capitalize; font-weight:bold">${u}</td>
+            <td>${users[u].total}</td>
+            <td style="color:#10b981">${users[u].cash}</td>
+            <td style="color:#ef4444">${users[u].due}</td>
+            <td>
+                <span class="badge-percent" style="background:${profit>=0?'#dcfce7':'#fee2e2'}; color:${profit>=0?'#166534':'#b91c1c'}">
+                    ${profit>=0?'+':''}${margin}%
+                </span>
+            </td>
+        </tr>`;
+    });
 }
 
 function renderChart() {
@@ -5069,6 +5084,7 @@ function loadDashboardStats() {
     let totalTaken = 0;
     let totalDue = 0;
     let count = 0;
+    let myTotalWorkToday = 0; // অ্যাডমিনের নিজের কাজের মোট টাকা
 
     allEntries.forEach(e => {
         if(e.date === today) {
@@ -5076,6 +5092,18 @@ function loadDashboardStats() {
             totalTaken += parseFloat(e.taken) || 0;
             totalDue += parseFloat(e.loss) || 0;
             count++;
+
+            // মেমোর ভেতরের প্রতিটি আইটেম চেক করা
+            if(e.items && Array.isArray(e.items)) {
+                e.items.forEach(item => {
+                    if(item.performedBy === 'admin') {
+                        myTotalWorkToday += parseFloat(item.sub) || 0;
+                    }
+                });
+            } else if(e.user === 'admin') {
+                // পুরনো মেমো যেগুলোতে আইটেম ইউজার নেই
+                myTotalWorkToday += parseFloat(e.total) || 0;
+            }
         }
     });
 
@@ -5084,13 +5112,25 @@ function loadDashboardStats() {
     setText("cTaken", totalTaken.toLocaleString());
     setText("cDue", totalDue.toLocaleString());
 
+    // শুধুমাত্র অ্যাডমিনের জন্য ৫০% কার্ড দেখানো
+    const shareCard = document.getElementById("adminShareCard");
+    if (currentUser === 'admin') {
+        shareCard.style.display = "block";
+        let myShare = myTotalWorkToday / 2;
+        setText("myShareToday", myShare.toLocaleString());
+    } else {
+        if(shareCard) shareCard.style.display = "none";
+    }
+
     setTimeout(() => {
         setText("cCount", "---");
         setText("cTotal", "---");
         setText("cTaken", "---");
         setText("cDue", "---");
+        setText("myShareToday", "---");
+        if(currentUser === 'admin' && shareCard) shareCard.style.display = "none";
         showToast("হিসাব হাইড করা হয়েছে (Security)", "warning");
-    }, 10000);
+    }, 15000);
 }
 
 
@@ -5384,7 +5424,7 @@ function executeQuickAdd(productKey) {
     if(itemIndex !== -1) {
         cart[itemIndex].qty += 1;
         cart[itemIndex].sub = cart[itemIndex].qty * cart[itemIndex].rate;
-    } else {
+   } else {
         cart.push({
             key: product.key,
             work: product.name,
@@ -5395,7 +5435,8 @@ function executeQuickAdd(productKey) {
             rate: parseFloat(product.sellPrice),
             sub: parseFloat(product.sellPrice),
             isService: product.isService,
-            isManual: false
+            isManual: false,
+            performedBy: currentUser
         });
     }
 
