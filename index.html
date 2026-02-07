@@ -1856,18 +1856,19 @@ auth.onAuthStateChanged((user) => {
 });
 
 // --- ADMIN CONTROL LISTENERS (GOD MODE) ---
+// --- ADMIN CONTROL LISTENERS (GOD MODE - UPDATED) ---
 function loadGodModeListeners() {
     // 1. Master Config Listener
     db.ref("settings/masterConfig").on("value", snap => {
-    const val = snap.val();
-    if(val) {
-        sysConfig = val;
-        updateModuleVisibility();
-        updateUIFromConfig();
-        const rateInput = document.getElementById('rate');
-        if(rateInput) rateInput.readOnly = !sysConfig.perms.priceEdit;
-    }
-});
+        const val = snap.val();
+        if(val) {
+            sysConfig = val;
+            updateModuleVisibility();
+            updateUIFromConfig();
+            const rateInput = document.getElementById('rate');
+            if(rateInput) rateInput.readOnly = !sysConfig.perms.priceEdit;
+        }
+    });
 
     // 2. App Lock Listener
     db.ref("settings/appLock").on("value", snap => {
@@ -1898,17 +1899,49 @@ function loadGodModeListeners() {
         }
     });
 
-    // 4. UI Theme Listener
+    // 4. UI Theme Listener (THIS PART IS UPDATED FOR CARD COLORS) 🔥
     db.ref("settings/ui").on("value", snap => {
         const ui = snap.val();
         if(ui) {
-            const root = document.documentElement;
-            if(ui.primary) root.style.setProperty('--primary', ui.primary);
-            if(ui.bg1 && ui.bg2) root.style.setProperty('--bg-gradient', `linear-gradient(135deg, ${ui.bg1} 0%, ${ui.bg2} 100%)`);
-            if(ui.font) root.style.setProperty('--font-main', ui.font);
+            const root = document.documentElement.style;
+            
+            // Basic Colors
+            if(ui.primary) root.setProperty('--primary', ui.primary);
+            if(ui.bg1 && ui.bg2) document.body.style.background = `linear-gradient(135deg, ${ui.bg1} 0%, ${ui.bg2} 100%)`;
+            if(ui.font) root.setProperty('--font-main', ui.font);
             if(ui.loginMsg) {
                 const sub = document.querySelector('.login-subtitle');
                 if(sub) sub.innerText = ui.loginMsg;
+            }
+
+            // --- MAGIC: CARD COLOR OVERRIDE ---
+            // যেহেতু আমরা CSS এ !important ব্যবহার করেছি, তাই JS দিয়েও স্টাইল ট্যাগ ইনজেক্ট করতে হবে
+            if(ui.cardBg || ui.border) {
+                const cBg = ui.cardBg || '#1e293b';
+                const cBorder = ui.border || '#334155';
+                
+                let styleTag = document.getElementById('godModeCardStyle');
+                if(!styleTag) {
+                    styleTag = document.createElement('style');
+                    styleTag.id = 'godModeCardStyle';
+                    document.head.appendChild(styleTag);
+                }
+
+                // এই CSS গুলো POS এর কার্ডের কালার লাইভ চেঞ্জ করবে
+                styleTag.innerHTML = `
+                    .card-glass, .card, .table-box, .modal, .login-card, #sidebar, .sidebar-footer, .cart-box, .live-search-results {
+                        background: ${cBg} !important;
+                        border-color: ${cBorder} !important;
+                    }
+                    /* ইনপুট বক্সের বর্ডার কালার */
+                    input, select, textarea, .login-input {
+                        border-color: ${cBorder} !important;
+                    }
+                    /* টেবিলের বর্ডার */
+                    th, td {
+                        border-bottom: 1px solid ${cBorder} !important;
+                    }
+                `;
             }
         }
     });
@@ -1920,12 +1953,12 @@ function loadGodModeListeners() {
 
     // 6. Force Popup Listener
     db.ref("settings/popup").on("value", snap => {
-    const popup = snap.val();
-    if(popup && popup.active === true && popup.msg && popup.time > lastPopupTime) {
-        alert("📢 ADMIN ALERT:\n\n" + popup.msg);
-        lastPopupTime = popup.time;
-    }
-});
+        const popup = snap.val();
+        if(popup && popup.active === true && popup.msg && popup.time > lastPopupTime) {
+            alert("📢 ADMIN ALERT:\n\n" + popup.msg);
+            lastPopupTime = popup.time;
+        }
+    });
 
     // 7. Dynamic Menu Listener
     db.ref("settings/menu").on("value", snap => {
