@@ -1789,10 +1789,10 @@ select option {
     </div>
 </div>
 
---- END OF FILE (Part 1) ---
+// --- END OF FILE (Part 1) ---
 
 
---- START OF FILE (Part 2 - JavaScript) --
+// --- START OF FILE (Part 2 - JavaScript) --
 
 <script>
 // --- CONFIGURATION ---
@@ -1855,8 +1855,7 @@ auth.onAuthStateChanged((user) => {
     }
 });
 
-// --- ADMIN CONTROL LISTENERS (GOD MODE) ---
-// --- ADMIN CONTROL LISTENERS (GOD MODE - UPDATED) ---
+// --- ADMIN CONTROL LISTENERS (GOD MODE - FIXED) ---
 function loadGodModeListeners() {
     // 1. Master Config Listener
     db.ref("settings/masterConfig").on("value", snap => {
@@ -1899,50 +1898,59 @@ function loadGodModeListeners() {
         }
     });
 
-    // 4. UI Theme Listener (THIS PART IS UPDATED FOR CARD COLORS) 🔥
+    // 4. UI Theme Listener (GRADIENT SUPPORT FIXED) 🎨
     db.ref("settings/ui").on("value", snap => {
         const ui = snap.val();
         if(ui) {
             const root = document.documentElement.style;
             
-            // Basic Colors
-            if(ui.primary) root.setProperty('--primary', ui.primary);
-            if(ui.bg1 && ui.bg2) document.body.style.background = `linear-gradient(135deg, ${ui.bg1} 0%, ${ui.bg2} 100%)`;
+            // Text & Font settings
+            if(ui.prime1) root.setProperty('--primary', ui.prime1);
             if(ui.font) root.setProperty('--font-main', ui.font);
+            
+            // Update Login Message
             if(ui.loginMsg) {
                 const sub = document.querySelector('.login-subtitle');
                 if(sub) sub.innerText = ui.loginMsg;
             }
 
-            // --- MAGIC: CARD COLOR OVERRIDE ---
-            // যেহেতু আমরা CSS এ !important ব্যবহার করেছি, তাই JS দিয়েও স্টাইল ট্যাগ ইনজেক্ট করতে হবে
-            if(ui.cardBg || ui.border) {
-                const cBg = ui.cardBg || '#1e293b';
-                const cBorder = ui.border || '#334155';
-                
-                let styleTag = document.getElementById('godModeCardStyle');
-                if(!styleTag) {
-                    styleTag = document.createElement('style');
-                    styleTag.id = 'godModeCardStyle';
-                    document.head.appendChild(styleTag);
-                }
-
-                // এই CSS গুলো POS এর কার্ডের কালার লাইভ চেঞ্জ করবে
-                styleTag.innerHTML = `
-                    .card-glass, .card, .table-box, .modal, .login-card, #sidebar, .sidebar-footer, .cart-box, .live-search-results {
-                        background: ${cBg} !important;
-                        border-color: ${cBorder} !important;
-                    }
-                    /* ইনপুট বক্সের বর্ডার কালার */
-                    input, select, textarea, .login-input {
-                        border-color: ${cBorder} !important;
-                    }
-                    /* টেবিলের বর্ডার */
-                    th, td {
-                        border-bottom: 1px solid ${cBorder} !important;
-                    }
-                `;
+            // --- INJECT GRADIENT CSS ---
+            let styleTag = document.getElementById('godModeCardStyle');
+            if(!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'godModeCardStyle';
+                document.head.appendChild(styleTag);
             }
+
+            // Apply Gradients
+            styleTag.innerHTML = `
+                /* Main Background Gradient */
+                body {
+                    background: linear-gradient(135deg, ${ui.bg1 || '#0f172a'} 0%, ${ui.bg2 || '#172554'} 100%) !important;
+                }
+                /* Sidebar Gradient */
+                #sidebar {
+                    background: linear-gradient(180deg, ${ui.side1 || '#1e293b'} 0%, ${ui.side2 || '#0f172a'} 100%) !important;
+                    border-right: 1px solid rgba(255,255,255,0.1);
+                }
+                /* Card & Panel Gradient */
+                .card-glass, .card, .table-box, .modal, .login-card, .cart-box, .live-search-results {
+                    background: linear-gradient(135deg, ${ui.card1 || '#1e293b'} 0%, ${ui.card2 || '#334155'} 100%) !important;
+                    border: 1px solid rgba(255,255,255,0.1) !important;
+                }
+                /* Buttons Gradient */
+                button, .sidebar-header, .login-btn, #chatBtn, #profileBtn {
+                    background: linear-gradient(135deg, ${ui.prime1 || '#8b5cf6'} 0%, ${ui.prime2 || '#7c3aed'} 100%) !important;
+                    color: #fff !important;
+                    border: none !important;
+                }
+                /* Input Transparency */
+                input, select, textarea {
+                    background: rgba(0,0,0,0.3) !important;
+                    border: 1px solid rgba(255,255,255,0.2) !important;
+                    color: #fff !important;
+                }
+            `;
         }
     });
 
