@@ -9,6 +9,11 @@
 <!-- EXCEL & CSV LIBRARY (SheetJS) -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
+<!-- FIREBASE LIBRARIES (Auth Added) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <!-- DYNAMIC CSS FROM ADMIN -->
 <style id="adminDynamicStyle"></style>
 
@@ -574,15 +579,15 @@ tr:hover { background-color: #f8fafc; }
         <h2 class="login-title">শেখ কম্পিউটার <span>PRO</span></h2>
         <p class="login-subtitle" id="loginMsgDisplay">v7.5 (God Mode Connected)</p>
         <div class="login-form-group">
-            <label class="login-label">👤 ইউজারনেম</label>
-            <input id="uName" class="login-input" placeholder="ইউজারনেম">
-        </div>
-        <div class="login-form-group">
-            <label class="login-label">🔒 পাসওয়ার্ড</label>
-            <input id="uPass" type="password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
-        </div>
+    <label class="login-label">📧 ইমেইল (Email)</label>
+    <input id="uEmail" type="email" class="login-input" placeholder="example@gmail.com">
+</div>
+<div class="login-form-group">
+    <label class="login-label">🔒 পাসওয়ার্ড</label>
+    <input id="uPass" type="password" class="login-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') login()">
+</div>
         <button onclick="login()" class="login-btn">➜ লগইন করুন</button>
-        <p class="login-footer" style="cursor:pointer; color:#3b82f6" onclick="alert('পাসওয়ার্ড ভুলে গেলে অ্যাডমিনের সাথে যোগাযোগ করুন।')">পাসওয়ার্ড ভুলে গেছেন?</p>
+        <p class="login-footer" style="cursor:pointer; color:#3b82f6" onclick="resetPassword()">পাসওয়ার্ড ভুলে গেছেন? (Reset Here)</p>
         <p class="login-footer">ℹ️ সকল ইউজারের একই এক্সেস | ডেভেলপার: আরাফাত সিকদার</p>
     </div>
 </div>
@@ -1833,8 +1838,10 @@ tr:hover { background-color: #f8fafc; }
     </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+--- END OF FILE (Part 1) ---
+
+
+--- START OF FILE (Part 2 - JavaScript) --
 
 <script>
 // --- CONFIGURATION ---
@@ -1844,13 +1851,24 @@ const firebaseConfig = {
     databaseURL: "https://sheikh-computer-b41d5-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "sheikh-computer-b41d5"
 };
+
+// Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+const auth = firebase.auth();
 
 // --- OFFLINE PERSISTENCE ---
 try {
     db.setPersistenceEnabled(true);
 } catch(e) { console.log("Persistence Error: ", e); }
+
+// --- USER MAPPING (EMAIL TO SYSTEM USERNAME) ---
+// এই অংশটি আপনার দেওয়া ইমেইলগুলোকে সিস্টেমের পুরনো ইউজারনেমের সাথে কানেক্ট করবে
+const userMap = {
+    "lbarafat9@gmail.com": "admin",
+    "toosher2006@gmail.com": "owner",
+    "rokysheikh92@gmail.com": "roky"
+};
 
 // --- GOD MODE CONFIGURATION STATE ---
 let sysConfig = {
@@ -1862,6 +1880,29 @@ let sysConfig = {
 };
 let translations = {};
 let lastPopupTime = 0;
+
+// --- AUTHENTICATION STATE OBSERVER ---
+// পেজ রিফ্রেশ দিলেও লগইন ধরে রাখবে
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        const systemUser = userMap[user.email];
+        if (systemUser) {
+            // সিস্টেম ইউজার পাওয়া গেলে লগইন করাবে
+            setupUser(systemUser);
+        } else {
+            // ইমেইল ঠিক আছে কিন্তু সিস্টেমে ম্যাপ করা নেই
+            showToast("এই ইমেইলটি সিস্টেমে রেজিস্টার্ড নয়!", "error");
+            auth.signOut();
+        }
+    } else {
+        // লগআউট অবস্থায়
+        document.getElementById("loginDiv").style.display = "flex";
+        document.getElementById("container").style.display = "none";
+        document.getElementById("header").style.display = "none";
+        document.getElementById("menuBtn").style.display = "none";
+        document.getElementById("profileBtn").style.display = "none";
+    }
+});
 
 // --- ADMIN CONTROL LISTENERS (GOD MODE) ---
 function loadGodModeListeners() {
@@ -1929,7 +1970,6 @@ function loadGodModeListeners() {
     // 6. Force Popup Listener
     db.ref("settings/popup").on("value", snap => {
     const popup = snap.val();
-    // এখানে popup.active === true চেকটি যোগ করা হয়েছে
     if(popup && popup.active === true && popup.msg && popup.time > lastPopupTime) {
         alert("📢 ADMIN ALERT:\n\n" + popup.msg);
         lastPopupTime = popup.time;
@@ -2108,8 +2148,8 @@ const rowsPerPage = 50;
 window.onload = function() {
     loadGodModeListeners();
 
-    const savedUser = localStorage.getItem("loggedInUser");
-    if(savedUser) setupUser(savedUser);
+    // Firebase Auth Listener handles the login state now
+    // So we don't need to check localStorage manually for "loggedInUser"
 
     const d = new Date();
     document.getElementById("anMonth").value = d.getMonth() + 1;
@@ -2174,24 +2214,25 @@ function showToast(message, type = 'success') {
     }, 3000);
 }
 
-// --- AUTHENTICATION ---
+// --- AUTHENTICATION (UPDATED FOR FIREBASE) ---
 function checkFirstTimeSetup() {
+    // This ensures roles exist in DB, even if Auth handles login
     db.ref("users").once("value", snap => {
         if(!snap.exists()) {
             db.ref("users").set({
-                admin: { pass: "123", role: "admin" },
-                owner: { pass: "456", role: "owner" },
-                roky: { pass: "789", role: "staff" }
+                admin: { role: "admin" },
+                owner: { role: "owner" },
+                roky: { role: "staff" }
             });
         }
     });
 }
 
 function login(){
-    const u = document.getElementById("uName").value.toLowerCase().trim();
-    const p = document.getElementById("uPass").value.trim();
+    const email = document.getElementById("uEmail").value.trim();
+    const pass = document.getElementById("uPass").value.trim();
 
-    if(!u || !p) return showToast("ইউজারনেম ও পাসওয়ার্ড দিন", "error");
+    if(!email || !pass) return showToast("ইমেইল ও পাসওয়ার্ড দিন", "error");
 
     const now = new Date();
     const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
@@ -2202,24 +2243,16 @@ function login(){
         return showToast("এই সময়ে লগইন করার অনুমতি নেই!", "error");
     }
 
-    db.ref("users/" + u).once("value", snap => {
-        if(snap.exists()) {
-            const userData = snap.val();
-            if(userData.blocked) {
-                showToast("🚫 এই অ্যাকাউন্টটি অ্যাডমিন ব্লক করেছে!", "error");
-                return;
-            }
-            if(userData.pass === p) {
-                localStorage.setItem("loggedInUser", u);
-                showToast(`স্বাগতম, ${u.toUpperCase()}!`, "success");
-                setTimeout(() => setupUser(u), 1000);
-            } else {
-                showToast("ভুল পাসওয়ার্ড!", "error");
-            }
-        } else {
-            showToast("ইউজার পাওয়া যায়নি!", "error");
-        }
-    });
+    showToast("লগইন হচ্ছে...", "warning");
+
+    auth.signInWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+            // Successful login handled by onAuthStateChanged
+            showToast("লগইন সফল!", "success");
+        })
+        .catch((error) => {
+            showToast("লগইন ব্যর্থ: " + error.message, "error");
+        });
 }
 
 function setupUser(u) {
@@ -2263,7 +2296,6 @@ function setupUser(u) {
     setText("modalProfileName", u.toUpperCase());
     setText("modalProfileInit", u.charAt(0).toUpperCase());
 
-    // --- এই লাইনটি আপনার সমস্যার সমাধান করবে ---
     if(document.getElementById("itemUser")) {
         document.getElementById("itemUser").value = u;
     }
@@ -2280,8 +2312,9 @@ function setupUser(u) {
 }
 
 function logout() {
-    localStorage.removeItem("loggedInUser");
-    location.reload();
+    auth.signOut().then(() => {
+        location.reload();
+    });
 }
 
 // --- PROFILE & SETTINGS LOGIC ---
@@ -2641,10 +2674,15 @@ function changeOwnPassword() {
     const newPass = document.getElementById("newPassInput").value.trim();
     if(!newPass) return showToast("নতুন পাসওয়ার্ড দিন", "error");
 
-    db.ref("users/" + currentUser).update({ pass: newPass }).then(() => {
-        showToast("পাসওয়ার্ড পরিবর্তন হয়েছে!", "success");
-        document.getElementById("newPassInput").value = "";
-    });
+    const user = auth.currentUser;
+    if(user) {
+        user.updatePassword(newPass).then(() => {
+            showToast("পাসওয়ার্ড পরিবর্তন হয়েছে!", "success");
+            document.getElementById("newPassInput").value = "";
+        }).catch((error) => {
+            showToast("ত্রুটি: " + error.message, "error");
+        });
+    }
 }
 
 function loadUserManagement() {
@@ -2660,27 +2698,17 @@ function loadUserManagement() {
         snap.forEach(child => {
             const u = child.key;
             const data = child.val();
-            const passDisplay = (u === 'admin') ? '******' : data.pass;
             tbody.innerHTML += `
             <tr>
                 <td style="text-transform:uppercase; font-weight:bold">${u}</td>
                 <td>${data.role}</td>
-                <td style="font-family:monospace; color:#ef4444">${passDisplay}</td>
+                <td style="font-family:monospace; color:#ef4444">Firebase Auth</td>
                 <td>
-                    ${u !== 'admin' ? `<button onclick="resetUserPass('${u}')" style="padding:5px 10px; font-size:12px; background:#f59e0b">Reset</button>` : ''}
+                    ${u !== 'admin' ? `<button onclick="alert('Firebase Console থেকে পাসওয়ার্ড রিসেট করুন')" style="padding:5px 10px; font-size:12px; background:#f59e0b">Reset</button>` : ''}
                 </td>
             </tr>`;
         });
     });
-}
-
-function resetUserPass(user) {
-    const newPass = prompt(`Enter new password for ${user}:`);
-    if(newPass) {
-        db.ref("users/" + user).update({ pass: newPass }).then(() => {
-            showToast(`${user}-এর পাসওয়ার্ড রিসেট হয়েছে!`, "success");
-        });
-    }
 }
 
 function saveShopInfo() {
@@ -5613,6 +5641,33 @@ window.onbeforeunload = function() {
         return "কার্টে পণ্য আছে। পেজ রিলোড দিলে ডাটা মুছে যাবে।";
     }
 };
+// --- PASSWORD RESET FUNCTION ---
+function resetPassword() {
+    const email = document.getElementById("uEmail").value.trim();
+    
+    if (!email) {
+        return showToast("⚠️ দয়া করে প্রথমে 'ইমেইল' বক্সে আপনার ইমেইলটি লিখুন, তারপর এই লিংকে ক্লিক করুন।", "warning");
+    }
+
+    if(confirm(`আপনি কি ${email} এ পাসওয়ার্ড রিসেট লিংক পাঠাতে চান?`)) {
+        showToast("অপেক্ষা করুন...", "warning");
+        
+        auth.sendPasswordResetEmail(email)
+            .then(() => {
+                alert("✅ আপনার ইমেইলে একটি রিসেট লিংক পাঠানো হয়েছে।\n\nইমেইল চেক করুন এবং লিংকে ক্লিক করে নতুন পাসওয়ার্ড সেট করুন।");
+                showToast("ইমেইল পাঠানো হয়েছে!", "success");
+            })
+            .catch((error) => {
+                let msg = error.message;
+                if(error.code === 'auth/user-not-found') msg = "এই ইমেইল দিয়ে কোনো অ্যাকাউন্ট খোলা নেই!";
+                if(error.code === 'auth/invalid-email') msg = "ইমেইল অ্যাড্রেসটি সঠিক নয়!";
+                alert("❌ ত্রুটি: " + msg);
+            });
+    }
+}
 </script>
 </body>
 </html>
+
+
+--- END OF FILE (Part 2) ---
