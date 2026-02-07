@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Admin Ultimate (v14.0 - God Mode)</title>
+<title>Sheikh Admin Ultimate (v15.0 - Gradient Master)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -24,10 +24,10 @@
     }
     .pos-mode-link:hover { background: #8b5cf6; color: white; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
 
-    /* CSS VARIABLES (DYNAMIC) */
+    /* CSS VARIABLES */
     :root {
-        --bg-dark: #0f172a;      /* মেইন ব্যাকগ্রাউন্ড */
-        --bg-panel: #1e293b;     /* কার্ড ব্যাকগ্রাউন্ড */
+        --bg-dark: #0f172a;
+        --bg-panel: #1e293b;
         --primary: #8b5cf6;
         --primary-hover: #7c3aed;
         --danger: #ef4444;
@@ -35,7 +35,7 @@
         --warning: #f59e0b;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
-        --border: #334155;       /* বর্ডার কালার */
+        --border: #334155;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Inter', sans-serif; }
@@ -141,7 +141,7 @@
     }
     .stat-val { font-size: 32px; font-weight: 700; color: var(--text-main); }
 
-    /* CONTROLS & INPUTS (FIXED VISIBILITY) */
+    /* CONTROLS & INPUTS */
     .control-bar {
         display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;
         background: var(--bg-panel); padding: 20px; border-radius: 12px;
@@ -155,20 +155,19 @@
         font-size: 14px; outline: none; width: 100%; transition: 0.2s;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; }
-    
     ::placeholder { color: #64748b; opacity: 1; }
 
     .btn {
         padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer;
         font-size: 14px; font-weight: 600; display: inline-flex; align-items: center;
-        gap: 8px; transition: 0.2s; width: auto;
+        gap: 8px; transition: 0.2s; width: auto; color: white;
     }
     .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-success { background: var(--success); color: white; }
+    .btn-primary { background: var(--primary); }
+    .btn-danger { background: var(--danger); }
+    .btn-success { background: var(--success); }
     .btn-warning { background: var(--warning); color: #000; }
-    .btn-dark { background: var(--border); color: white; }
+    .btn-dark { background: var(--border); }
 
     /* TABLES */
     .table-wrapper {
@@ -221,7 +220,7 @@
     input:checked + .slider { background-color: var(--primary); }
     input:checked + .slider:before { transform: translateX(22px); }
 
-    /* CONFIG GRID */
+    /* CONFIG & GRADIENT STYLES */
     .config-grid {
         display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px;
     }
@@ -242,6 +241,17 @@
     .config-input {
         width: 140px; padding: 8px; font-size: 13px; background: #0f172a;
         border: 1px solid #334155; color: #fff; border-radius: 6px;
+    }
+    
+    /* GRADIENT PICKER SPECIFIC */
+    .gradient-row { 
+        display: flex; align-items: center; justify-content: space-between; 
+        margin-bottom: 12px; background: rgba(255,255,255,0.05); 
+        padding: 8px 12px; border-radius: 6px; 
+    }
+    input[type="color"] { 
+        width: 45px; height: 40px; padding: 0; border: none; 
+        cursor: pointer; background: none; border-radius: 6px; overflow: hidden; 
     }
 
     @media (max-width: 768px) {
@@ -539,8 +549,6 @@
         <!-- 15. POS CONFIGURATION (MASTER CONTROL) -->
         <div id="pos_config" class="view-section">
             <div class="config-grid">
-
-                <!-- 1. MODULE TOGGLES -->
                 <div class="config-box">
                     <h4>🔌 1. Module Toggles</h4>
                     <div class="config-item"><label>Chat System</label><label class="toggle-switch"><input type="checkbox" id="modChat"><span class="slider"></span></label></div>
@@ -549,8 +557,6 @@
                     <div class="config-item"><label>Sales Return</label><label class="toggle-switch"><input type="checkbox" id="modReturn"><span class="slider"></span></label></div>
                     <div class="config-item"><label>Expense Manager</label><label class="toggle-switch"><input type="checkbox" id="modExpense"><span class="slider"></span></label></div>
                 </div>
-
-                <!-- 2. PERMISSIONS -->
                 <div class="config-box">
                     <h4>🛡️ 2. Staff Permissions</h4>
                     <div class="config-item"><label>Can Edit Price</label><label class="toggle-switch"><input type="checkbox" id="permPriceEdit"><span class="slider"></span></label></div>
@@ -558,8 +564,6 @@
                     <div class="config-item"><label>View Cost Price</label><label class="toggle-switch"><input type="checkbox" id="permViewCost"><span class="slider"></span></label></div>
                     <div class="config-item"><label>Backdated Entry</label><label class="toggle-switch"><input type="checkbox" id="permBackdate"><span class="slider"></span></label></div>
                 </div>
-
-                <!-- 3. VALIDATION RULES -->
                 <div class="config-box">
                     <h4>⚠️ 3. Validation Rules</h4>
                     <div class="config-item"><label>Phone Mandatory?</label><label class="toggle-switch"><input type="checkbox" id="rulePhoneReq"><span class="slider"></span></label></div>
@@ -567,8 +571,6 @@
                     <div class="config-item"><label>Max Due Limit</label><input id="ruleDueLimit" type="number" placeholder="0 = Unlimited" class="config-input"></div>
                     <div class="config-item"><label>Stock Alert Lvl</label><input id="ruleStockAlert" type="number" value="5" class="config-input"></div>
                 </div>
-
-                <!-- 4. UI & PRINT -->
                 <div class="config-box">
                     <h4>🖨️ 4. UI & Print</h4>
                     <div class="config-item"><label>Memo Label</label><input id="uiMemoLabel" placeholder="MEMO / BILL" class="config-input"></div>
@@ -576,16 +578,12 @@
                     <div class="config-item"><label>Currency</label><input id="uiCurrency" value="৳" class="config-input" style="width:50px; text-align:center"></div>
                     <div class="config-item"><label>Footer Msg</label><textarea id="uiFooter" placeholder="Thank you..." class="config-input" style="height:60px"></textarea></div>
                 </div>
-
-                <!-- 5. BUSINESS LOGIC -->
                 <div class="config-box">
                     <h4>💰 5. Business Logic</h4>
                     <div class="config-item"><label>Enable VAT</label><label class="toggle-switch"><input type="checkbox" id="logicVatEnable"><span class="slider"></span></label></div>
                     <div class="config-item"><label>VAT %</label><input id="logicVatPercent" type="number" value="0" class="config-input"></div>
                     <div class="config-item"><label>Max Discount %</label><input id="logicMaxDisc" type="number" value="100" class="config-input"></div>
                 </div>
-
-                <!-- 6. ADVANCED AUTOMATION -->
                 <div class="config-box">
                     <h4>🤖 6. Automation</h4>
                     <div class="config-item"><label>Login Allowed</label><div style="display:flex; gap:5px"><input id="autoLoginStart" type="time" class="config-input" style="width:90px"><span style="color:#aaa">-</span><input id="autoLoginEnd" type="time" class="config-input" style="width:90px"></div></div>
@@ -652,7 +650,7 @@
                     <div class="config-box">
                         <h4>Header & Logo</h4>
                         <div class="config-item"><label>Logo URL</label><input id="invLogoUrl" class="config-input"></div>
-                        <div class="config-item"><label>Header Color</label><input type="color" id="invHeaderColor" value="#000000" style="width:50px"></div>
+                        <div class="config-item"><label>Header Color</label><input type="color" id="invHeaderColor" value="#000000" style="width:50px; height:40px; border-radius:6px; cursor:pointer"></div>
                     </div>
                 </div>
                 <button class="btn btn-success" style="margin-top:20px" onclick="saveInvoiceDesign()">Save Design</button>
@@ -672,33 +670,72 @@
             </div>
         </div>
 
-        <!-- 20. UI BUILDER (UPDATED) -->
+        <!-- 20. UI BUILDER (NEW GRADIENT EDITION) -->
         <div id="ui_builder" class="view-section">
-            <div class="grid-4">
-                <div class="card" style="grid-column: span 2;">
-                    <div class="card-header"><span class="card-title">🎨 Theme & Experience</span></div>
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:15px">
+                    <span class="card-title" style="font-size:16px; color:#fff">🎨 Ultimate Gradient Theme Builder</span>
+                    <button class="btn btn-warning" onclick="resetUIDefaults()">↺ Reset Defaults</button>
+                </div>
+                
+                <div class="config-grid">
                     
-                    <div class="config-grid">
-                        <!-- Main Colors -->
-                        <div class="config-box">
-                            <h4>Main Background</h4>
-                            <div class="config-item"><label>Primary Color</label><input type="color" id="uiPrimary" value="#8b5cf6" style="width:50px; height:30px; border:none"></div>
-                            <div class="config-item"><label>BG Gradient Start</label><input type="color" id="uiBg1" value="#0f172a" style="width:50px; height:30px; border:none"></div>
-                            <div class="config-item"><label>BG Gradient End</label><input type="color" id="uiBg2" value="#172554" style="width:50px; height:30px; border:none"></div>
+                    <!-- Primary Colors -->
+                    <div class="config-box">
+                        <h4>1. Primary / Buttons</h4>
+                        <p style="font-size:12px; color:#94a3b8; margin-bottom:10px">Header and Action Buttons</p>
+                        <div class="gradient-row">
+                            <span>Start Color</span> <input type="color" id="uiPrime1" value="#8b5cf6">
                         </div>
-
-                        <!-- Card Colors (NEW ADDED) -->
-                        <div class="config-box">
-                            <h4>Cards & Panels</h4>
-                            <div class="config-item"><label>Card Background</label><input type="color" id="uiCardBg" value="#1e293b" style="width:50px; height:30px; border:none"></div>
-                            <div class="config-item"><label>Card Border</label><input type="color" id="uiBorder" value="#334155" style="width:50px; height:30px; border:none"></div>
+                        <div class="gradient-row">
+                            <span>End Color</span> <input type="color" id="uiPrime2" value="#7c3aed">
                         </div>
                     </div>
 
-                    <div class="config-item" style="margin-top:20px"><label>Font Family</label><input id="uiFont" placeholder="Inter, sans-serif" class="config-input" style="width:100%"></div>
-                    <div class="config-item"><label>Login Message</label><input id="uiLoginMsg" placeholder="Welcome..." class="config-input" style="width:100%"></div>
-                    
-                    <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="saveUISettings()">💾 Apply UI Changes</button>
+                    <!-- Main Background -->
+                    <div class="config-box">
+                        <h4>2. Main Background</h4>
+                        <p style="font-size:12px; color:#94a3b8; margin-bottom:10px">Body Background Gradient</p>
+                        <div class="gradient-row">
+                            <span>Top Color</span> <input type="color" id="uiBg1" value="#0f172a">
+                        </div>
+                        <div class="gradient-row">
+                            <span>Bottom Color</span> <input type="color" id="uiBg2" value="#172554">
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div class="config-box">
+                        <h4>3. Sidebar Panel</h4>
+                        <p style="font-size:12px; color:#94a3b8; margin-bottom:10px">Left Menu Gradient</p>
+                        <div class="gradient-row">
+                            <span>Top Color</span> <input type="color" id="uiSide1" value="#1e293b">
+                        </div>
+                        <div class="gradient-row">
+                            <span>Bottom Color</span> <input type="color" id="uiSide2" value="#0f172a">
+                        </div>
+                    </div>
+
+                    <!-- Cards -->
+                    <div class="config-box">
+                        <h4>4. Cards & Tables</h4>
+                        <p style="font-size:12px; color:#94a3b8; margin-bottom:10px">Content Box Gradient</p>
+                        <div class="gradient-row">
+                            <span>Top Color</span> <input type="color" id="uiCard1" value="#1e293b">
+                        </div>
+                        <div class="gradient-row">
+                            <span>Bottom Color</span> <input type="color" id="uiCard2" value="#334155">
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="margin-top:20px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+                        <div><label>Login Message</label><input id="uiLoginMsg" placeholder="Welcome..." class="config-input" style="width:100%"></div>
+                        <div><label>Font Family</label><input id="uiFont" placeholder="Inter, sans-serif" class="config-input" style="width:100%"></div>
+                    </div>
+                    <button class="btn btn-success" style="width:100%; margin-top:15px; padding:15px" onclick="saveUISettings()">💾 Apply & Save Theme</button>
                 </div>
             </div>
         </div>
@@ -768,6 +805,25 @@ function safeSet(id, val) { const el = document.getElementById(id); if(el) el.va
 function safeCheck(id, val) { const el = document.getElementById(id); if(el) el.checked = val; }
 
 function loadData() {
+    // --- UPDATED UI SETTINGS LISTENER (GRADIENT) ---
+    db.ref("settings/ui").on("value", s => { 
+        const ui = s.val() || {}; 
+        
+        // Load values into new Gradient Inputs
+        safeSet("uiPrime1", ui.prime1 || "#8b5cf6"); safeSet("uiPrime2", ui.prime2 || "#7c3aed");
+        safeSet("uiBg1", ui.bg1 || "#0f172a"); safeSet("uiBg2", ui.bg2 || "#172554");
+        safeSet("uiSide1", ui.side1 || "#1e293b"); safeSet("uiSide2", ui.side2 || "#0f172a");
+        safeSet("uiCard1", ui.card1 || "#1e293b"); safeSet("uiCard2", ui.card2 || "#334155");
+        
+        safeSet("uiFont", ui.font || ""); 
+        safeSet("uiLoginMsg", ui.loginMsg || ""); 
+
+        // Apply visual preview to Admin Panel itself
+        const root = document.documentElement.style;
+        if(ui.prime1) root.setProperty('--primary', ui.prime1);
+        if(ui.bg1) document.body.style.background = `linear-gradient(135deg, ${ui.bg1}, ${ui.bg2})`;
+    });
+
     db.ref("products").on("value", s => { products = []; s.forEach(c => { let p = c.val(); p.key = c.key; products.push(p); }); renderInventory(); updateDashboard(); });
     db.ref("entries").on("value", s => { entries = []; s.forEach(c => { let e = c.val(); e.key = c.key; entries.push(e); }); updateDashboard(); renderChart(); renderCustomers(); genReport(); renderStaffPerf(); });
     db.ref("users").on("value", s => { users = s.val() || {}; renderUsers(); });
@@ -799,26 +855,6 @@ function loadData() {
     db.ref("settings/payments").on("value", s => renderList(s.val(), "pmListContainer", "removePM"));
     db.ref("settings/css").on("value", s => safeSet("customCssArea", s.val() || ""));
     db.ref("settings/invoiceDesign").on("value", s => { const d = s.val() || {}; safeCheck("invShowSerial", d.showSerial); safeCheck("invShowDesc", d.showDesc); safeCheck("invShowRate", d.showRate); safeSet("invLogoUrl", d.logoUrl || ""); safeSet("invHeaderColor", d.headerColor || "#000000"); });
-    
-    // --- UPDATED UI SETTINGS LISTENER ---
-    db.ref("settings/ui").on("value", s => { 
-        const ui = s.val() || {}; 
-        
-        safeSet("uiPrimary", ui.primary || "#8b5cf6"); 
-        safeSet("uiBg1", ui.bg1 || "#0f172a"); 
-        safeSet("uiBg2", ui.bg2 || "#172554"); 
-        safeSet("uiCardBg", ui.cardBg || "#1e293b"); // New Input
-        safeSet("uiBorder", ui.border || "#334155"); // New Input
-        safeSet("uiFont", ui.font || ""); 
-        safeSet("uiLoginMsg", ui.loginMsg || ""); 
-
-        const root = document.documentElement.style;
-        if(ui.primary) root.setProperty('--primary', ui.primary);
-        if(ui.cardBg) root.setProperty('--bg-panel', ui.cardBg); 
-        if(ui.border) root.setProperty('--border', ui.border);   
-        if(ui.bg1 && ui.bg2) document.body.style.background = `linear-gradient(135deg, ${ui.bg1}, ${ui.bg2})`;
-        if(ui.font) document.body.style.fontFamily = ui.font;
-    });
 }
 
 function showView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active'); if(window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active"); }
@@ -943,15 +979,26 @@ function stopPopup() {
 // --- UPDATED SAVE UI SETTINGS ---
 function saveUISettings() { 
     const ui = { 
-        primary: document.getElementById("uiPrimary").value, 
-        bg1: document.getElementById("uiBg1").value, 
-        bg2: document.getElementById("uiBg2").value, 
-        cardBg: document.getElementById("uiCardBg").value, // New
-        border: document.getElementById("uiBorder").value, // New
-        font: document.getElementById("uiFont").value, 
-        loginMsg: document.getElementById("uiLoginMsg").value 
-    }; 
-    db.ref("settings/ui").set(ui).then(() => alert("🎨 UI Theme Saved Successfully!")); 
+        prime1: document.getElementById("uiPrime1").value, prime2: document.getElementById("uiPrime2").value,
+        bg1: document.getElementById("uiBg1").value, bg2: document.getElementById("uiBg2").value,
+        side1: document.getElementById("uiSide1").value, side2: document.getElementById("uiSide2").value,
+        card1: document.getElementById("uiCard1").value, card2: document.getElementById("uiCard2").value,
+        loginMsg: document.getElementById("uiLoginMsg").value, font: document.getElementById("uiFont").value
+    };
+    db.ref("settings/ui").set(ui).then(() => alert("🎨 Gradient Theme Applied!"));
+}
+
+function resetUIDefaults() {
+    if(confirm("Reset all colors to default?")) {
+        const defaults = {
+            prime1: "#8b5cf6", prime2: "#7c3aed",
+            bg1: "#0f172a", bg2: "#172554",
+            side1: "#1e293b", side2: "#0f172a",
+            card1: "#1e293b", card2: "#1e293b",
+            loginMsg: "Welcome to Sheikh Computer PRO", font: "'Hind Siliguri', sans-serif"
+        };
+        db.ref("settings/ui").set(defaults).then(() => alert("Defaults Restored!"));
+    }
 }
 
 function renderList(data, containerId, removeFunc, isObj=false) {
