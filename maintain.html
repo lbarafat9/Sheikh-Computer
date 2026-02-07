@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sheikh Admin Ultimate (v14.0 - Full God Mode)</title>
+<title>Sheikh Admin Ultimate (v14.0 - God Mode)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -13,35 +13,21 @@
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
 
 <style>
+    /* POS Mode Link */
+    .pos-mode-link {
+        position: absolute; top: 20px; right: 20px;
+        background: rgba(139, 92, 246, 0.2); color: white;
+        padding: 10px 18px; border-radius: 30px; text-decoration: none;
+        font-size: 13px; font-weight: bold; backdrop-filter: blur(10px);
+        border: 1px solid rgba(139, 92, 246, 0.3); transition: 0.3s; z-index: 10000;
+        display: flex; align-items: center; gap: 8px;
+    }
+    .pos-mode-link:hover { background: #8b5cf6; color: white; box-shadow: 0 0 20px rgba(139, 92, 246, 0.4); }
 
-/* POS Mode Link Button Style for Admin Page */
-.pos-mode-link {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(139, 92, 246, 0.2); /* এডমিন থিমের বেগুনি কালার */
-    color: white;
-    padding: 10px 18px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    transition: 0.3s;
-    z-index: 10000; /* যাতে এটি লগইন বক্সের উপরে থাকে */
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.pos-mode-link:hover {
-    background: #8b5cf6;
-    color: white;
-    box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
-}
+    /* CSS VARIABLES (DYNAMIC) */
     :root {
-        --bg-dark: #0f172a;
-        --bg-panel: #1e293b;
+        --bg-dark: #0f172a;      /* মেইন ব্যাকগ্রাউন্ড */
+        --bg-panel: #1e293b;     /* কার্ড ব্যাকগ্রাউন্ড */
         --primary: #8b5cf6;
         --primary-hover: #7c3aed;
         --danger: #ef4444;
@@ -49,7 +35,7 @@
         --warning: #f59e0b;
         --text-main: #f8fafc;
         --text-muted: #94a3b8;
-        --border: #334155;
+        --border: #334155;       /* বর্ডার কালার */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: 'Inter', sans-serif; }
@@ -142,7 +128,7 @@
     .card {
         background: var(--bg-panel); border: 1px solid var(--border);
         border-radius: 16px; padding: 25px; position: relative; overflow: hidden;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: 0.3s;
     }
     .card-header {
         display: flex; justify-content: space-between; align-items: center;
@@ -155,18 +141,22 @@
     }
     .stat-val { font-size: 32px; font-weight: 700; color: var(--text-main); }
 
-    /* CONTROLS & INPUTS */
+    /* CONTROLS & INPUTS (FIXED VISIBILITY) */
     .control-bar {
         display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;
         background: var(--bg-panel); padding: 20px; border-radius: 12px;
         border: 1px solid var(--border); align-items: center;
     }
     input, select, textarea {
-        background: var(--bg-dark); border: 1px solid var(--border);
-        color: white; padding: 12px 15px; border-radius: 8px;
+        background: var(--bg-dark) !important; 
+        border: 1px solid var(--border) !important;
+        color: white !important; 
+        padding: 12px 15px; border-radius: 8px;
         font-size: 14px; outline: none; width: 100%; transition: 0.2s;
     }
-    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary) !important; }
+    
+    ::placeholder { color: #64748b; opacity: 1; }
 
     .btn {
         padding: 12px 20px; border-radius: 8px; border: none; cursor: pointer;
@@ -187,9 +177,9 @@
     }
     table { width: 100%; border-collapse: collapse; min-width: 900px; }
     th {
-        background: #253045; color: var(--text-muted); font-size: 12px;
+        background: rgba(0,0,0,0.2); color: var(--text-muted); font-size: 12px;
         text-transform: uppercase; padding: 18px; text-align: left;
-        font-weight: 700; white-space: nowrap;
+        font-weight: 700; white-space: nowrap; border-bottom: 1px solid var(--border);
     }
     td {
         padding: 18px; border-bottom: 1px solid var(--border);
@@ -682,7 +672,38 @@
             </div>
         </div>
 
-        <!-- 20. CUSTOM CSS -->
+        <!-- 20. UI BUILDER (UPDATED) -->
+        <div id="ui_builder" class="view-section">
+            <div class="grid-4">
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-header"><span class="card-title">🎨 Theme & Experience</span></div>
+                    
+                    <div class="config-grid">
+                        <!-- Main Colors -->
+                        <div class="config-box">
+                            <h4>Main Background</h4>
+                            <div class="config-item"><label>Primary Color</label><input type="color" id="uiPrimary" value="#8b5cf6" style="width:50px; height:30px; border:none"></div>
+                            <div class="config-item"><label>BG Gradient Start</label><input type="color" id="uiBg1" value="#0f172a" style="width:50px; height:30px; border:none"></div>
+                            <div class="config-item"><label>BG Gradient End</label><input type="color" id="uiBg2" value="#172554" style="width:50px; height:30px; border:none"></div>
+                        </div>
+
+                        <!-- Card Colors (NEW ADDED) -->
+                        <div class="config-box">
+                            <h4>Cards & Panels</h4>
+                            <div class="config-item"><label>Card Background</label><input type="color" id="uiCardBg" value="#1e293b" style="width:50px; height:30px; border:none"></div>
+                            <div class="config-item"><label>Card Border</label><input type="color" id="uiBorder" value="#334155" style="width:50px; height:30px; border:none"></div>
+                        </div>
+                    </div>
+
+                    <div class="config-item" style="margin-top:20px"><label>Font Family</label><input id="uiFont" placeholder="Inter, sans-serif" class="config-input" style="width:100%"></div>
+                    <div class="config-item"><label>Login Message</label><input id="uiLoginMsg" placeholder="Welcome..." class="config-input" style="width:100%"></div>
+                    
+                    <button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="saveUISettings()">💾 Apply UI Changes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 21. CUSTOM CSS -->
         <div id="css_injector" class="view-section">
             <div class="card">
                 <div class="card-header"><span class="card-title">Custom CSS Injector</span></div>
@@ -707,7 +728,6 @@
 
         <div id="logs" class="view-section"><div class="card"><div class="card-header"><span class="card-title">System Activity Logs</span><button class="btn btn-danger" style="padding:5px 10px; font-size:12px" onclick="wipeData('logs')">🗑️ Clear All Logs</button></div><div class="table-wrapper" style="max-height: 70vh;"><table><thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead><tbody id="logTable"></tbody></table></div></div></div>
         <div id="system" class="view-section"><div class="grid-4"><div class="card" style="border-color:var(--danger)"><div class="card-header"><span class="card-title" style="color:var(--danger)">EMERGENCY LOCKDOWN</span><label class="toggle-switch"><input type="checkbox" id="lockSwitch" onchange="toggleLock()"><span class="slider" style="background-color:#334155"></span></label></div><p style="font-size:13px; color:#94a3b8">Turn ON to instantly block all POS access.</p><div class="config-item" style="margin-top:10px"><label>Maintenance Message</label><input id="sysMaintMsg" placeholder="System under maintenance..." class="config-input" style="width:100%"></div><button class="btn btn-danger" style="width:100%; margin-top:10px" onclick="saveSystemMsg()">Update Message</button></div><div class="card"><div class="card-header"><span class="card-title">Scrolling Notice</span></div><div style="display:flex; gap:10px"><input id="noticeInput" placeholder="Message for staff..."><div style="display:flex; gap:5px"><button class="btn btn-primary" onclick="updateNotice()">Send</button><button class="btn btn-danger" onclick="clearNotice()">OFF</button></div></div></div></div><div class="card"><div class="card-header"><span class="card-title">Data Management</span></div><div style="display:flex; gap:15px; flex-wrap:wrap"><button class="btn btn-success" onclick="backupData()"><i class="fa-solid fa-download"></i> Full Backup</button><button class="btn btn-danger" onclick="wipeData('entries')"><i class="fa-solid fa-trash"></i> Clear Sales</button></div></div></div>
-        <div id="ui_builder" class="view-section"><div class="grid-4"><div class="card" style="grid-column: span 2;"><div class="card-header"><span class="card-title">🎨 Theme & Experience</span></div><div class="config-item"><label>Primary Color</label><input type="color" id="uiPrimary" value="#4f46e5" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Background Start</label><input type="color" id="uiBg1" value="#0f172a" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Background End</label><input type="color" id="uiBg2" value="#172554" style="width:50px; height:30px; padding:0; border:none"></div><div class="config-item"><label>Font Family</label><input id="uiFont" placeholder="Hind Siliguri" class="config-input" style="width:150px"></div><div class="config-item"><label>Login Message</label><input id="uiLoginMsg" placeholder="Welcome..." class="config-input" style="width:200px"></div><button class="btn btn-primary" style="width:100%; margin-top:15px" onclick="saveUISettings()">Apply UI Changes</button></div></div></div>
 
     </div>
 </div>
@@ -779,7 +799,26 @@ function loadData() {
     db.ref("settings/payments").on("value", s => renderList(s.val(), "pmListContainer", "removePM"));
     db.ref("settings/css").on("value", s => safeSet("customCssArea", s.val() || ""));
     db.ref("settings/invoiceDesign").on("value", s => { const d = s.val() || {}; safeCheck("invShowSerial", d.showSerial); safeCheck("invShowDesc", d.showDesc); safeCheck("invShowRate", d.showRate); safeSet("invLogoUrl", d.logoUrl || ""); safeSet("invHeaderColor", d.headerColor || "#000000"); });
-    db.ref("settings/ui").on("value", s => { const ui = s.val() || {}; safeSet("uiPrimary", ui.primary || "#4f46e5"); safeSet("uiBg1", ui.bg1 || "#0f172a"); safeSet("uiBg2", ui.bg2 || "#172554"); safeSet("uiFont", ui.font || ""); safeSet("uiLoginMsg", ui.loginMsg || ""); });
+    
+    // --- UPDATED UI SETTINGS LISTENER ---
+    db.ref("settings/ui").on("value", s => { 
+        const ui = s.val() || {}; 
+        
+        safeSet("uiPrimary", ui.primary || "#8b5cf6"); 
+        safeSet("uiBg1", ui.bg1 || "#0f172a"); 
+        safeSet("uiBg2", ui.bg2 || "#172554"); 
+        safeSet("uiCardBg", ui.cardBg || "#1e293b"); // New Input
+        safeSet("uiBorder", ui.border || "#334155"); // New Input
+        safeSet("uiFont", ui.font || ""); 
+        safeSet("uiLoginMsg", ui.loginMsg || ""); 
+
+        const root = document.documentElement.style;
+        if(ui.primary) root.setProperty('--primary', ui.primary);
+        if(ui.cardBg) root.setProperty('--bg-panel', ui.cardBg); 
+        if(ui.border) root.setProperty('--border', ui.border);   
+        if(ui.bg1 && ui.bg2) document.body.style.background = `linear-gradient(135deg, ${ui.bg1}, ${ui.bg2})`;
+        if(ui.font) document.body.style.fontFamily = ui.font;
+    });
 }
 
 function showView(id) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); document.getElementById(id).classList.add('active'); event.currentTarget.classList.add('active'); if(window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active"); }
@@ -901,6 +940,20 @@ function stopPopup() {
     alert("📢 Admin Alert is now OFF!");
 }
 
+// --- UPDATED SAVE UI SETTINGS ---
+function saveUISettings() { 
+    const ui = { 
+        primary: document.getElementById("uiPrimary").value, 
+        bg1: document.getElementById("uiBg1").value, 
+        bg2: document.getElementById("uiBg2").value, 
+        cardBg: document.getElementById("uiCardBg").value, // New
+        border: document.getElementById("uiBorder").value, // New
+        font: document.getElementById("uiFont").value, 
+        loginMsg: document.getElementById("uiLoginMsg").value 
+    }; 
+    db.ref("settings/ui").set(ui).then(() => alert("🎨 UI Theme Saved Successfully!")); 
+}
+
 function renderList(data, containerId, removeFunc, isObj=false) {
     const c = document.getElementById(containerId); c.innerHTML = "";
     if(!data) return;
@@ -933,7 +986,6 @@ function toggleBan(username, status) { if(confirm(`Are you sure you want to ${st
 function kickUser(u) { if(confirm("Kick out " + u + " from POS immediately?")) { db.ref("users/"+u).update({forceLogout:true}); alert("User kicked out!"); } }
 
 // --- EXISTING FUNCTIONS ---
-function saveUISettings() { const ui = { primary: document.getElementById("uiPrimary").value, bg1: document.getElementById("uiBg1").value, bg2: document.getElementById("uiBg2").value, font: document.getElementById("uiFont").value, loginMsg: document.getElementById("uiLoginMsg").value }; db.ref("settings/ui").set(ui).then(() => alert("🎨 Applied!")); }
 function saveSystemMsg() { db.ref("settings/maintMsg").set(document.getElementById("sysMaintMsg").value).then(() => alert("Updated")); }
 function renderInventory() { const q = document.getElementById("invSearch").value.toLowerCase(); const t = document.getElementById("invTable"); t.innerHTML = ""; products.filter(p => p.name.toLowerCase().includes(q)).forEach(p => { t.innerHTML += `<tr><td>${p.name}</td><td>${p.category}</td><td>${p.qty}</td><td>${p.costPrice}</td><td>${p.sellPrice}</td><td>${p.qty<=5?'Low':'OK'}</td><td><button class="btn btn-primary" style="padding:5px" onclick="editProduct('${p.key}')">Edit</button></td></tr>`; }); }
 function openProductModal() { document.getElementById("prodModal").style.display = "flex"; }
