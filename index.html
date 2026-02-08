@@ -256,6 +256,19 @@ input, select, button, textarea {
     background: #0f172a; /* খুব কালো ব্যাকগ্রাউন্ড */
     color: #fff; /* সাদা লেখা */
 }
+/* Fix for DUE Input Visibility */
+#due {
+    background-color: #450a0a !important; /* গাঢ় লাল ব্যাকগ্রাউন্ড */
+    color: #fca5a5 !important;           /* হালকা লাল/গোলাপি লেখা */
+    border-color: #ef4444 !important;
+    font-weight: bold;
+}
+/* Fix for Change/Return Input (Green) */
+#due.return-mode {
+    background-color: #064e3b !important;
+    color: #6ee7b7 !important;
+    border-color: #10b981 !important;
+}
 input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.3); }
 input::placeholder { color: #64748b; }
 
@@ -354,8 +367,9 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
 .p-item { padding: 14px 20px; border-bottom: 1px solid #374151; cursor: pointer; color: #e2e8f0; transition: 0.2s; font-weight: 500; }
 .p-item:hover { background: #374151; color: var(--primary); padding-left: 25px; }
 
-/* --- CHAT SYSTEM (DARK) --- */
+/* --- CHAT SYSTEM (UPDATED MESSENGER STYLE) --- */
 #chatBtn { position: fixed; bottom: 90px; right: 30px; width: 50px; height: 50px; background: var(--primary); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; z-index: 1290; }
+
 #chatBox {
     position: fixed; bottom: 150px; right: 30px; width: 340px; height: 500px;
     background: #1e293b; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
@@ -365,17 +379,49 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
 .chat-body { flex: 1; overflow-y: auto; padding: 15px; background: #0f172a; display: flex; flex-direction: column; gap: 8px; }
 .chat-footer { padding: 10px; background: #1e293b; border-top: 1px solid #334155; display: flex; flex-direction: column; gap: 5px; }
 
-/* Message Bubble */
-.msg { max-width: 75%; padding: 8px 12px; border-radius: 18px; font-size: 13px; line-height: 1.4; position: relative; word-wrap: break-word; }
-.msg.me { background: var(--primary); color: #fff; border-bottom-right-radius: 4px; padding-right: 25px; }
-.msg.other { background: #334155; color: #fff; border-bottom-left-radius: 4px; border: 1px solid #475569; padding-right: 25px; }
-.msg-meta { font-size: 9px; opacity: 0.7; display: block; margin-top: 4px; text-align: right; color: #cbd5e1; }
-.sender-name { font-size: 10px; color: #94a3b8; margin-bottom: 2px; display: block; font-weight: bold; }
+/* Message Row Container */
+.msg-row { display: flex; width: 100%; margin-bottom: 5px; align-items: center; position: relative; }
+.msg-row.me { justify-content: flex-end; }
+.msg-row.other { justify-content: flex-start; }
 
-/* Chat Menu */
-.msg-menu-modern { background: rgba(30, 30, 30, 0.95); border: 1px solid rgba(255,255,255,0.1); }
-.msg-menu-item { color: #fff; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.msg-menu-item:hover { background: rgba(255,255,255,0.1); }
+/* Message Bubble */
+.msg { max-width: 70%; padding: 10px 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
+
+/* Own Message Style (Right) */
+.msg-row.me .msg { 
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
+    color: #fff; 
+    border-radius: 18px 18px 4px 18px; 
+}
+
+/* Other Message Style (Left) */
+.msg-row.other .msg { 
+    background: #334155; 
+    color: #fff; 
+    border-radius: 18px 18px 18px 4px; 
+    border: 1px solid #475569; 
+}
+
+.msg-meta { font-size: 10px; opacity: 0.7; display: block; margin-top: 4px; text-align: right; color: #e2e8f0; }
+.sender-name { font-size: 10px; color: #94a3b8; margin-bottom: 3px; display: block; font-weight: bold; }
+
+/* Three Dot Button */
+.msg-opt-btn { cursor: pointer; font-size: 16px; color: #64748b; padding: 5px; opacity: 0; transition: 0.2s; }
+.msg-row:hover .msg-opt-btn { opacity: 1; }
+
+/* Popup Menu */
+.msg-menu-modern { 
+    display: none; position: absolute; bottom: 30px; 
+    background: #1e293b; border: 1px solid #475569; 
+    border-radius: 8px; width: 100px; z-index: 1500; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; 
+}
+.msg-row.me .msg-menu-modern { right: 40px; }
+.msg-row.other .msg-menu-modern { left: 40px; }
+
+.msg-menu-item { padding: 8px 12px; font-size: 12px; color: #fff; cursor: pointer; border-bottom: 1px solid #334155; }
+.msg-menu-item:hover { background: #334155; }
+.msg-menu-item.del { color: #ff6b6b; }
 
 /* --- OTHER BADGES --- */
 .row-zero { background-color: #450a0a !important; color: #fca5a5 !important; font-weight: bold; }
@@ -807,7 +853,7 @@ select option {
     <div id="customerManager" class="section">
         <div class="card-glass">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #f1f5f9; padding-bottom:15px; margin-bottom:25px;">
-                <h3 style="margin:0; color:var(--text-main)">👥 কাস্টমার ম্যানেজমেন্ট</h3>
+                <h3 style="margin:0; 👥 কাস্টমার ম্যানেজমেন্ট</h3>
                 <div style="display:flex; gap:10px">
                     <button onclick="downloadExcel('customer')" style="width:auto; background:#10b981; padding:10px 20px;">📊 Excel</button>
                     <button onclick="openDueCollectionModal()" style="width:auto; background:#f59e0b; padding:10px 20px;">💰 বাকি জমা নিন</button>
@@ -1608,7 +1654,8 @@ select option {
         <h3 style="margin:0; color:#3b82f6;">📜 কাস্টমার হিস্ট্রি</h3>
         <button onclick="closeModal('customerHistoryModal')" style="background:none; color:#ef4444; font-size:28px; padding:0; width:auto; box-shadow:none;">×</button>
     </div>
-    <div style="background:#f0fdf4; padding:15px; border-radius:10px; margin-bottom:20px; font-weight:bold; color:var(--text-main)">
+ 
+<div style="background:#f0fdf4; padding:15px; border-radius:10px margin-bottom:20px; font-weight:bold; color:#1e293b">
         কাস্টমার: <span id="histName"></span> | মোবাইল: <span id="histPhone" class="en"></span>
     </div>
     <div class="table-box" style="max-height:450px; overflow-y:auto">
@@ -2484,24 +2531,42 @@ function setupChat() {
                     if(msgDate === today) displayDate = "Today";
                     else if(msgDate === yesterday) displayDate = "Yesterday";
 
-                    div.innerHTML += `<div class="chat-date">${displayDate}</div>`;
+                    div.innerHTML += `<div class="chat-date" style="text-align:center; font-size:10px; color:#64748b; margin:10px 0;">${displayDate}</div>`;
                     lastDate = msgDate;
                 }
 
+                // --- নতুন স্ট্রাকচার (Messenger Style) ---
                 div.innerHTML += `
                 <div class="msg-row ${isMe ? 'me' : 'other'}" onmouseleave="hideMsgMenu('${key}')">
-                    ${canEdit ? `
-                        <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')">⋮</div>
-                        <div id="menu_${key}" class="msg-menu-modern">
-                            <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
-                            <div class="msg-menu-item del" onclick="deleteMsg('${key}')">🗑️ Delete</div>
+                    
+                    <!-- যদি নিজের মেসেজ হয়, থ্রি ডট বামে থাকবে -->
+                    ${isMe && canEdit ? `
+                        <div style="position:relative">
+                            <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')">⋮</div>
+                            <div id="menu_${key}" class="msg-menu-modern">
+                                <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
+                                <div class="msg-menu-item del" onclick="deleteMsg('${key}')">🗑️ Delete</div>
+                            </div>
                         </div>
                     ` : ''}
-                    <div class="msg ${isMe ? 'me' : 'other'}">
+
+                    <div class="msg">
                         ${!isMe ? `<span class="sender-name">${m.sender.toUpperCase()}</span>` : ''}
                         ${m.text}
                         <span class="msg-meta">${m.time} ${m.edited ? '(edited)' : ''}</span>
                     </div>
+
+                    <!-- যদি অন্যের মেসেজ হয়, থ্রি ডট ডানে থাকবে (শুধু এডমিন দেখতে পারবে) -->
+                    ${!isMe && canEdit ? `
+                        <div style="position:relative">
+                            <div class="msg-opt-btn" onclick="toggleMsgMenu('${key}')">⋮</div>
+                            <div id="menu_${key}" class="msg-menu-modern">
+                                <div class="msg-menu-item" onclick="editMsg('${key}', '${m.text}')">✏️ Edit</div>
+                                <div class="msg-menu-item del" onclick="deleteMsg('${key}')">🗑️ Delete</div>
+                            </div>
+                        </div>
+                    ` : ''}
+                    
                 </div>`;
 
                 if(!isMe) {
@@ -2516,7 +2581,7 @@ function setupChat() {
         if(isChatInit && unread) {
             const audio = document.getElementById("chatSound");
             if(audio) audio.play().catch(e => console.log("Audio play failed", e));
-
+            
             const box = document.getElementById("chatBox");
             if(box.style.display === "none" || box.style.display === "") {
                 box.style.display = "flex";
@@ -4433,7 +4498,7 @@ function renderTable(data, tableId){
 
     data.forEach(e => {
         const itemSummary = (e.items && Array.isArray(e.items))
-            ? e.items.map(i => `<span style="background:#f1f1f1;padding:2px 5px;border-radius:4px;font-size:12px">${i.work}</span>`).join(" ")
+            ? e.items.map(i => `<span style="background:#f1f1f1 color:#333; padding:2px 5px; border-radius:4px; font-size:12px; font-weight:600;">${i.work}</span>`).join(" ")
             : e.work;
         const memoNo = e.memoId ? e.memoId : e.key.slice(-4).toUpperCase();
         const btnView = `<button class="btn-action btn-view" onclick="viewMemo('${e.key}')" title="বিস্তারিত দেখুন">👁️</button>`;
