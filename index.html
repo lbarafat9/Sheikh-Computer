@@ -341,54 +341,75 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
 }
 
 /* --- PRINT SETTINGS (FIXED FOR FULL PAGE) --- */
+/* --- PRINT SETTINGS (FINAL FULL PAGE FIX) --- */
 @media print {
+    /* ১. কাগজের মার্জিন সেটআপ */
     @page {
         size: auto;
         margin: 5mm;
     }
+
+    /* ২. পুরো স্ক্রিন রিসেট */
     html, body {
-        width: 100%;
-        height: auto;
+        width: 100% !important;
+        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
-        overflow: visible !important;
         background: #fff !important;
-        color: #000 !important;
+        overflow: visible !important;
     }
+
+    /* ৩. অপ্রয়োজনীয় সব কিছু লুকানো */
     body * {
-        visibility: hidden;
+        visibility: hidden !important;
     }
+
+    /* ৪. মেমো মোডালকে প্রিন্টের জন্য তৈরি করা */
     #memoModal, #memoModal * {
         visibility: visible !important;
-        color: #000 !important;
     }
+
     #memoModal {
         display: block !important;
         position: absolute !important;
         left: 0 !important;
         top: 0 !important;
         width: 100% !important;
-        height: auto !important;
-        background: #fff !important;
+        margin: 0 !important;
+        padding: 10px !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 20px !important;
+        background: #fff !important;
+        /* নিচের লাইনটি সবচেয়ে গুরুত্বপূর্ণ (কোণায় যাওয়া বন্ধ করবে) */
+        transform: none !important;
     }
+
+    /* ৫. টেবিল এবং লেখা স্পষ্ট করা */
     table {
         width: 100% !important;
+        border-collapse: collapse !important;
+        margin-top: 10px !important;
     }
-    table, th, td {
+
+    th, td {
         border: 1px solid #000 !important;
+        padding: 6px !important;
         color: #000 !important;
         background: transparent !important;
+        font-size: 14px !important;
     }
-    .noPrint {
+
+    /* ৬. সিগনেচার এরিয়া */
+    .signature-area {
+        margin-top: 40px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+
+    /* ৭. প্রিন্টে যা আসবে না */
+    .noPrint, #menuBtn, #sidebar, header, #chatBtn, #profileBtn {
         display: none !important;
     }
-    .signature-area {
-        margin-top: 50px !important;
-    }
-}
 }
 
 /* --- FLOATING PROFILE BUTTON --- */
