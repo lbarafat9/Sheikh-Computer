@@ -26,17 +26,17 @@
     /* ব্যাকগ্রাউন্ড আগের মতই থাকছে */
     --bg-gradient: linear-gradient(135deg, #0f172a 0%, #172554 100%);
     --sidebar-bg: rgba(15, 23, 42, 0.98);
-    
+
     /* টেক্সট কালার পরিবর্তন (সাদা) */
     --text-main: #f8fafc;  /* প্রধান লেখা সাদা */
     --text-light: #94a3b8; /* ছোট লেখা হালকা ধূসর */
-    
+
     --success: #10b981;
     --danger: #ef4444;
     --warning: #f59e0b;
-    
+
     /* গ্লাস ইফেক্ট এখন কালো (কার্ডের জন্য) */
-    --glass-bg: #1e293b; 
+    --glass-bg: #1e293b;
     --card-border: 1px solid rgba(255, 255, 255, 0.1);
     --font-main: 'Hind Siliguri', sans-serif;
 }
@@ -73,7 +73,7 @@ body {
 /* --- TOAST --- */
 #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
 .toast {
-    min-width: 300px; margin-bottom: 12px; 
+    min-width: 300px; margin-bottom: 12px;
     background: #1e293b; /* কালো */
     color: #fff; /* সাদা */
     padding: 16px 20px;
@@ -286,10 +286,10 @@ button:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.
 .table-box { overflow-x: auto; background: #1e293b; border: 1px solid #334155; }
 table { width: 100%; border-collapse: collapse; }
 th, td { padding: 18px 25px; border-bottom: 1px solid #334155; text-align: left; vertical-align: middle; }
-th { 
+th {
     background: #0f172a; /* হেডারের জন্য গাঢ় কালো */
-    color: #94a3b8; 
-    font-weight: 700; font-size: 13px; text-transform: uppercase; white-space: nowrap; 
+    color: #94a3b8;
+    font-weight: 700; font-size: 13px; text-transform: uppercase; white-space: nowrap;
 }
 td { font-size: 15px; color: #e2e8f0; }
 tr:last-child td { border-bottom: none; }
@@ -340,15 +340,55 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
     .card b { font-size: 24px; }
 }
 
-/* --- PRINT SETTINGS (Keep White for Paper) --- */
+/* --- PRINT SETTINGS (FIXED FOR FULL PAGE) --- */
 @media print {
-    @page { size: auto; margin: 0mm; }
-    html, body { width: 100%; height: 100%; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #fff !important; color: #000 !important; }
-    body * { visibility: hidden; }
-    #memoModal, #memoModal * { visibility: visible !important; color: #000 !important; }
-    #memoModal { display: block !important; position: fixed !important; left: 0 !important; top: 0 !important; width: 100% !important; background: #fff !important; border: none !important; box-shadow: none !important; }
-    table, th, td { border-color: #000 !important; color: #000 !important; background: transparent !important; }
-    .noPrint { display: none !important; }
+    @page {
+        size: auto;
+        margin: 5mm;
+    }
+    html, body {
+        width: 100%;
+        height: auto;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+    body * {
+        visibility: hidden;
+    }
+    #memoModal, #memoModal * {
+        visibility: visible !important;
+        color: #000 !important;
+    }
+    #memoModal {
+        display: block !important;
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #fff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 20px !important;
+    }
+    table {
+        width: 100% !important;
+    }
+    table, th, td {
+        border: 1px solid #000 !important;
+        color: #000 !important;
+        background: transparent !important;
+    }
+    .noPrint {
+        display: none !important;
+    }
+    .signature-area {
+        margin-top: 50px !important;
+    }
+}
 }
 
 /* --- FLOATING PROFILE BUTTON --- */
@@ -388,18 +428,18 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
 .msg { max-width: 70%; padding: 10px 14px; font-size: 13px; line-height: 1.4; word-wrap: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.1); position: relative; }
 
 /* Own Message Style (Right) */
-.msg-row.me .msg { 
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-    color: #fff; 
-    border-radius: 18px 18px 4px 18px; 
+.msg-row.me .msg {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: #fff;
+    border-radius: 18px 18px 4px 18px;
 }
 
 /* Other Message Style (Left) */
-.msg-row.other .msg { 
-    background: #334155; 
-    color: #fff; 
-    border-radius: 18px 18px 18px 4px; 
-    border: 1px solid #475569; 
+.msg-row.other .msg {
+    background: #334155;
+    color: #fff;
+    border-radius: 18px 18px 18px 4px;
+    border: 1px solid #475569;
 }
 
 .msg-meta { font-size: 10px; opacity: 0.7; display: block; margin-top: 4px; text-align: right; color: #e2e8f0; }
@@ -410,11 +450,11 @@ tr:hover { background-color: #334155; } /* হোভার করলে কা�
 .msg-row:hover .msg-opt-btn { opacity: 1; }
 
 /* Popup Menu */
-.msg-menu-modern { 
-    display: none; position: absolute; bottom: 30px; 
-    background: #1e293b; border: 1px solid #475569; 
-    border-radius: 8px; width: 100px; z-index: 1500; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden; 
+.msg-menu-modern {
+    display: none; position: absolute; bottom: 30px;
+    background: #1e293b; border: 1px solid #475569;
+    border-radius: 8px; width: 100px; z-index: 1500;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5); overflow: hidden;
 }
 .msg-row.me .msg-menu-modern { right: 40px; }
 .msg-row.other .msg-menu-modern { left: 40px; }
@@ -465,16 +505,16 @@ select option {
 
 /* ৩. সেটিংসের ট্যাগগুলো (Shop Rent, Electricity...) */
 /* এগুলোর ব্যাকগ্রাউন্ড আগে হলুদ/সাদা ছিল, এখন ডার্ক হবে */
-#sectionList span, 
-#expCatList span, 
+#sectionList span,
+#expCatList span,
 #qbSettingsList span {
     background-color: #1e293b !important; /* ট্যাগ ব্যাকগ্রাউন্ড */
     color: #e2e8f0 !important;           /* ট্যাগ লেখা */
     border: 1px solid #475569 !important;
 }
 /* ট্যাগের ভেতরের 'x' বাটন */
-#sectionList span b, 
-#expCatList span b, 
+#sectionList span b,
+#expCatList span b,
 #qbSettingsList span b {
     color: #f87171 !important; /* লাল রঙের ক্রস */
 }
@@ -1654,7 +1694,7 @@ select option {
         <h3 style="margin:0; color:#3b82f6;">📜 কাস্টমার হিস্ট্রি</h3>
         <button onclick="closeModal('customerHistoryModal')" style="background:none; color:#ef4444; font-size:28px; padding:0; width:auto; box-shadow:none;">×</button>
     </div>
- 
+
 <div style="background:#f0fdf4; padding:15px; border-radius:10px margin-bottom:20px; font-weight:bold; color:#1e293b">
         কাস্টমার: <span id="histName"></span> | মোবাইল: <span id="histPhone" class="en"></span>
     </div>
@@ -1946,11 +1986,11 @@ function loadGodModeListeners() {
         const ui = snap.val();
         if(ui) {
             const root = document.documentElement.style;
-            
+
             // Text & Font settings
             if(ui.prime1) root.setProperty('--primary', ui.prime1);
             if(ui.font) root.setProperty('--font-main', ui.font);
-            
+
             // Update Login Message
             if(ui.loginMsg) {
                 const sub = document.querySelector('.login-subtitle');
@@ -2538,7 +2578,7 @@ function setupChat() {
                 // --- নতুন স্ট্রাকচার (Messenger Style) ---
                 div.innerHTML += `
                 <div class="msg-row ${isMe ? 'me' : 'other'}" onmouseleave="hideMsgMenu('${key}')">
-                    
+
                     <!-- যদি নিজের মেসেজ হয়, থ্রি ডট বামে থাকবে -->
                     ${isMe && canEdit ? `
                         <div style="position:relative">
@@ -2566,7 +2606,7 @@ function setupChat() {
                             </div>
                         </div>
                     ` : ''}
-                    
+
                 </div>`;
 
                 if(!isMe) {
@@ -2581,7 +2621,7 @@ function setupChat() {
         if(isChatInit && unread) {
             const audio = document.getElementById("chatSound");
             if(audio) audio.play().catch(e => console.log("Audio play failed", e));
-            
+
             const box = document.getElementById("chatBox");
             if(box.style.display === "none" || box.style.display === "") {
                 box.style.display = "flex";
@@ -2919,17 +2959,17 @@ function factoryReset() {
 // --- NEW RESTORE FUNCTION ADDED HERE ---
 function restoreBackup() {
     if(currentUser !== 'admin') return showToast("শুধুমাত্র অ্যাডমিন এটি করতে পারবে!", "error");
-    
+
     const input = document.getElementById('backupFileInput');
     const file = input.files[0];
-    
+
     if(!file) return showToast("আগে একটি ব্যাকআপ ফাইল সিলেক্ট করুন!", "error");
 
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const data = JSON.parse(e.target.result);
-            
+
             // Simple validation check
             if(!data.products && !data.entries && !data.customers) {
                 return showToast("ভুল ফাইল! এটি সঠিক ব্যাকআপ ফাইল নয়।", "error");
@@ -5731,14 +5771,14 @@ window.onbeforeunload = function() {
 // --- PASSWORD RESET FUNCTION ---
 function resetPassword() {
     const email = document.getElementById("uEmail").value.trim();
-    
+
     if (!email) {
         return showToast("⚠️ দয়া করে প্রথমে 'ইমেইল' বক্সে আপনার ইমেইলটি লিখুন, তারপর এই লিংকে ক্লিক করুন।", "warning");
     }
 
     if(confirm(`আপনি কি ${email} এ পাসওয়ার্ড রিসেট লিংক পাঠাতে চান?`)) {
         showToast("অপেক্ষা করুন...", "warning");
-        
+
         auth.sendPasswordResetEmail(email)
             .then(() => {
                 alert("✅ আপনার ইমেইলে একটি রিসেট লিংক পাঠানো হয়েছে।\n\nইমেইল চেক করুন এবং লিংকে ক্লিক করে নতুন পাসওয়ার্ড সেট করুন।");
